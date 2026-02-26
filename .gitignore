@@ -1,0 +1,16 @@
+/node_modules
+/vendor
+/.ddev
+/.idea
+/.env
+.env.backup
+.DS_Store
+/public/hot
+/public/storage
+/storage/*.key
+/storage/app
+/storage/framework
+/storage/logs
+/bootstrap/cache
+*.zip
+Thumbs.db

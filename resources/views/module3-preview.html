@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lavarell – Module 3 Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --sb:#08080f;--mb:#0c0c14;--cb:#111119;--bo:rgba(139,92,246,.15);
+  --ac:#7c3aed;--al:#a78bfa;--ag:rgba(124,58,237,.15);
+  --t1:#f0eeff;--t2:#9d9bbf;--t3:#4e4c6a;
+  --ok:#10b981;--wa:#f59e0b;--da:#f43f5e
+}
+body{font-family:'Inter',sans-serif;background:var(--mb);color:var(--t1);font-size:14px;-webkit-font-smoothing:antialiased;padding:0;}
+
+/* Tabs */
+.tab-bar{display:flex;gap:0;background:var(--sb);border-bottom:1px solid rgba(139,92,246,.1);padding:0 24px;}
+.tab{padding:14px 20px;font-size:13px;font-weight:500;cursor:pointer;color:var(--t3);border-bottom:2px solid transparent;transition:all .15s;}
+.tab:hover{color:var(--t2);}
+.tab.active{color:var(--al);border-bottom-color:var(--ac);}
+
+/* Main frame */
+.page{display:none;padding:28px;max-width:1100px;animation:fadeIn .2s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* === Shared === */
+.page-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;gap:16px;}
+.page-title{font-size:22px;font-weight:600;letter-spacing:-.03em;}
+.page-subtitle{font-size:13px;color:var(--t3);margin-top:3px;}
+
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:none;text-decoration:none;transition:all .15s;white-space:nowrap;}
+.btn-primary{background:var(--ac);color:white;box-shadow:0 0 20px var(--ag);}
+.btn-primary:hover{background:#6d28d9;transform:translateY(-1px);}
+.btn-secondary{background:rgba(255,255,255,.06);color:var(--t2);border:1px solid rgba(255,255,255,.1);}
+.btn-sm{padding:5px 12px;font-size:12px;}
+
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:500;}
+.bv{background:rgba(124,58,237,.15);color:var(--al);border:1px solid rgba(124,58,237,.3);}
+.bg{background:rgba(16,185,129,.12);color:#34d399;border:1px solid rgba(16,185,129,.3);}
+.ba{background:rgba(245,158,11,.12);color:#fbbf24;border:1px solid rgba(245,158,11,.3);}
+.br{background:rgba(244,63,94,.12);color:#fb7185;border:1px solid rgba(244,63,94,.3);}
+.bx{background:rgba(255,255,255,.06);color:var(--t2);border:1px solid rgba(255,255,255,.1);}
+
+/* === CREDENTIALS PAGE === */
+.encrypt-box{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:rgba(124,58,237,.06);border:1px solid rgba(124,58,237,.2);border-radius:10px;margin-bottom:22px;font-size:12px;color:var(--t2);line-height:1.6;}
+
+.provider-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;}
+.pcard{background:var(--cb);border:1px solid var(--bo);border-radius:12px;overflow:hidden;transition:border-color .2s,transform .2s;}
+.pcard:hover{border-color:rgba(124,58,237,.35);transform:translateY(-2px);}
+
+.pcard-header{padding:14px 16px;display:flex;align-items:center;gap:12px;border-bottom:1px solid rgba(255,255,255,.05);}
+.picon{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;}
+.ic1{background:rgba(14,165,233,.12)}
+.ic2{background:rgba(16,185,129,.12)}
+.ic3{background:rgba(245,158,11,.12)}
+.ic4{background:rgba(234,88,12,.12)}
+
+.pname{font-size:14px;font-weight:600;}
+.pdesc{font-size:11px;color:var(--t3);margin-top:1px;}
+
+.cred-list{padding:0;}
+.cred-item{display:flex;align-items:center;padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.03);gap:10px;}
+.cred-item:last-child{border-bottom:none;}
+.status-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.sok{background:var(--ok);box-shadow:0 0 6px var(--ok);}
+.sfail{background:var(--da);}
+.sun{background:var(--t3);}
+.cred-label{flex:1;font-size:13px;font-weight:500;}
+.cred-sub{font-size:11px;color:var(--t3);font-weight:400;}
+.test-btn{padding:3px 10px;border-radius:6px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:var(--t2);font-size:11px;cursor:pointer;transition:all .15s;}
+.test-btn:hover{background:rgba(255,255,255,.08);color:var(--t1);}
+.del-btn{padding:3px 10px;border-radius:6px;background:rgba(244,63,94,.08);border:1px solid rgba(244,63,94,.2);color:#fb7185;font-size:11px;cursor:pointer;}
+
+.add-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;margin:10px 16px;border-radius:8px;background:rgba(124,58,237,.08);border:1px dashed rgba(124,58,237,.3);color:var(--al);font-size:12px;font-weight:500;text-decoration:none;transition:all .15s;cursor:pointer;}
+.add-btn:hover{background:rgba(124,58,237,.15);border-style:solid;}
+
+/* === CREDENTIALS CREATE === */
+.create-grid{display:grid;grid-template-columns:260px 1fr;gap:22px;align-items:start;}
+
+.selector-title{font-size:10px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;}
+.prov-opt{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);cursor:pointer;transition:all .15s;margin-bottom:5px;}
+.prov-opt:hover{border-color:rgba(124,58,237,.3);background:rgba(124,58,237,.05);}
+.prov-opt.sel{border-color:rgba(124,58,237,.5);background:rgba(124,58,237,.12);}
+.popt-icon{width:32px;height:32px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.popt-name{font-size:13px;font-weight:500;}
+.popt-desc{font-size:10px;color:var(--t3);}
+.checkmark{width:16px;height:16px;border-radius:50%;background:var(--ac);display:flex;align-items:center;justify-content:center;font-size:10px;margin-left:auto;opacity:0;transition:opacity .15s;}
+.prov-opt.sel .checkmark{opacity:1;}
+
+.form-card{background:var(--cb);border:1px solid var(--bo);border-radius:12px;padding:22px;}
+.fsec-title{font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.05);}
+.fgroup{margin-bottom:16px;}
+.flabel{display:block;font-size:12px;font-weight:500;color:var(--t2);margin-bottom:5px;}
+.finput{width:100%;padding:9px 12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:var(--t1);font-size:13px;font-family:inherit;outline:none;transition:all .2s;}
+.finput:focus{border-color:var(--ac);box-shadow:0 0 0 3px var(--ag);background:rgba(124,58,237,.05);}
+.finput::placeholder{color:var(--t3);}
+.fhint{font-size:11px;color:var(--t3);margin-top:4px;}
+.info-box{background:rgba(16,185,129,.06);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--t2);margin-top:4px;}
+
+/* === SUBSCRIPTION === */
+.plan-banner{display:flex;align-items:center;gap:16px;padding:18px 22px;background:linear-gradient(135deg,rgba(124,58,237,.12),rgba(147,51,234,.06));border:1px solid rgba(124,58,237,.3);border-radius:12px;margin-bottom:28px;position:relative;overflow:hidden;}
+.plan-banner::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(167,139,250,.6),transparent);}
+.plan-badge{width:50px;height:50px;background:linear-gradient(135deg,var(--ac),#9333ea);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 0 24px var(--ag);flex-shrink:0;}
+.plan-name{font-size:18px;font-weight:700;letter-spacing:-.02em;}
+.plan-meta{font-size:12px;color:var(--t2);margin-top:4px;display:flex;gap:12px;}
+
+.billing-toggle{display:inline-flex;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:99px;padding:3px;gap:2px;margin-bottom:20px;}
+.tbtn{padding:5px 16px;border-radius:99px;font-size:12px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--t2);transition:all .2s;}
+.tbtn.active{background:var(--ac);color:white;box-shadow:0 0 12px var(--ag);}
+
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:32px;}
+.prc-card{background:var(--cb);border:1px solid var(--bo);border-radius:16px;padding:22px;display:flex;flex-direction:column;position:relative;transition:border-color .2s,transform .2s;}
+.prc-card:hover{transform:translateY(-3px);}
+.prc-card.pop{border-color:rgba(124,58,237,.5);background:linear-gradient(180deg,rgba(124,58,237,.08),var(--cb) 60%);}
+.pop-tag{position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--ac),#9333ea);color:white;font-size:10px;font-weight:600;padding:3px 14px;border-radius:0 0 8px 8px;letter-spacing:.04em;}
+.prc-icon{font-size:26px;margin-bottom:10px;}
+.prc-title{font-size:17px;font-weight:700;letter-spacing:-.02em;}
+.prc-desc{font-size:11px;color:var(--t3);margin-top:2px;}
+.prc-price{margin:16px 0;display:flex;align-items:flex-end;gap:3px;}
+.price-num{font-size:36px;font-weight:800;letter-spacing:-.04em;line-height:1;}
+.price-cur{font-size:18px;font-weight:600;margin-bottom:4px;}
+.price-per{font-size:11px;color:var(--t3);margin-bottom:4px;}
+.feat-list{list-style:none;margin-bottom:18px;flex:1;}
+.feat-list li{display:flex;align-items:center;gap:7px;padding:5px 0;font-size:12px;color:var(--t2);border-bottom:1px solid rgba(255,255,255,.03);}
+.feat-list li:last-child{border-bottom:none;}
+.fchk{color:var(--ok);font-size:13px;flex-shrink:0;}
+.prc-cta{width:100%;padding:10px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .2s;}
+.cta-p{background:var(--ac);color:white;box-shadow:0 0 20px var(--ag);}
+.cta-p:hover{background:#6d28d9;}
+.cta-s{background:rgba(255,255,255,.05);color:var(--t2);border:1px solid rgba(255,255,255,.1);}
+.cta-s:hover{background:rgba(255,255,255,.08);}
+.cta-c{background:rgba(16,185,129,.1);color:#34d399;border:1px solid rgba(16,185,129,.3);cursor:default;}
+
+.inv-table{width:100%;border-collapse:collapse;}
+.inv-table th{padding:9px 14px;text-align:left;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--t3);background:rgba(255,255,255,.02);border-bottom:1px solid rgba(255,255,255,.05);}
+.inv-table td{padding:11px 14px;font-size:13px;color:var(--t2);border-bottom:1px solid rgba(255,255,255,.03);}
+.inv-table tr:last-child td{border-bottom:none;}
+
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:rgba(124,58,237,.3);border-radius:99px}
+</style>
+</head>
+<body>
+
+<!-- Tab Navigation -->
+<div class="tab-bar">
+  <div class="tab active" onclick="showTab('credentials')">🔑 API Credentials</div>
+  <div class="tab" onclick="showTab('create')">+ Credentials hinzufügen</div>
+  <div class="tab" onclick="showTab('subscription')">💳 Abonnement</div>
+</div>
+
+<!-- ══════════ TAB 1: CREDENTIALS ══════════ -->
+<div class="page active" id="tab-credentials">
+
+  <div class="page-header">
+    <div>
+      <div class="page-title">🔑 API Credentials</div>
+      <div class="page-subtitle">Verwalte deine API-Keys für alle verbundenen Dienste</div>
+    </div>
+    <button class="btn btn-primary" onclick="showTab('create')">+ Neue Credentials</button>
+  </div>
+
+  <div class="encrypt-box">
+    <span style="font-size:18px">🔒</span>
+    <div>
+      <strong style="color:var(--t1)">Ende-zu-Ende verschlüsselt</strong><br>
+      Alle API-Keys werden mit AES-256-CBC verschlüsselt in der Datenbank gespeichert.
+      Nur du kannst deine Keys lesen. Lavarell hat zu keinem Zeitpunkt Zugang zu deinen Klartextdaten.
+    </div>
+  </div>
+
+  <div class="provider-grid">
+    <!-- Shopware -->
+    <div class="pcard">
+      <div class="pcard-header">
+        <div class="picon ic1">🛒</div>
+        <div style="flex:1"><div class="pname">Shopware 6</div><div class="pdesc">API-Zugang für deinen Shop</div></div>
+        <span class="badge bg">2 aktiv</span>
+      </div>
+      <div class="cred-list">
+        <div class="cred-item">
+          <div class="status-dot sok"></div>
+          <div style="flex:1"><div class="cred-label">Shop DE</div><div class="cred-sub">Getestet vor 5 Min.</div></div>
+          <div style="display:flex;gap:6px;">
+            <button class="test-btn">⚡ Test</button>
+            <button class="del-btn">🗑</button>
+          </div>
+        </div>
+        <div class="cred-item">
+          <div class="status-dot sok"></div>
+          <div style="flex:1"><div class="cred-label">Shop AT</div><div class="cred-sub">Getestet vor 2 Std.</div></div>
+          <div style="display:flex;gap:6px;">
+            <button class="test-btn">⚡ Test</button>
+            <button class="del-btn">🗑</button>
+          </div>
+        </div>
+      </div>
+      <div class="add-btn">+ Shop hinzufügen</div>
+    </div>
+
+    <!-- OpenAI -->
+    <div class="pcard">
+      <div class="pcard-header">
+        <div class="picon ic2">🤖</div>
+        <div style="flex:1"><div class="pname">OpenAI</div><div class="pdesc">GPT-4o · Texte & Alt-Texte</div></div>
+        <span class="badge bg">1 aktiv</span>
+      </div>
+      <div class="cred-list">
+        <div class="cred-item">
+          <div class="status-dot sok"></div>
+          <div style="flex:1"><div class="cred-label">OpenAI</div><div class="cred-sub">Getestet vor 1 Std.</div></div>
+          <div style="display:flex;gap:6px;">
+            <button class="test-btn">⚡ Test</button>
+            <button class="del-btn">🗑</button>
+          </div>
+        </div>
+      </div>
+      <div class="add-btn">+ Verbinden</div>
+    </div>
+
+    <!-- Gemini -->
+    <div class="pcard">
+      <div class="pcard-header">
+        <div class="picon ic3">✨</div>
+        <div style="flex:1"><div class="pname">Google Gemini</div><div class="pdesc">Gemini Pro · Alternative KI</div></div>
+        <span class="badge bx">Nicht verbunden</span>
+      </div>
+      <div style="padding:16px;text-align:center;font-size:12px;color:var(--t3);">Noch keine Verbindung eingerichtet</div>
+      <div class="add-btn">+ Verbinden</div>
+    </div>
+
+    <!-- GSC -->
+    <div class="pcard">
+      <div class="pcard-header">
+        <div class="picon ic4">📊</div>
+        <div style="flex:1"><div class="pname">Google Search Console</div><div class="pdesc">GSC API · Ranking & Clicks</div></div>
+        <span class="badge bx">Nicht verbunden</span>
+      </div>
+      <div style="padding:16px;text-align:center;font-size:12px;color:var(--t3);">Noch keine Verbindung eingerichtet</div>
+      <div class="add-btn">+ Verbinden</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ TAB 2: CREATE ══════════ -->
+<div class="page" id="tab-create">
+  <div class="page-header">
+    <div>
+      <div class="page-title">🔑 Credentials hinzufügen</div>
+      <div class="page-subtitle">Wähle einen Dienst und gib deine API-Keys ein</div>
+    </div>
+    <button class="btn btn-secondary" onclick="showTab('credentials')">← Zurück</button>
+  </div>
+
+  <div class="create-grid">
+    <!-- Provider Selector -->
+    <div>
+      <div class="selector-title">Dienst wählen</div>
+      <div class="prov-opt sel" onclick="selProvider(this,'shopware')">
+        <div class="popt-icon ic1">🛒</div>
+        <div><div class="popt-name">Shopware 6</div><div class="popt-desc">API-Zugang für deinen Shop</div></div>
+        <div class="checkmark">✓</div>
+      </div>
+      <div class="prov-opt" onclick="selProvider(this,'openai')">
+        <div class="popt-icon ic2">🤖</div>
+        <div><div class="popt-name">OpenAI</div><div class="popt-desc">GPT-4o für SEO-Texte</div></div>
+        <div class="checkmark">✓</div>
+      </div>
+      <div class="prov-opt" onclick="selProvider(this,'gemini')">
+        <div class="popt-icon ic3">✨</div>
+        <div><div class="popt-name">Google Gemini</div><div class="popt-desc">Gemini Pro als Alternative</div></div>
+        <div class="checkmark">✓</div>
+      </div>
+      <div class="prov-opt" onclick="selProvider(this,'gsc')">
+        <div class="popt-icon ic4">📊</div>
+        <div><div class="popt-name">Search Console</div><div class="popt-desc">Ranking & Performance</div></div>
+        <div class="checkmark">✓</div>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <div class="form-card">
+      <div class="fgroup">
+        <label class="flabel">Label <span style="color:var(--t3)">(optional)</span></label>
+        <input type="text" class="finput" placeholder='z.B. "Shop DE", "Hauptshop"'>
+        <div class="fhint">Hilft dir, mehrere Accounts desselben Dienstes zu unterscheiden.</div>
+      </div>
+
+      <!-- Shopware Fields -->
+      <div id="f-shopware">
+        <div class="fsec-title">🛒 Shopware 6 API</div>
+        <div class="fgroup">
+          <label class="flabel">Shop URL</label>
+          <input type="url" class="finput" placeholder="https://dein-shop.de">
+        </div>
+        <div class="fgroup">
+          <label class="flabel">Client ID</label>
+          <input type="text" class="finput" placeholder="SWIAXXXXXXXXXXXXXXXX">
+        </div>
+        <div class="fgroup">
+          <label class="flabel">Client Secret</label>
+          <input type="password" class="finput" placeholder="••••••••••••••••••••••••">
+          <div class="fhint">Shopware Admin → Einstellungen → Integrationen → Neue Integration</div>
+        </div>
+      </div>
+
+      <!-- OpenAI Fields (hidden) -->
+      <div id="f-openai" style="display:none">
+        <div class="fsec-title">🤖 OpenAI API</div>
+        <div class="fgroup">
+          <label class="flabel">API Key</label>
+          <input type="password" class="finput" placeholder="sk-proj-••••••••••••••••••">
+          <div class="fhint">→ API Key bei platform.openai.com erstellen</div>
+        </div>
+        <div class="info-box">💡 <strong style="color:#34d399">Empfohlen</strong> für Alt-Text-Generierung und SEO-Texte.</div>
+      </div>
+
+      <!-- Gemini Fields (hidden) -->
+      <div id="f-gemini" style="display:none">
+        <div class="fsec-title">✨ Google Gemini</div>
+        <div class="fgroup">
+          <label class="flabel">API Key</label>
+          <input type="password" class="finput" placeholder="AIzaSy••••••••••••••••••••••">
+          <div class="fhint">→ API Key bei aistudio.google.com erstellen</div>
+        </div>
+      </div>
+
+      <!-- GSC Fields (hidden) -->
+      <div id="f-gsc" style="display:none">
+        <div class="fsec-title">📊 Google Search Console</div>
+        <div style="background:rgba(124,58,237,.08);border:1px solid rgba(124,58,237,.25);border-radius:8px;padding:10px 12px;font-size:12px;color:var(--al);margin-bottom:14px;">
+          GSC benötigt OAuth2. Du brauchst eine Google Cloud Console App mit aktivierter Search Console API.
+        </div>
+        <div class="fgroup">
+          <label class="flabel">OAuth Client ID</label>
+          <input type="text" class="finput" placeholder="XXXXXX.apps.googleusercontent.com">
+        </div>
+        <div class="fgroup">
+          <label class="flabel">OAuth Client Secret</label>
+          <input type="password" class="finput" placeholder="GOCSPX-••••••••••••••••">
+        </div>
+        <div class="fgroup">
+          <label class="flabel">Refresh Token</label>
+          <input type="password" class="finput" placeholder="1//XXXXXXXX…">
+          <div class="fhint">Einmalig über Google OAuth Playground generieren</div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:20px;padding-top:18px;border-top:1px solid rgba(255,255,255,.05);">
+        <button class="btn btn-primary" style="flex:1">🔒 Verschlüsselt speichern</button>
+        <button class="btn btn-secondary" onclick="showTab('credentials')">Abbrechen</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ TAB 3: SUBSCRIPTION ══════════ -->
+<div class="page" id="tab-subscription">
+
+  <div class="page-header">
+    <div><div class="page-title">💳 Abonnement</div><div class="page-subtitle">Verwalte deinen Plan und deine Rechnungen</div></div>
+  </div>
+
+  <!-- Current Plan Banner -->
+  <div class="plan-banner">
+    <div class="plan-badge">⚡</div>
+    <div style="flex:1">
+      <div class="plan-name">Pro <span class="badge bg" style="font-size:11px;vertical-align:middle;">Aktiv</span></div>
+      <div class="plan-meta">
+        <span>🔄 Verlängert am: 24.03.2025</span>
+        <span>💳 Monatlich</span>
+        <span>💶 € 49,00/Monat</span>
+      </div>
+    </div>
+    <button class="btn btn-secondary btn-sm">Kündigen</button>
+  </div>
+
+  <!-- Billing Toggle -->
+  <div style="text-align:center;margin-bottom:20px;">
+    <div style="font-size:20px;font-weight:700;letter-spacing:-.03em;margin-bottom:6px;">Plan wählen oder wechseln</div>
+    <div style="color:var(--t3);font-size:13px;margin-bottom:12px;">Alle Pläne inklusive 14-Tage-Trial</div>
+    <div class="billing-toggle">
+      <button class="tbtn active" id="tb-m" onclick="setBill('m')">Monatlich</button>
+      <button class="tbtn" id="tb-y" onclick="setBill('y')">Jährlich <span style="background:rgba(16,185,129,.12);color:#34d399;border:1px solid rgba(16,185,129,.3);font-size:10px;font-weight:600;padding:1px 7px;border-radius:99px;margin-left:4px;">-17%</span></button>
+    </div>
+  </div>
+
+  <!-- Pricing Cards -->
+  <div class="pricing-grid">
+    <!-- Starter -->
+    <div class="prc-card">
+      <div class="prc-icon">🚀</div>
+      <div class="prc-title">Starter</div>
+      <div class="prc-desc">Perfekt für einzelne Shops</div>
+      <div class="prc-price">
+        <span class="price-cur">€</span>
+        <span class="price-num" id="s-price">19</span>
+        <span class="price-per">/Monat</span>
+      </div>
+      <ul class="feat-list">
+        <li><span class="fchk">✓</span> 1 Shop verbinden</li>
+        <li><span class="fchk">✓</span> 50 API-Calls/Tag</li>
+        <li><span class="fchk">🏷️</span> Produkte SEO</li>
+        <li><span class="fchk">📁</span> Kategorien SEO</li>
+        <li><span class="fchk">🖼️</span> Alt-Text Generator (KI)</li>
+      </ul>
+      <button class="prc-cta cta-s">14 Tage gratis testen</button>
+    </div>
+
+    <!-- Pro (Popular + Current) -->
+    <div class="prc-card pop">
+      <div class="pop-tag">BELIEBT</div>
+      <div class="prc-icon">⚡</div>
+      <div class="prc-title">Pro</div>
+      <div class="prc-desc">Für wachsende Händler</div>
+      <div class="prc-price">
+        <span class="price-cur">€</span>
+        <span class="price-num" id="p-price">49</span>
+        <span class="price-per">/Monat</span>
+      </div>
+      <ul class="feat-list">
+        <li><span class="fchk">✓</span> 3 Shops verbinden</li>
+        <li><span class="fchk">✓</span> 300 API-Calls/Tag</li>
+        <li><span class="fchk">🏷️</span> Produkte SEO</li>
+        <li><span class="fchk">📁</span> Kategorien SEO</li>
+        <li><span class="fchk">🖼️</span> Alt-Text Generator (KI)</li>
+        <li><span class="fchk">📊</span> GSC Dashboard</li>
+        <li><span class="fchk">⚡</span> Bulk-Generierung</li>
+      </ul>
+      <button class="prc-cta cta-c">✓ Aktueller Plan</button>
+    </div>
+
+    <!-- Agency -->
+    <div class="prc-card">
+      <div class="prc-icon">🏢</div>
+      <div class="prc-title">Agency</div>
+      <div class="prc-desc">Für SEO-Agenturen</div>
+      <div class="prc-price">
+        <span class="price-cur">€</span>
+        <span class="price-num" id="a-price">149</span>
+        <span class="price-per">/Monat</span>
+      </div>
+      <ul class="feat-list">
+        <li><span class="fchk">✓</span> 20 Shops verbinden</li>
+        <li><span class="fchk">✓</span> 2.000 API-Calls/Tag</li>
+        <li><span class="fchk">🏷️</span> Produkte SEO</li>
+        <li><span class="fchk">📁</span> Kategorien SEO</li>
+        <li><span class="fchk">🖼️</span> Alt-Text Generator (KI)</li>
+        <li><span class="fchk">📊</span> GSC Dashboard</li>
+        <li><span class="fchk">⚡</span> Bulk-Generierung</li>
+        <li><span class="fchk">📤</span> CSV Export</li>
+      </ul>
+      <button class="prc-cta cta-s">Wechseln zu Agency</button>
+    </div>
+  </div>
+
+  <!-- Invoice History -->
+  <div style="background:var(--cb);border:1px solid var(--bo);border-radius:12px;overflow:hidden;">
+    <div style="padding:14px 18px;border-bottom:1px solid rgba(255,255,255,.05);display:flex;align-items:center;justify-content:space-between;">
+      <div>
+        <div style="font-size:14px;font-weight:600;">🧾 Rechnungshistorie</div>
+        <div style="font-size:12px;color:var(--t3);">3 Zahlungen</div>
+      </div>
+    </div>
+    <table class="inv-table">
+      <thead><tr><th>Datum</th><th>Plan</th><th>Betrag</th><th>Status</th><th>PayPal TX</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>24.02.2025</td><td>Pro</td>
+          <td style="font-weight:600;color:var(--t1)">€ 49,00</td>
+          <td><span class="badge bg">✓ Bezahlt</span></td>
+          <td style="font-family:monospace;font-size:11px;color:var(--t3)">TX-8F29A1B3</td>
+        </tr>
+        <tr>
+          <td>24.01.2025</td><td>Pro</td>
+          <td style="font-weight:600;color:var(--t1)">€ 49,00</td>
+          <td><span class="badge bg">✓ Bezahlt</span></td>
+          <td style="font-family:monospace;font-size:11px;color:var(--t3)">TX-3C18D2E4</td>
+        </tr>
+        <tr>
+          <td>24.12.2024</td><td>Starter</td>
+          <td style="font-weight:600;color:var(--t1)">€ 19,00</td>
+          <td><span class="badge bg">✓ Bezahlt</span></td>
+          <td style="font-family:monospace;font-size:11px;color:var(--t3)">TX-9A45F1C7</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+function showTab(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  const tabs = ['credentials','create','subscription'];
+  document.querySelectorAll('.tab')[tabs.indexOf(id)].classList.add('active');
+}
+
+function selProvider(el, key) {
+  document.querySelectorAll('.prov-opt').forEach(o => o.classList.remove('sel'));
+  el.classList.add('sel');
+  ['shopware','openai','gemini','gsc'].forEach(k => {
+    const f = document.getElementById('f-' + k);
+    if(f) f.style.display = k === key ? 'block' : 'none';
+  });
+}
+
+function setBill(cycle) {
+  document.getElementById('tb-m').classList.toggle('active', cycle==='m');
+  document.getElementById('tb-y').classList.toggle('active', cycle==='y');
+  const prices = cycle === 'm'
+    ? {s:19, p:49, a:149}
+    : {s:16, p:41, a:124};
+  document.getElementById('s-price').textContent = prices.s;
+  document.getElementById('p-price').textContent = prices.p;
+  document.getElementById('a-price').textContent = prices.a;
+}
+</script>
+
+</body>
+</html>

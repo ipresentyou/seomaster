@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Lavarell – Module 4: SEO Controllers Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --sidebar-bg:#08080f; --main-bg:#0c0c14; --card-bg:#111119;
+  --border:#1e1e2e; --accent:#7c3aed; --accent-glow:rgba(124,58,237,.25);
+  --text-1:#f0eeff; --text-2:#9d9bbf; --text-3:#4e4c6a;
+  --success:#10b981; --warning:#f59e0b; --danger:#f43f5e;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Inter',sans-serif;background:var(--main-bg);color:var(--text-1);display:flex;flex-direction:column;height:100vh;overflow:hidden;}
+
+/* ── Header ── */
+.header{background:var(--sidebar-bg);border-bottom:1px solid var(--border);padding:10px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.header-logo{font-size:17px;font-weight:700;color:var(--text-1);}
+.header-logo span{color:var(--accent);}
+.module-badge{background:var(--accent);color:#fff;font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;}
+
+/* ── Tool Tabs ── */
+.tab-bar{display:flex;gap:4px;padding:10px 20px;background:var(--card-bg);border-bottom:1px solid var(--border);flex-shrink:0;}
+.tab{padding:7px 16px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;color:var(--text-2);}
+.tab:hover{background:rgba(255,255,255,.04);}
+.tab.active{background:var(--accent);color:#fff;}
+
+/* ── Main layout ── */
+.layout{display:flex;flex:1;overflow:hidden;}
+
+/* ── Toolbar ── */
+.toolbar{display:flex;align-items:center;gap:8px;padding:12px 20px;border-bottom:1px solid var(--border);background:var(--card-bg);flex-wrap:wrap;}
+.seo-select{height:34px;padding:0 10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:8px;color:var(--text-1);font-size:12px;font-family:inherit;outline:none;}
+.seo-select:focus{border-color:var(--accent);}
+.toolbar-right{margin-left:auto;display:flex;gap:8px;}
+
+/* ── Content ── */
+.content{flex:1;overflow-y:auto;padding:20px;}
+
+/* ── Opt Group ── */
+.opt-group{display:flex;align-items:center;gap:14px;padding:9px 14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:8px;margin-bottom:16px;font-size:12px;color:var(--text-2);flex-wrap:wrap;}
+.opt-check{display:flex;align-items:center;gap:6px;cursor:pointer;}
+.opt-check input{width:14px;height:14px;accent-color:var(--accent);cursor:pointer;}
+
+/* ── Stats Bar ── */
+.stats-bar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;}
+.stat-chip{background:var(--card-bg);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:12px;display:flex;align-items:center;gap:6px;}
+.stat-chip strong{color:var(--text-1);}
+.stat-chip.warn strong{color:var(--danger);}
+.stat-chip.ok strong{color:var(--success);}
+
+/* ── Result Row ── */
+.result-row{margin-bottom:28px;padding-bottom:24px;border-bottom:1px solid rgba(255,255,255,.05);}
+.breadcrumb{font-size:11px;color:var(--text-3);margin-bottom:3px;display:flex;align-items:center;gap:4px;}
+.result-title-link{font-size:18px;font-weight:500;color:#8ab4f8;text-decoration:none;cursor:pointer;line-height:1.3;}
+.result-title-link:hover{text-decoration:underline;}
+.result-desc{font-size:13px;color:var(--text-2);margin-top:4px;line-height:1.6;max-width:600px;}
+.result-meta{display:flex;gap:10px;margin-top:6px;font-size:11px;color:var(--text-3);flex-wrap:wrap;}
+.result-meta span{display:flex;align-items:center;gap:3px;}
+.result-actions{display:flex;gap:6px;margin-top:8px;}
+
+/* ── Buttons ── */
+.btn{padding:6px 14px;border:none;border-radius:8px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;transition:all .2s;display:inline-flex;align-items:center;gap:5px;}
+.btn-sm{padding:4px 10px;font-size:11px;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:#6d28d9;}
+.btn-secondary{background:rgba(255,255,255,.06);color:var(--text-2);border:1px solid rgba(255,255,255,.1);}
+.btn-secondary:hover{background:rgba(255,255,255,.1);}
+.btn-save{background:var(--success);color:#fff;}
+.btn-save:hover{background:#059669;}
+.btn-analyze{background:transparent;color:#60a5fa;border:1px solid #60a5fa;}
+.btn-analyze:hover{background:rgba(96,165,250,.1);}
+
+/* ── Edit Panel ── */
+.edit-panel{margin-top:14px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:18px;display:none;}
+.edit-panel.show{display:block;}
+.ep-field{margin-bottom:14px;}
+.ep-label{font-size:11px;font-weight:600;color:var(--text-2);margin-bottom:5px;display:flex;justify-content:space-between;}
+.ep-input,.ep-textarea{width:100%;padding:8px 11px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);border-radius:7px;color:var(--text-1);font-size:13px;font-family:inherit;outline:none;resize:none;}
+.ep-input:focus,.ep-textarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-glow);}
+.char-badge{font-size:10px;padding:2px 6px;border-radius:4px;}
+.char-ok{background:rgba(16,185,129,.15);color:var(--success);}
+.char-warn{background:rgba(244,63,94,.15);color:var(--danger);}
+.char-neutral{background:rgba(255,255,255,.06);color:var(--text-3);}
+
+/* ── AI badge ── */
+.ai-badge{background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);color:#a78bfa;font-size:11px;padding:5px 10px;border-radius:6px;margin-bottom:12px;}
+
+/* ── Analysis Box ── */
+.analysis-box{background:rgba(96,165,250,.07);border-left:3px solid #60a5fa;padding:10px 14px;border-radius:0 8px 8px 0;margin:10px 0;font-size:12px;display:none;}
+.analysis-box.show{display:block;}
+.analysis-row{display:flex;gap:6px;margin:3px 0;align-items:flex-start;}
+.analysis-row.ok{color:var(--success);}
+.analysis-row.warn{color:var(--warning);}
+.analysis-row.err{color:var(--danger);}
+.analysis-key{color:var(--text-3);font-weight:500;min-width:110px;flex-shrink:0;}
+
+/* ── Image Preview (Alt-Text) ── */
+.image-grid{display:grid;gap:20px;}
+.image-row{display:flex;gap:16px;padding-bottom:20px;border-bottom:1px solid rgba(255,255,255,.05);}
+.image-thumb{width:180px;height:160px;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:36px;}
+.image-info{flex:1;}
+.image-filename{font-size:14px;font-weight:500;margin-bottom:3px;}
+.image-alt{font-size:12px;color:var(--text-2);font-style:italic;margin-bottom:6px;}
+.image-alt.missing{color:var(--danger);}
+.image-meta{display:flex;gap:8px;font-size:11px;color:var(--text-3);}
+
+/* ── Preview box ── */
+.seo-preview{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:12px;margin-top:8px;font-size:13px;line-height:1.7;max-height:200px;overflow-y:auto;}
+.seo-preview h2{font-size:14px;margin:10px 0 4px;}
+.seo-preview h3{font-size:13px;margin:8px 0 3px;}
+.seo-preview p{margin:4px 0;}
+.seo-preview ul{margin:4px 0 4px 18px;}
+
+/* ── Keywords input ── */
+.keywords-cloud{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;}
+.kw-tag{background:rgba(124,58,237,.12);border:1px solid rgba(124,58,237,.25);color:#a78bfa;font-size:11px;padding:2px 8px;border-radius:99px;}
+
+/* ── Loading indicator ── */
+.loading-row{display:flex;align-items:center;gap:8px;padding:10px;color:var(--text-3);font-size:13px;}
+.spinner{width:16px;height:16px;border:2px solid rgba(124,58,237,.3);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── Route info box ── */
+.routes-box{background:var(--card-bg);border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:20px;}
+.routes-box h3{font-size:13px;font-weight:600;margin-bottom:10px;color:var(--text-2);}
+.route-line{display:flex;gap:8px;font-size:11px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.04);align-items:center;}
+.method{padding:2px 7px;border-radius:4px;font-weight:600;font-size:10px;min-width:44px;text-align:center;}
+.method.get{background:rgba(16,185,129,.15);color:var(--success);}
+.method.post{background:rgba(124,58,237,.15);color:#a78bfa;}
+.route-path{color:#8ab4f8;font-family:monospace;flex:1;}
+.route-name{color:var(--text-3);font-size:10px;}
+
+/* ── Tab panes ── */
+.tab-pane{display:none;flex-direction:column;flex:1;overflow:hidden;}
+.tab-pane.active{display:flex;}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-logo">Lavar<span>ell</span></div>
+  <div style="display:flex;gap:10px;align-items:center;">
+    <span style="font-size:12px;color:var(--text-3);">Project: disana-shop</span>
+    <div class="module-badge">Module 4 – SEO Controllers</div>
+  </div>
+</div>
+
+<!-- Tool Tabs -->
+<div class="tab-bar">
+  <div class="tab active" onclick="switchTool('products')">🏷️ Produkte</div>
+  <div class="tab" onclick="switchTool('categories')">📁 Kategorien</div>
+  <div class="tab" onclick="switchTool('alttext')">🖼️ Alt-Texte</div>
+  <div class="tab" onclick="switchTool('routes')">🗺️ Routes & Controller</div>
+</div>
+
+<!-- Layout -->
+<div class="layout">
+
+<!-- ════════════════════════════════════════════════════
+     TAB: PRODUCTS
+═════════════════════════════════════════════════════ -->
+<div id="pane-products" class="tab-pane active" style="flex-direction:column;flex:1;overflow:hidden;">
+  <div class="toolbar">
+    <select class="seo-select"><option>disana Hauptshop</option></select>
+    <select class="seo-select"><option>Deutsch</option><option>English</option></select>
+    <input class="seo-select" placeholder="🔍 Produktname" style="width:180px;">
+    <select class="seo-select" style="width:80px;"><option>50</option><option>100</option></select>
+    <div class="toolbar-right">
+      <button class="btn btn-secondary" onclick="analyzeAll('products')">🔍 Alle analysieren</button>
+      <button class="btn btn-primary">📋 Laden</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="opt-group">
+      <strong style="color:var(--text-1);font-size:12px;">⚙️ Optimieren:</strong>
+      <label class="opt-check"><input type="checkbox" checked> 📝 Meta Title</label>
+      <label class="opt-check"><input type="checkbox" checked> 📄 Meta Description</label>
+      <label class="opt-check"><input type="checkbox" checked> 📋 Produktbeschreibung</label>
+      <span style="margin-left:auto;font-size:11px;color:var(--text-3);">Gilt für alle KI-Generierungen</span>
+    </div>
+
+    <div class="stats-bar">
+      <div class="stat-chip"><span>📦</span> <span>50 Produkte geladen</span></div>
+      <div class="stat-chip warn"><span>⚠️</span> <strong>23</strong> <span style="color:var(--text-2)">ohne Meta-Daten</span></div>
+      <div class="stat-chip ok"><span>✅</span> <strong>27</strong> <span style="color:var(--text-2)">vollständig</span></div>
+    </div>
+
+    <!-- Product 1 -->
+    <div class="result-row" id="prod-0">
+      <div class="breadcrumb">🛍️ disana-shop.de › wollkleidung › babykleidung</div>
+      <a class="result-title-link" onclick="toggleEdit('prod-0-edit')">disana Wollpullover Baby – Bio Merinowolle</a>
+      <div class="result-desc">Hochwertiger Babypullover aus 100% Biomerino – weich, atmungsaktiv und nachhaltig produziert. Jetzt entdecken.</div>
+      <div class="result-meta">
+        <span>🔢 DIS-1042</span>
+        <span>✅ Beschreibung vorhanden</span>
+        <span>📐 60 Zeichen</span>
+        <span>📄 148 Zeichen</span>
+      </div>
+      <div class="result-actions">
+        <button class="btn btn-analyze btn-sm" onclick="showAnalysis('prod-0-analysis')">🔍 Analysieren</button>
+        <button class="btn btn-secondary btn-sm" onclick="toggleEdit('prod-0-edit')">✏️ Bearbeiten</button>
+        <button class="btn btn-primary btn-sm" onclick="showAiEdit('prod-0-edit', 'product')">✨ Optimieren</button>
+      </div>
+      <div class="analysis-box" id="prod-0-analysis">
+        <div class="analysis-row ok"><span class="analysis-key">HTTP Status:</span> 200 OK</div>
+        <div class="analysis-row ok"><span class="analysis-key">&lt;title&gt;:</span> disana Wollpullover Baby – Biomerino (52 Zeichen)</div>
+        <div class="analysis-row ok"><span class="analysis-key">Meta Desc:</span> Hochwertiger Babypullover aus 100% Biomerino (148 Zeichen)</div>
+        <div class="analysis-row ok"><span class="analysis-key">&lt;h1&gt;:</span> Wollpullover Baby Natur</div>
+        <div class="analysis-row ok"><span class="analysis-key">Preis:</span> 39,90 €</div>
+        <div class="analysis-row ok"><span class="analysis-key">Features:</span> 100% Biomerino, GOTS-zertifiziert, Handwäsche</div>
+      </div>
+      <div class="edit-panel" id="prod-0-edit"></div>
+    </div>
+
+    <!-- Product 2 -->
+    <div class="result-row" id="prod-1">
+      <div class="breadcrumb">🛍️ disana-shop.de › strickkleidung</div>
+      <a class="result-title-link" onclick="toggleEdit('prod-1-edit')">disana Strickjacke Wolle</a>
+      <div class="result-desc" style="color:var(--danger);">❌ Keine Meta-Description vorhanden</div>
+      <div class="result-meta">
+        <span>🔢 DIS-2087</span>
+        <span style="color:var(--warning);">⚠️ Keine Beschreibung</span>
+      </div>
+      <div class="result-actions">
+        <button class="btn btn-analyze btn-sm">🔍 Analysieren</button>
+        <button class="btn btn-secondary btn-sm" onclick="toggleEdit('prod-1-edit')">✏️ Bearbeiten</button>
+        <button class="btn btn-primary btn-sm" onclick="showAiEdit('prod-1-edit', 'product-new')">✨ Optimieren</button>
+      </div>
+      <div class="analysis-box" id="prod-1-analysis"></div>
+      <div class="edit-panel" id="prod-1-edit"></div>
+    </div>
+
+    <!-- Product 3 -->
+    <div class="result-row">
+      <div class="breadcrumb">🛍️ disana-shop.de › schlafsäcke</div>
+      <a class="result-title-link">disana Schlafsack Wolle Seide</a>
+      <div class="result-desc">Natürlicher Schlafsack aus Wolle-Seide-Mischung für einen ruhigen, warmen Babyschlaf.</div>
+      <div class="result-meta">
+        <span>🔢 DIS-3301</span>
+        <span>✅ Vollständig</span>
+      </div>
+      <div class="result-actions">
+        <button class="btn btn-analyze btn-sm">🔍 Analysieren</button>
+        <button class="btn btn-secondary btn-sm">✏️ Bearbeiten</button>
+        <button class="btn btn-primary btn-sm">✨ Optimieren</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     TAB: CATEGORIES
+═════════════════════════════════════════════════════ -->
+<div id="pane-categories" class="tab-pane" style="flex-direction:column;flex:1;overflow:hidden;">
+  <div class="toolbar">
+    <select class="seo-select"><option>disana Hauptshop</option></select>
+    <select class="seo-select"><option>Deutsch</option><option>English</option></select>
+    <select class="seo-select" style="width:80px;"><option>50</option></select>
+    <div class="toolbar-right">
+      <button class="btn btn-secondary">🔍 Alle analysieren</button>
+      <button class="btn btn-primary">📋 Laden</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="opt-group">
+      <strong style="color:var(--text-1);font-size:12px;">⚙️ Optimieren:</strong>
+      <label class="opt-check"><input type="checkbox" checked> 📝 Meta Title</label>
+      <label class="opt-check"><input type="checkbox" checked> 📄 Meta Description</label>
+      <label class="opt-check"><input type="checkbox" checked> 🔑 Keywords</label>
+      <label class="opt-check"><input type="checkbox" checked> 📋 SEO-Text</label>
+    </div>
+
+    <!-- Category 1 -->
+    <div class="result-row" id="cat-0">
+      <div class="breadcrumb">🏷️ disana-shop.de › babykleidung</div>
+      <a class="result-title-link" onclick="toggleEdit('cat-0-edit')">Babykleidung aus Bio-Wolle – disana</a>
+      <div class="result-desc">Natürliche Babykleidung aus Biowollе und GOTS-zertifizierten Materialien. Nachhaltig hergestellt in Deutschland.</div>
+      <div class="result-meta">
+        <span>📄 page</span>
+        <span>🔑 8 Keywords</span>
+        <span>✅ SEO-Text</span>
+      </div>
+      <div class="result-actions">
+        <button class="btn btn-analyze btn-sm" onclick="showAnalysis('cat-0-analysis')">🔍 Analysieren</button>
+        <button class="btn btn-secondary btn-sm" onclick="toggleEdit('cat-0-edit')">✏️ Bearbeiten</button>
+        <button class="btn btn-primary btn-sm" onclick="showAiEdit('cat-0-edit', 'category')">✨ Optimieren</button>
+      </div>
+      <div class="analysis-box" id="cat-0-analysis">
+        <div class="analysis-row ok"><span class="analysis-key">HTTP Status:</span> 200 OK</div>
+        <div class="analysis-row ok"><span class="analysis-key">&lt;title&gt;:</span> Babykleidung Bio-Wolle | disana (44 Zeichen)</div>
+        <div class="analysis-row warn"><span class="analysis-key">Meta Desc:</span> 163 Zeichen – leicht zu lang</div>
+        <div class="analysis-row ok"><span class="analysis-key">&lt;h1&gt;:</span> Babykleidung aus Bio-Wolle</div>
+        <div class="analysis-row ok"><span class="analysis-key">Keywords:</span> babykleidung wolle, bio merino, gots zertifiziert...</div>
+        <div class="analysis-row ok"><span class="analysis-key">Content:</span> Unsere Babykleidung besteht aus 100% Biomerino...</div>
+      </div>
+      <div class="edit-panel" id="cat-0-edit"></div>
+    </div>
+
+    <!-- Category 2 -->
+    <div class="result-row">
+      <div class="breadcrumb">🏷️ disana-shop.de › strickwaren</div>
+      <a class="result-title-link">Strickwaren</a>
+      <div class="result-desc" style="color:var(--warning);">⚠️ Keine Meta-Description</div>
+      <div class="result-meta"><span>📄 folder</span></div>
+      <div class="result-actions">
+        <button class="btn btn-secondary btn-sm">✏️ Bearbeiten</button>
+        <button class="btn btn-primary btn-sm">✨ Optimieren</button>
+      </div>
+    </div>
+
+    <!-- Category 3 -->
+    <div class="result-row">
+      <div class="breadcrumb">🏷️ disana-shop.de › schlafsäcke</div>
+      <a class="result-title-link">Schlafsäcke aus Wolle für Babys</a>
+      <div class="result-desc">Natürliche Wollschlafsäcke für einen sicheren, warmen Babyschlaf – in verschiedenen Größen.</div>
+      <div class="result-meta"><span>📄 page</span><span>🔑 6 Keywords</span><span>✅ SEO-Text</span></div>
+      <div class="result-actions">
+        <button class="btn btn-analyze btn-sm">🔍 Analysieren</button>
+        <button class="btn btn-secondary btn-sm">✏️ Bearbeiten</button>
+        <button class="btn btn-primary btn-sm">✨ Optimieren</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     TAB: ALT-TEXT
+═════════════════════════════════════════════════════ -->
+<div id="pane-alttext" class="tab-pane" style="flex-direction:column;flex:1;overflow:hidden;">
+  <div class="toolbar">
+    <select class="seo-select"><option>disana Hauptshop</option></select>
+    <select class="seo-select"><option>Deutsch</option><option>English</option></select>
+    <select class="seo-select"><option>❌ Fehlende Alt-Texte</option><option>📸 Alle Bilder</option></select>
+    <select class="seo-select" style="width:80px;"><option>50</option></select>
+    <div class="toolbar-right">
+      <button class="btn btn-primary" onclick="batchGenerate()">✨ Alle generieren</button>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="stats-bar">
+      <div class="stat-chip"><span>🖼️</span> <strong>50</strong> <span style="color:var(--text-2)">Bilder geladen</span></div>
+      <div class="stat-chip warn"><span>❌</span> <strong>31</strong> <span style="color:var(--text-2)">ohne Alt-Text (62%)</span></div>
+      <div class="stat-chip ok"><span>✅</span> <strong>19</strong> <span style="color:var(--text-2)">vollständig</span></div>
+      <div class="stat-chip"><span>💾</span> <strong>14.2 MB</strong></div>
+    </div>
+
+    <!-- Image 1 – missing alt -->
+    <div class="image-row" id="img-0">
+      <div class="image-thumb">🧥</div>
+      <div class="image-info">
+        <div class="image-filename">disana-wollpullover-baby-natur-1.jpg</div>
+        <div class="image-alt missing">❌ Kein Alt-Text vorhanden</div>
+        <div class="image-meta"><span>📐 image/jpeg</span><span>💾 142 KB</span><span>🛍️ Wollpullover Baby Natur</span></div>
+        <div style="display:flex;gap:6px;margin-top:8px;">
+          <button class="btn btn-secondary btn-sm" onclick="toggleEdit('img-0-edit')">✏️ Bearbeiten</button>
+          <button class="btn btn-primary btn-sm" onclick="showAltEdit('img-0-edit')">✨ KI generieren</button>
+        </div>
+        <div class="edit-panel" id="img-0-edit"></div>
+      </div>
+    </div>
+
+    <!-- Image 2 – missing alt -->
+    <div class="image-row" id="img-1">
+      <div class="image-thumb">🧣</div>
+      <div class="image-info">
+        <div class="image-filename">disana-schlafsack-wolle-seide-detail.jpg</div>
+        <div class="image-alt missing">❌ Kein Alt-Text vorhanden</div>
+        <div class="image-meta"><span>📐 image/jpeg</span><span>💾 87 KB</span></div>
+        <div style="display:flex;gap:6px;margin-top:8px;">
+          <button class="btn btn-secondary btn-sm">✏️ Bearbeiten</button>
+          <button class="btn btn-primary btn-sm" onclick="showAltEdit('img-1-edit', true)">✨ KI generieren</button>
+        </div>
+        <div class="edit-panel" id="img-1-edit"></div>
+      </div>
+    </div>
+
+    <!-- Image 3 – has alt -->
+    <div class="image-row">
+      <div class="image-thumb">👶</div>
+      <div class="image-info">
+        <div class="image-filename">disana-baby-strumpfhose-wolle-pink.jpg</div>
+        <div class="image-alt">Alt: "disana Babystrumpfhose aus Bio-Merinowolle in Rosa"</div>
+        <div class="image-meta"><span>📐 image/jpeg</span><span>💾 65 KB</span><span>🛍️ Babystrumpfhose Wolle</span></div>
+        <div style="display:flex;gap:6px;margin-top:8px;">
+          <button class="btn btn-secondary btn-sm">✏️ Bearbeiten</button>
+          <button class="btn btn-primary btn-sm">✨ Neu generieren</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════════════
+     TAB: ROUTES & CONTROLLER
+═════════════════════════════════════════════════════ -->
+<div id="pane-routes" class="tab-pane" style="flex-direction:column;flex:1;overflow:hidden;">
+  <div class="content">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+
+      <!-- Routes -->
+      <div class="routes-box">
+        <h3>🗺️ web.php – SEO Routes</h3>
+        <div class="route-line"><span class="method get">GET</span><span class="route-path">/projects/{project}/seo/products</span><span class="route-name">seo.products</span></div>
+        <div class="route-line"><span class="method get">GET</span><span class="route-path">/projects/{project}/seo/products/analyze</span><span class="route-name">seo.products.analyze</span></div>
+        <div class="route-line"><span class="method post">POST</span><span class="route-path">/projects/{project}/seo/products/generate</span><span class="route-name">seo.products.generate</span></div>
+        <div class="route-line"><span class="method post">POST</span><span class="route-path">/projects/{project}/seo/products/save</span><span class="route-name">seo.products.save</span></div>
+        <div style="height:8px;"></div>
+        <div class="route-line"><span class="method get">GET</span><span class="route-path">/projects/{project}/seo/categories</span><span class="route-name">seo.categories</span></div>
+        <div class="route-line"><span class="method get">GET</span><span class="route-path">/projects/{project}/seo/categories/analyze</span><span class="route-name">seo.categories.analyze</span></div>
+        <div class="route-line"><span class="method post">POST</span><span class="route-path">/projects/{project}/seo/categories/generate</span><span class="route-name">seo.categories.generate</span></div>
+        <div class="route-line"><span class="method post">POST</span><span class="route-path">/projects/{project}/seo/categories/save</span><span class="route-name">seo.categories.save</span></div>
+        <div style="height:8px;"></div>
+        <div class="route-line"><span class="method get">GET</span><span class="route-path">/projects/{project}/seo/alt-text</span><span class="route-name">seo.alttext</span></div>
+        <div class="route-line"><span class="method post">POST</span><span class="route-path">/projects/{project}/seo/alt-text/generate</span><span class="route-name">seo.alttext.generate</span></div>
+        <div class="route-line"><span class="method post">POST</span><span class="route-path">/projects/{project}/seo/alt-text/save</span><span class="route-name">seo.alttext.save</span></div>
+        <div class="route-line"><span class="method post">POST</span><span class="route-path">/projects/{project}/seo/alt-text/batch</span><span class="route-name">seo.alttext.batch</span></div>
+      </div>
+
+      <!-- Controllers & Services -->
+      <div>
+        <div class="routes-box">
+          <h3>🎮 Controller (app/Http/Controllers/Seo/)</h3>
+          <div class="route-line"><span style="color:#a78bfa;font-size:11px;font-family:monospace;">BaseSeoController.php</span><span class="route-name">Abstract – bootProject, log, ok/err</span></div>
+          <div class="route-line"><span style="color:#8ab4f8;font-size:11px;font-family:monospace;">ProductSeoController.php</span><span class="route-name">index, analyze, generate, save</span></div>
+          <div class="route-line"><span style="color:#8ab4f8;font-size:11px;font-family:monospace;">CategorySeoController.php</span><span class="route-name">index, analyze, generate, save</span></div>
+          <div class="route-line"><span style="color:#8ab4f8;font-size:11px;font-family:monospace;">AltTextController.php</span><span class="route-name">index, generate, save, batchSave</span></div>
+        </div>
+        <div class="routes-box" style="margin-top:0;">
+          <h3>⚙️ Services (app/Services/)</h3>
+          <div class="route-line"><span style="color:var(--success);font-size:11px;font-family:monospace;">ShopwareService.php</span><span class="route-name">OAuth, Products, Categories, Media, SEO-URLs</span></div>
+          <div class="route-line"><span style="color:var(--success);font-size:11px;font-family:monospace;">AiService.php</span><span class="route-name">generateAltText, generateMeta, generateSeoText</span></div>
+          <div class="route-line"><span style="color:var(--success);font-size:11px;font-family:monospace;">StorefrontScraper.php</span><span class="route-name">scrapeProduct, scrapeCategory</span></div>
+        </div>
+        <div class="routes-box" style="margin-top:0;">
+          <h3>🛡️ Middleware</h3>
+          <div class="route-line"><span style="color:var(--warning);font-size:11px;font-family:monospace;">user.active</span><span class="route-name">EnsureUserIsActive</span></div>
+          <div class="route-line"><span style="color:var(--warning);font-size:11px;font-family:monospace;">subscription.active</span><span class="route-name">EnsureSubscriptionIsActive</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="routes-box" style="margin-top:0;">
+      <h3>📊 Datenfluss – Produkt SEO Optimierung</h3>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:11px;padding:6px 0;">
+        <div style="background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);padding:6px 12px;border-radius:6px;color:#a78bfa;">① Browser GET /products</div>
+        <span style="color:var(--text-3)">→</span>
+        <div style="background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.2);padding:6px 12px;border-radius:6px;color:#60a5fa;">② auth + subscription.active middleware</div>
+        <span style="color:var(--text-3)">→</span>
+        <div style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);padding:6px 12px;border-radius:6px;color:var(--success);">③ bootProject() → ShopwareService</div>
+        <span style="color:var(--text-3)">→</span>
+        <div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);padding:6px 12px;border-radius:6px;color:var(--warning);">④ Shopware API (OAuth cached)</div>
+        <span style="color:var(--text-3)">→</span>
+        <div style="background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);padding:6px 12px;border-radius:6px;color:#a78bfa;">⑤ Blade view mit Daten</div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;font-size:11px;padding:6px 0;margin-top:4px;">
+        <div style="background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);padding:6px 12px;border-radius:6px;color:#a78bfa;">① Klick "Optimieren"</div>
+        <span style="color:var(--text-3)">→</span>
+        <div style="background:rgba(96,165,250,.1);border:1px solid rgba(96,165,250,.2);padding:6px 12px;border-radius:6px;color:#60a5fa;">② optional: StorefrontScraper</div>
+        <span style="color:var(--text-3)">→</span>
+        <div style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);padding:6px 12px;border-radius:6px;color:var(--success);">③ AiService (OpenAI/Gemini)</div>
+        <span style="color:var(--text-3)">→</span>
+        <div style="background:rgba(245,158,11,.1);border:1px solid rgba(245,158,11,.2);padding:6px 12px;border-radius:6px;color:var(--warning);">④ JSON zurück</div>
+        <span style="color:var(--text-3)">→</span>
+        <div style="background:rgba(124,58,237,.15);border:1px solid rgba(124,58,237,.3);padding:6px 12px;border-radius:6px;color:#a78bfa;">⑤ "Speichern" → PATCH /product/{id}</div>
+        <span style="color:var(--text-3)">→</span>
+        <div style="background:rgba(16,185,129,.1);border:1px solid rgba(16,185,129,.2);padding:6px 12px;border-radius:6px;color:var(--success);">⑥ ActivityLog::record()</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /layout -->
+
+<script>
+function switchTool(tab) {
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.remove('active'));
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelector(`.tab:nth-child(${['products','categories','alttext','routes'].indexOf(tab)+1})`).classList.add('active');
+  document.getElementById('pane-' + tab).classList.add('active');
+}
+
+function toggleEdit(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('show');
+}
+
+function showAnalysis(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('show');
+}
+
+function showAiEdit(id, type) {
+  const el = document.getElementById(id);
+  el.classList.add('show');
+
+  if (type === 'product') {
+    el.innerHTML = `
+      <div class="ai-badge">✨ KI-generiert – basierend auf Seitenanalyse</div>
+      <div class="ep-field">
+        <div class="ep-label">Meta Title <span class="char-badge char-ok">55 / 60 ✓</span></div>
+        <input class="ep-input" value="disana Wollpullover Baby – Bio Merinowolle | disana-shop" oninput="updateCount(this, 60, this.previousSibling.querySelector('span'))">
+      </div>
+      <div class="ep-field">
+        <div class="ep-label">Meta Description <span class="char-badge char-ok">142 / 155 ✓</span></div>
+        <textarea class="ep-textarea" rows="3" oninput="updateCount(this, 155, this.previousSibling.querySelector('span'))">Entdecken Sie den disana Wollpullover Baby aus 100% GOTS-zertifizierter Biomerino. Weich, atmungsaktiv, nachhaltig. Jetzt im disana-Shop kaufen.</textarea>
+      </div>
+      <div class="ep-field">
+        <div class="ep-label">Produktbeschreibung <span class="char-badge char-ok">~280 Wörter ✓</span></div>
+        <div class="seo-preview"><h2>Wärme aus der Natur für Ihr Baby</h2><p>Der <strong>disana Wollpullover Baby</strong> vereint über 40 Jahre Erfahrung in der Verarbeitung natürlicher Textilien mit modernem Design. Gefertigt aus 100% GOTS-zertifizierter Biomerino-Wolle, bietet dieser Pullover Ihrem Kind optimalen Komfort.</p><h3>Produktmerkmale</h3><ul><li>100% Bio-Merinowolle, GOTS-zertifiziert</li><li>Temperaturregulierend und atmungsaktiv</li><li>Schonende Färbung ohne schädliche Substanzen</li><li>Langlebig und pflegeleicht</li></ul></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="btn btn-save" onclick="simulateSave(this)">💾 In Shopware speichern</button>
+        <button class="btn btn-secondary">✏️ Weiter bearbeiten</button>
+      </div>`;
+  } else if (type === 'product-new') {
+    el.innerHTML = `
+      <div class="loading-row"><div class="spinner"></div>KI analysiert Produkt und generiert SEO-Daten...</div>`;
+    setTimeout(() => {
+      el.innerHTML = `
+        <div class="ai-badge">✨ Neu generiert</div>
+        <div class="ep-field">
+          <div class="ep-label">Meta Title <span class="char-badge char-ok">52 / 60 ✓</span></div>
+          <input class="ep-input" value="disana Strickjacke Wolle – Naturbelassen & GOTS">
+        </div>
+        <div class="ep-field">
+          <div class="ep-label">Meta Description <span class="char-badge char-ok">138 / 155 ✓</span></div>
+          <textarea class="ep-textarea" rows="3">Hochwertige disana Strickjacke aus reiner Biowollе. Langlebig, weich und schadstofffrei. Für Babys und Kleinkinder. Jetzt online bestellen.</textarea>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <button class="btn btn-save" onclick="simulateSave(this)">💾 In Shopware speichern</button>
+        </div>`;
+    }, 1800);
+  } else if (type === 'category') {
+    el.innerHTML = `
+      <div class="ai-badge">✨ KI-optimiert basierend auf Analyse</div>
+      <div class="ep-field">
+        <div class="ep-label">Meta Title <span class="char-badge char-ok">44 / 60 ✓</span></div>
+        <input class="ep-input" value="Babykleidung Bio-Wolle | disana Online-Shop">
+      </div>
+      <div class="ep-field">
+        <div class="ep-label">Meta Description <span class="char-badge char-ok">153 / 155 ✓</span></div>
+        <textarea class="ep-textarea" rows="3">Nachhaltige Babykleidung aus 100% GOTS-zertifizierter Biomerinowolle. Weich, schadstoffgeprüft & made in Germany. Jetzt im disana Online-Shop entdecken.</textarea>
+      </div>
+      <div class="ep-field">
+        <div class="ep-label">Keywords</div>
+        <div class="keywords-cloud">
+          <span class="kw-tag">babykleidung wolle</span>
+          <span class="kw-tag">bio merino baby</span>
+          <span class="kw-tag">gots zertifiziert</span>
+          <span class="kw-tag">disana kleidung</span>
+          <span class="kw-tag">natürliche babykleidung</span>
+          <span class="kw-tag">babystrickwaren</span>
+          <span class="kw-tag">ökologisch baby</span>
+        </div>
+      </div>
+      <div class="ep-field">
+        <div class="ep-label">SEO-Text</div>
+        <div class="seo-preview"><h2>Naturbelassene Babykleidung – mehr als nur Mode</h2><p>Bei disana steht das Wohlbefinden Ihres Kindes an erster Stelle. Unsere <strong>Babykleidung aus Bio-Wolle</strong> ist speziell für die empfindliche Haut von Neugeborenen und Kleinkindern entwickelt.</p><h3>Warum Wolle für Babys?</h3><ul><li>Temperaturausgleichend – wärmt im Winter, kühlt im Sommer</li><li>Antibakteriell von Natur aus</li><li>Atmungsaktiv – kein Schwitzen</li></ul></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:4px;">
+        <button class="btn btn-save" onclick="simulateSave(this)">💾 In Shopware speichern</button>
+      </div>`;
+  }
+}
+
+function showAltEdit(id, skipLoading) {
+  const el = document.getElementById(id);
+  el.classList.add('show');
+
+  if (!skipLoading) {
+    el.innerHTML = `
+      <div class="ai-badge">✨ KI analysiert Bild...</div>
+      <div class="loading-row"><div class="spinner"></div>GPT-4o Vision analysiert das Bild...</div>`;
+    setTimeout(() => {
+      el.innerHTML = `
+        <div class="ai-badge">✨ Alt-Text generiert (GPT-4o Vision)</div>
+        <div class="ep-field">
+          <div class="ep-label">Alt-Text <span class="char-badge char-ok">78 / 125 ✓</span></div>
+          <input class="ep-input" value="disana Wollpullover Baby in Naturfarbe aus Bio-Merinowolle" oninput="this.previousSibling.querySelector('span').textContent = this.value.length + ' / 125'">
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px;">
+          <button class="btn btn-save" onclick="simulateAltSave(this)">💾 Speichern</button>
+        </div>`;
+    }, 2000);
+  } else {
+    el.innerHTML = `
+      <div class="ep-field">
+        <div class="ep-label">Alt-Text <span class="char-badge char-neutral">0 / 125</span></div>
+        <input class="ep-input" placeholder="Alt-Text eingeben..." oninput="this.previousSibling.querySelector('span').textContent = this.value.length + ' / 125'">
+      </div>
+      <button class="btn btn-save btn-sm" onclick="simulateAltSave(this)">💾 Speichern</button>`;
+  }
+}
+
+function simulateSave(btn) {
+  btn.textContent = '⏳ Speichere...';
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.textContent = '✅ Gespeichert!';
+    btn.style.background = 'var(--success)';
+    setTimeout(() => { btn.closest('.edit-panel').classList.remove('show'); }, 1500);
+  }, 1000);
+}
+
+function simulateAltSave(btn) {
+  btn.textContent = '⏳...';
+  btn.disabled = true;
+  setTimeout(() => {
+    const panel = btn.closest('.edit-panel');
+    const row   = panel.closest('.image-row');
+    const altDiv = row.querySelector('.image-alt');
+    const input  = panel.querySelector('input');
+    altDiv.className = 'image-alt';
+    altDiv.textContent = `Alt: "${input.value || 'Gespeicherter Alt-Text'}"`;
+    panel.classList.remove('show');
+  }, 800);
+}
+
+function batchGenerate() {
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = '⏳ Generiere 1/31...';
+  let i = 1;
+  const interval = setInterval(() => {
+    i++;
+    btn.textContent = `⏳ Generiere ${i}/31...`;
+    if (i >= 5) {
+      clearInterval(interval);
+      btn.textContent = '✅ 5 generiert (Demo)';
+      btn.disabled = false;
+      setTimeout(() => { btn.textContent = '✨ Alle generieren'; }, 2500);
+    }
+  }, 600);
+}
+
+function analyzeAll(type) {
+  const btn = event.target;
+  btn.disabled = true;
+  btn.textContent = '⏳ Analysiere 1/50...';
+  setTimeout(() => {
+    btn.textContent = '✅ 50 analysiert!';
+    btn.disabled = false;
+    setTimeout(() => { btn.textContent = '🔍 Alle analysieren'; }, 2000);
+  }, 2500);
+}
+
+function updateCount(el, max, badge) {
+  const len = el.value.length;
+  badge.textContent = `${len} / ${max} ${len <= max ? '✓' : '✗'}`;
+  badge.className = 'char-badge ' + (len <= max ? 'char-ok' : 'char-warn');
+}
+</script>
+</body>
+</html>

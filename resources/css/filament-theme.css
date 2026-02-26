@@ -1,0 +1,319 @@
+/**
+ * Lavarell – Dark Mode SaaS Theme für Filament 3
+ * Inspiriert von Linear, Vercel, Supabase
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* ─── CSS Variables (Dark Override) ─────────────────────────────────────── */
+:root,
+.dark {
+    /* Hintergrund-Hierarchie */
+    --sidebar-bg:       #0a0a0f;
+    --main-bg:          #0d0d14;
+    --card-bg:          #13131f;
+    --card-border:      rgba(139, 92, 246, 0.12);
+    --card-hover:       rgba(139, 92, 246, 0.06);
+
+    /* Violet Akzente */
+    --accent-primary:   #7c3aed;
+    --accent-glow:      rgba(124, 58, 237, 0.15);
+    --accent-border:    rgba(124, 58, 237, 0.4);
+
+    /* Text */
+    --text-primary:     #f1f0ff;
+    --text-secondary:   #a09ec0;
+    --text-muted:       #5b5880;
+
+    /* Status */
+    --success-glow:     rgba(16, 185, 129, 0.15);
+    --danger-glow:      rgba(244, 63, 94, 0.15);
+    --warning-glow:     rgba(245, 158, 11, 0.15);
+}
+
+/* ─── Global ─────────────────────────────────────────────────────────────── */
+body {
+    background: var(--main-bg) !important;
+    font-family: 'Inter', system-ui, sans-serif !important;
+    -webkit-font-smoothing: antialiased;
+}
+
+/* ─── Sidebar ────────────────────────────────────────────────────────────── */
+.fi-sidebar {
+    background: var(--sidebar-bg) !important;
+    border-right: 1px solid rgba(139, 92, 246, 0.1) !important;
+}
+
+.fi-sidebar-header {
+    padding: 1.5rem 1.25rem 1rem !important;
+    border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+}
+
+/* Logo-Bereich */
+.fi-logo {
+    font-weight: 700 !important;
+    font-size: 1.25rem !important;
+    letter-spacing: -0.025em !important;
+    color: var(--text-primary) !important;
+}
+
+/* Nav-Gruppen */
+.fi-sidebar-group-label {
+    font-size: 0.65rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.1em !important;
+    text-transform: uppercase !important;
+    color: var(--text-muted) !important;
+    padding: 0.5rem 1rem !important;
+}
+
+/* Nav Items */
+.fi-sidebar-item-button {
+    border-radius: 8px !important;
+    margin: 1px 8px !important;
+    padding: 8px 12px !important;
+    transition: all 0.15s ease !important;
+    color: var(--text-secondary) !important;
+}
+
+.fi-sidebar-item-button:hover {
+    background: var(--card-hover) !important;
+    color: var(--text-primary) !important;
+}
+
+.fi-sidebar-item-button.fi-active {
+    background: var(--accent-glow) !important;
+    color: #a78bfa !important;
+    border: 1px solid var(--accent-border) !important;
+}
+
+.fi-sidebar-item-button.fi-active .fi-sidebar-item-icon {
+    color: #a78bfa !important;
+}
+
+/* ─── Top Header ─────────────────────────────────────────────────────────── */
+.fi-topbar {
+    background: var(--sidebar-bg) !important;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.1) !important;
+}
+
+/* ─── Main Content Area ──────────────────────────────────────────────────── */
+.fi-main {
+    background: var(--main-bg) !important;
+}
+
+.fi-page-header-heading {
+    font-weight: 600 !important;
+    letter-spacing: -0.025em !important;
+    color: var(--text-primary) !important;
+}
+
+/* ─── Cards / Sections ───────────────────────────────────────────────────── */
+.fi-section,
+.fi-card {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--card-border) !important;
+    border-radius: 12px !important;
+}
+
+.fi-section-header {
+    border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+}
+
+/* ─── Stats Widgets ──────────────────────────────────────────────────────── */
+.fi-wi-stats-overview-stat {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--card-border) !important;
+    border-radius: 12px !important;
+    position: relative !important;
+    overflow: hidden !important;
+    transition: border-color 0.2s ease, transform 0.2s ease !important;
+}
+
+.fi-wi-stats-overview-stat:hover {
+    border-color: var(--accent-border) !important;
+    transform: translateY(-2px) !important;
+}
+
+/* Glow-Effekt oben */
+.fi-wi-stats-overview-stat::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(124, 58, 237, 0.6), transparent);
+}
+
+.fi-wi-stats-overview-stat-value {
+    font-size: 1.875rem !important;
+    font-weight: 700 !important;
+    letter-spacing: -0.025em !important;
+    color: var(--text-primary) !important;
+}
+
+.fi-wi-stats-overview-stat-label {
+    color: var(--text-secondary) !important;
+    font-size: 0.875rem !important;
+    font-weight: 500 !important;
+}
+
+.fi-wi-stats-overview-stat-description {
+    color: var(--text-muted) !important;
+    font-size: 0.75rem !important;
+}
+
+/* ─── Tables ─────────────────────────────────────────────────────────────── */
+.fi-ta-table {
+    background: transparent !important;
+}
+
+.fi-ta-header-cell {
+    background: rgba(255,255,255,0.02) !important;
+    color: var(--text-muted) !important;
+    font-size: 0.7rem !important;
+    font-weight: 600 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.08em !important;
+    border-bottom: 1px solid rgba(255,255,255,0.06) !important;
+}
+
+.fi-ta-row {
+    border-bottom: 1px solid rgba(255,255,255,0.04) !important;
+    transition: background 0.1s ease !important;
+}
+
+.fi-ta-row:hover {
+    background: rgba(139, 92, 246, 0.04) !important;
+}
+
+.fi-ta-cell {
+    color: var(--text-secondary) !important;
+    font-size: 0.875rem !important;
+}
+
+/* ─── Buttons ────────────────────────────────────────────────────────────── */
+.fi-btn-primary {
+    background: var(--accent-primary) !important;
+    border: 1px solid rgba(124, 58, 237, 0.5) !important;
+    box-shadow: 0 0 20px var(--accent-glow) !important;
+    font-weight: 500 !important;
+    letter-spacing: -0.01em !important;
+    transition: all 0.2s ease !important;
+}
+
+.fi-btn-primary:hover {
+    background: #6d28d9 !important;
+    box-shadow: 0 0 30px rgba(124, 58, 237, 0.3) !important;
+    transform: translateY(-1px) !important;
+}
+
+.fi-btn-secondary {
+    background: rgba(255,255,255,0.05) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    color: var(--text-secondary) !important;
+}
+
+.fi-btn-secondary:hover {
+    background: rgba(255,255,255,0.08) !important;
+    border-color: rgba(255,255,255,0.15) !important;
+    color: var(--text-primary) !important;
+}
+
+/* ─── Form Inputs ────────────────────────────────────────────────────────── */
+.fi-input,
+.fi-select-input,
+.fi-textarea {
+    background: rgba(255,255,255,0.04) !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+    color: var(--text-primary) !important;
+    border-radius: 8px !important;
+    transition: all 0.2s ease !important;
+}
+
+.fi-input:focus,
+.fi-select-input:focus,
+.fi-textarea:focus {
+    border-color: var(--accent-primary) !important;
+    box-shadow: 0 0 0 3px var(--accent-glow) !important;
+    outline: none !important;
+}
+
+.fi-fo-field-wrp-label label {
+    color: var(--text-secondary) !important;
+    font-size: 0.8125rem !important;
+    font-weight: 500 !important;
+}
+
+/* ─── Badges ─────────────────────────────────────────────────────────────── */
+.fi-badge {
+    font-weight: 500 !important;
+    font-size: 0.7rem !important;
+    letter-spacing: 0.02em !important;
+    border-radius: 9999px !important;
+    padding: 2px 10px !important;
+}
+
+.fi-color-success .fi-badge {
+    background: var(--success-glow) !important;
+    color: #34d399 !important;
+    border: 1px solid rgba(16, 185, 129, 0.3) !important;
+}
+
+.fi-color-danger .fi-badge {
+    background: var(--danger-glow) !important;
+    color: #fb7185 !important;
+    border: 1px solid rgba(244, 63, 94, 0.3) !important;
+}
+
+.fi-color-warning .fi-badge {
+    background: var(--warning-glow) !important;
+    color: #fbbf24 !important;
+    border: 1px solid rgba(245, 158, 11, 0.3) !important;
+}
+
+/* ─── Modals ─────────────────────────────────────────────────────────────── */
+.fi-modal-window {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--card-border) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6) !important;
+}
+
+/* ─── Notifications ──────────────────────────────────────────────────────── */
+.fi-no-notification {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--card-border) !important;
+    border-radius: 12px !important;
+}
+
+/* ─── Page Header ────────────────────────────────────────────────────────── */
+.fi-page-header {
+    padding-bottom: 1.5rem !important;
+    border-bottom: 1px solid rgba(255,255,255,0.05) !important;
+    margin-bottom: 1.5rem !important;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(139, 92, 246, 0.3);
+    border-radius: 999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(139, 92, 246, 0.5);
+}
+
+/* ─── Chart Widget ───────────────────────────────────────────────────────── */
+.fi-wi-chart {
+    background: var(--card-bg) !important;
+    border: 1px solid var(--card-border) !important;
+    border-radius: 12px !important;
+}
