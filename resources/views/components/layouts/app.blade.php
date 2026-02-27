@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de" class="dark">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,34 +7,35 @@
     <title>{{ $title ?? 'SEOmaster' }} – SEO Platform</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
     /* ── Base ───────────────────────────────────────────────── */
     :root {
-        --sidebar-bg:   #08080f;
-        --main-bg:      #0c0c14;
-        --card-bg:      #111119;
-        --card-border:  rgba(139,92,246,0.15);
-        --accent:       #7c3aed;
-        --accent-light: #a78bfa;
-        --accent-glow:  rgba(124,58,237,0.15);
-        --text-1:       #f0eeff;
-        --text-2:       #9d9bbf;
-        --text-3:       #4e4c6a;
-        --success:      #10b981;
-        --warning:      #f59e0b;
-        --danger:       #f43f5e;
-        --info:         #0ea5e9;
+        --sidebar-bg:   #fff;
+        --main-bg:      #f8f9fa;
+        --card-bg:      #fff;
+        --card-border:  #dadce0;
+        --accent:       #1a73e8;
+        --accent-hover: #1765cc;
+        --accent-light: #e8f0fe;
+        --text-1:       #202124;
+        --text-2:       #5f6368;
+        --text-3:       #80868b;
+        --success:      #1e8e3e;
+        --warning:      #e37400;
+        --danger:       #d93025;
+        --info:         #1a73e8;
+        --border:       #dadce0;
         --sidebar-w:    240px;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-        font-family: 'Inter', system-ui, sans-serif;
+        font-family: 'Roboto', arial, sans-serif;
         background: var(--main-bg);
         color: var(--text-1);
         display: flex;
@@ -48,7 +49,7 @@
         width: var(--sidebar-w);
         flex-shrink: 0;
         background: var(--sidebar-bg);
-        border-right: 1px solid rgba(139,92,246,0.1);
+        border-right: 1px solid var(--border);
         display: flex;
         flex-direction: column;
         position: fixed;
@@ -57,8 +58,8 @@
     }
 
     .sidebar-logo {
-        padding: 20px 16px 16px;
-        border-bottom: 1px solid rgba(255,255,255,0.05);
+        padding: 16px 16px 14px;
+        border-bottom: 1px solid var(--border);
         display: flex;
         align-items: center;
         gap: 10px;
@@ -67,98 +68,109 @@
 
     .logo-icon {
         width: 32px; height: 32px;
-        background: linear-gradient(135deg, var(--accent), #9333ea);
+        background: var(--accent);
         border-radius: 8px;
         display: flex; align-items: center; justify-content: center;
         font-size: 16px;
-        box-shadow: 0 0 20px var(--accent-glow);
         flex-shrink: 0;
     }
 
     .logo-text {
-        font-size: 16px; font-weight: 700;
-        letter-spacing: -0.03em;
-        background: linear-gradient(135deg, #f0eeff, #a78bfa);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        font-family: 'Google Sans', sans-serif;
+        font-size: 16px; font-weight: 500;
+        color: var(--text-1);
+        letter-spacing: -0.01em;
     }
 
-    .nav-section { padding: 14px 8px 4px; }
+    .nav-section { padding: 10px 8px 4px; }
 
     .nav-label {
-        padding: 0 10px 5px;
-        font-size: 10px; font-weight: 600;
-        letter-spacing: 0.1em; text-transform: uppercase;
+        padding: 4px 10px 4px;
+        font-size: 11px; font-weight: 500;
+        letter-spacing: 0.07em; text-transform: uppercase;
         color: var(--text-3);
     }
 
     .nav-item {
-        display: flex; align-items: center; gap: 9px;
+        display: flex; align-items: center; gap: 10px;
         padding: 8px 10px;
-        border-radius: 8px;
+        border-radius: 0 24px 24px 0;
         text-decoration: none;
         color: var(--text-2);
-        font-size: 13px; font-weight: 450;
+        font-size: 13px; font-weight: 400;
         transition: all 0.15s;
         margin: 1px 0;
-        border: 1px solid transparent;
+        margin-right: 8px;
     }
 
-    .nav-item:hover { background: rgba(139,92,246,0.06); color: var(--text-1); }
+    .nav-item:hover { background: #f1f3f4; color: var(--text-1); }
 
     .nav-item.active {
-        background: rgba(124,58,237,0.15);
-        color: var(--accent-light);
-        border-color: rgba(124,58,237,0.3);
+        background: var(--accent-light);
+        color: var(--accent);
+        font-weight: 500;
     }
 
     .nav-badge {
         margin-left: auto;
-        background: rgba(124,58,237,0.2);
-        color: var(--accent-light);
-        font-size: 10px; font-weight: 600;
-        padding: 1px 6px;
+        background: var(--accent-light);
+        color: var(--accent);
+        font-size: 11px; font-weight: 500;
+        padding: 1px 7px;
         border-radius: 999px;
     }
 
     .sidebar-footer {
         margin-top: auto;
-        padding: 10px 8px;
-        border-top: 1px solid rgba(255,255,255,0.05);
+        padding: 8px 8px;
+        border-top: 1px solid var(--border);
     }
 
     .user-chip {
-        display: flex; align-items: center; gap: 9px;
+        display: flex; align-items: center; gap: 10px;
         padding: 8px 10px;
         border-radius: 8px;
         cursor: pointer;
         text-decoration: none;
         transition: background 0.15s;
     }
-    .user-chip:hover { background: rgba(255,255,255,0.04); }
+    .user-chip:hover { background: #f1f3f4; }
 
     .user-avatar {
         width: 30px; height: 30px;
-        background: linear-gradient(135deg, var(--accent), #9333ea);
+        background: var(--accent);
         border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
-        font-size: 12px; font-weight: 600;
+        font-size: 12px; font-weight: 500;
+        color: #fff;
         flex-shrink: 0;
     }
 
-    .user-name  { font-size: 12px; font-weight: 500; color: var(--text-1); }
+    .user-name  { font-size: 13px; font-weight: 500; color: var(--text-1); }
     .user-email { font-size: 11px; color: var(--text-3); }
 
     /* Subscription badge in sidebar */
     .sub-chip {
         display: flex; align-items: center; gap: 6px;
-        margin: 0 8px 10px;
-        padding: 8px 12px;
-        background: rgba(124,58,237,0.08);
-        border: 1px solid rgba(124,58,237,0.2);
+        margin: 0 8px 8px;
+        padding: 7px 12px;
+        background: var(--accent-light);
         border-radius: 8px;
-        font-size: 11px; color: var(--accent-light);
+        font-size: 12px; color: var(--accent);
+        font-weight: 500;
     }
+
+    .sub-chip-warn {
+        display: flex; align-items: center; gap: 6px;
+        margin: 0 8px 8px;
+        padding: 7px 12px;
+        background: #fce8e6;
+        border-radius: 8px;
+        font-size: 12px; color: var(--danger);
+        font-weight: 500;
+        text-decoration: none;
+    }
+    .sub-chip-warn:hover { background: #fad2cf; }
 
     /* ── Main Content ─────────────────────────────────────────── */
     .main-wrapper {
@@ -171,9 +183,8 @@
 
     .topbar {
         height: 52px;
-        background: rgba(8,8,15,0.8);
-        backdrop-filter: blur(12px);
-        border-bottom: 1px solid rgba(139,92,246,0.08);
+        background: #fff;
+        border-bottom: 1px solid var(--border);
         display: flex; align-items: center;
         padding: 0 28px;
         position: sticky; top: 0; z-index: 40;
@@ -181,25 +192,24 @@
     }
 
     .topbar-breadcrumb {
-        font-size: 12px; color: var(--text-3);
+        font-size: 13px; color: var(--text-2);
         display: flex; align-items: center; gap: 6px;
+        font-family: 'Google Sans', sans-serif;
     }
     .topbar-breadcrumb .sep { color: var(--text-3); }
-    .topbar-breadcrumb .current { color: var(--text-2); }
+    .topbar-breadcrumb .current { color: var(--text-1); font-weight: 500; }
 
-    .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
 
     .icon-btn {
-        width: 32px; height: 32px;
-        border-radius: 8px;
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.08);
+        width: 34px; height: 34px;
+        border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
-        cursor: pointer; font-size: 15px;
+        cursor: pointer; font-size: 16px;
         transition: background 0.15s;
         text-decoration: none;
     }
-    .icon-btn:hover { background: rgba(255,255,255,0.08); }
+    .icon-btn:hover { background: #f1f3f4; }
 
     .main-content {
         padding: 28px;
@@ -211,136 +221,173 @@
     .page-header {
         display: flex; align-items: flex-start;
         justify-content: space-between;
-        margin-bottom: 28px;
+        margin-bottom: 24px;
         gap: 16px;
     }
 
     .page-title {
-        font-size: 22px; font-weight: 600;
-        letter-spacing: -0.03em;
+        font-family: 'Google Sans', sans-serif;
+        font-size: 22px; font-weight: 400;
+        color: var(--text-1);
+        letter-spacing: -0.01em;
     }
 
-    .page-subtitle { font-size: 13px; color: var(--text-3); margin-top: 3px; }
+    .page-subtitle { font-size: 13px; color: var(--text-3); margin-top: 4px; }
 
     /* ── Buttons ──────────────────────────────────────────────── */
     .btn {
         display: inline-flex; align-items: center; gap: 7px;
-        padding: 8px 16px;
-        border-radius: 8px;
-        font-size: 13px; font-weight: 500;
+        padding: 8px 20px;
+        border-radius: 4px;
+        font-size: 14px; font-weight: 500;
         cursor: pointer; border: none;
         text-decoration: none;
         transition: all 0.15s;
         white-space: nowrap;
+        font-family: 'Google Sans', sans-serif;
     }
 
     .btn-primary {
         background: var(--accent);
         color: white;
-        box-shadow: 0 0 20px var(--accent-glow);
+        box-shadow: 0 1px 2px rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
     }
-    .btn-primary:hover { background: #6d28d9; transform: translateY(-1px); }
+    .btn-primary:hover {
+        background: var(--accent-hover);
+        box-shadow: 0 1px 3px rgba(60,64,67,.3), 0 4px 8px 3px rgba(60,64,67,.15);
+    }
 
     .btn-secondary {
-        background: rgba(255,255,255,0.06);
-        color: var(--text-2);
-        border: 1px solid rgba(255,255,255,0.1);
+        background: #fff;
+        color: var(--accent);
+        border: 1px solid var(--border);
+        box-shadow: 0 1px 2px rgba(60,64,67,.3);
     }
-    .btn-secondary:hover { background: rgba(255,255,255,0.09); color: var(--text-1); }
+    .btn-secondary:hover {
+        background: var(--accent-light);
+        border-color: #d2e3fc;
+    }
 
     .btn-danger {
-        background: rgba(244,63,94,0.12);
-        color: #fb7185;
-        border: 1px solid rgba(244,63,94,0.3);
+        background: var(--danger);
+        color: #fff;
     }
-    .btn-danger:hover { background: rgba(244,63,94,0.2); }
+    .btn-danger:hover { background: #c5221f; }
 
-    .btn-sm { padding: 5px 12px; font-size: 12px; }
+    .btn-sm { padding: 5px 14px; font-size: 13px; }
 
     /* ── Cards ────────────────────────────────────────────────── */
     .card {
         background: var(--card-bg);
         border: 1px solid var(--card-border);
-        border-radius: 12px;
+        border-radius: 8px;
+        box-shadow: 0 1px 2px rgba(60,64,67,.1);
     }
 
     .card-header {
         padding: 16px 20px;
-        border-bottom: 1px solid rgba(255,255,255,0.05);
+        border-bottom: 1px solid var(--border);
         display: flex; align-items: center; justify-content: space-between;
     }
 
-    .card-title { font-size: 14px; font-weight: 600; }
+    .card-title {
+        font-family: 'Google Sans', sans-serif;
+        font-size: 14px; font-weight: 500;
+        color: var(--text-1);
+    }
     .card-subtitle { font-size: 12px; color: var(--text-3); margin-top: 2px; }
     .card-body { padding: 20px; }
 
     /* ── Alerts ───────────────────────────────────────────────── */
     .alert {
-        padding: 12px 16px; border-radius: 8px;
+        padding: 12px 16px; border-radius: 4px;
         font-size: 13px;
         display: flex; align-items: flex-start; gap: 10px;
         margin-bottom: 20px;
     }
-    .alert-success { background: rgba(16,185,129,0.1); border: 1px solid rgba(16,185,129,0.3); color: #34d399; }
-    .alert-warning { background: rgba(245,158,11,0.1); border: 1px solid rgba(245,158,11,0.3); color: #fbbf24; }
-    .alert-danger   { background: rgba(244,63,94,0.1);  border: 1px solid rgba(244,63,94,0.3);  color: #fb7185; }
-    .alert-info     { background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.25); color: var(--accent-light); }
+    .alert-success { background: #e6f4ea; border-left: 4px solid var(--success); color: #137333; }
+    .alert-warning { background: #fef7e0; border-left: 4px solid var(--warning); color: #b06000; }
+    .alert-danger   { background: #fce8e6; border-left: 4px solid var(--danger);  color: #c5221f; }
+    .alert-info     { background: var(--accent-light); border-left: 4px solid var(--accent); color: #174ea6; }
 
     /* ── Badges ───────────────────────────────────────────────── */
     .badge {
         display: inline-flex; align-items: center;
-        padding: 2px 9px; border-radius: 999px;
+        padding: 2px 10px; border-radius: 999px;
         font-size: 11px; font-weight: 500;
     }
-    .badge-violet { background: rgba(124,58,237,0.15); color: var(--accent-light); border: 1px solid rgba(124,58,237,0.3); }
-    .badge-green  { background: rgba(16,185,129,0.12); color: #34d399;             border: 1px solid rgba(16,185,129,0.3); }
-    .badge-amber  { background: rgba(245,158,11,0.12); color: #fbbf24;             border: 1px solid rgba(245,158,11,0.3); }
-    .badge-red    { background: rgba(244,63,94,0.12);  color: #fb7185;             border: 1px solid rgba(244,63,94,0.3); }
-    .badge-gray   { background: rgba(255,255,255,0.06); color: var(--text-2);       border: 1px solid rgba(255,255,255,0.1); }
+    .badge-blue   { background: var(--accent-light); color: var(--accent); }
+    .badge-green  { background: #e6f4ea; color: var(--success); }
+    .badge-amber  { background: #fef7e0; color: var(--warning); }
+    .badge-red    { background: #fce8e6; color: var(--danger); }
+    .badge-gray   { background: #f1f3f4; color: var(--text-2); }
+
+    /* backwards compat */
+    .badge-violet { background: var(--accent-light); color: var(--accent); }
 
     /* ── Forms ────────────────────────────────────────────────── */
     .form-group { margin-bottom: 18px; }
 
     .form-label {
         display: block;
-        font-size: 12px; font-weight: 500;
-        color: var(--text-2);
+        font-size: 13px; font-weight: 500;
+        color: var(--text-1);
         margin-bottom: 6px;
     }
 
     .form-input, .form-select, .form-textarea {
         width: 100%;
         padding: 9px 12px;
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 8px;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 4px;
         color: var(--text-1);
-        font-size: 13px;
+        font-size: 14px;
         font-family: inherit;
         transition: all 0.2s;
         outline: none;
     }
 
+    .form-input:hover, .form-select:hover, .form-textarea:hover {
+        border-color: #b8bdc3;
+    }
+
     .form-input:focus, .form-select:focus, .form-textarea:focus {
         border-color: var(--accent);
-        box-shadow: 0 0 0 3px var(--accent-glow);
-        background: rgba(124,58,237,0.05);
+        box-shadow: 0 0 0 2px rgba(26,115,232,0.15);
     }
 
     .form-input::placeholder { color: var(--text-3); }
-
-    .form-hint { font-size: 11px; color: var(--text-3); margin-top: 5px; }
+    .form-hint { font-size: 12px; color: var(--text-3); margin-top: 5px; }
 
     .form-error {
-        font-size: 11px; color: #fb7185;
+        font-size: 12px; color: var(--danger);
         margin-top: 5px;
-        display: flex; align-items: center; gap: 4px;
     }
 
+    /* ── Table ────────────────────────────────────────────────── */
+    table { width: 100%; border-collapse: collapse; }
+    th {
+        font-size: 12px; font-weight: 500;
+        color: var(--text-2);
+        text-align: left;
+        padding: 10px 16px;
+        border-bottom: 1px solid var(--border);
+        background: #f8f9fa;
+    }
+    td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #f1f3f4;
+        font-size: 13px;
+        color: var(--text-1);
+    }
+    tr:hover td { background: #f8f9fa; }
+
     /* ── Scrollbar ────────────────────────────────────────────── */
-    ::-webkit-scrollbar { width: 5px; }
+    ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.3); border-radius: 999px; }
+    ::-webkit-scrollbar-thumb { background: #dadce0; border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: #bdc1c6; }
     </style>
 
     @stack('styles')
@@ -358,7 +405,7 @@
         <div class="nav-label">Übersicht</div>
         <a href="{{ route('dashboard') }}"
            class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-            <span>⬛</span> Dashboard
+            <span>📊</span> Dashboard
         </a>
     </div>
 
@@ -392,12 +439,12 @@
             <span>✨</span>
             <span>{{ $sub->plan->name ?? 'Plan' }}
                 @if($sub->isOnTrial())
-                    <span style="color:var(--warning)">· Trial</span>
+                    · <span style="color:var(--warning)">Trial</span>
                 @endif
             </span>
         </div>
     @else
-        <a href="{{ route('subscription.index') }}" style="margin: 0 8px 10px; display:flex; align-items:center; gap:6px; padding:8px 12px; background:rgba(244,63,94,0.08); border:1px solid rgba(244,63,94,0.2); border-radius:8px; font-size:11px; color:#fb7185; text-decoration:none;">
+        <a href="{{ route('subscription.index') }}" class="sub-chip-warn">
             <span>⚠️</span> Kein aktives Abo
         </a>
     @endif
@@ -407,13 +454,13 @@
             <div class="user-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
             <div>
                 <div class="user-name">{{ auth()->user()->name }}</div>
-                <div class="user-email">{{ Str::limit(auth()->user()->email, 22) }}</div>
+                <div class="user-email">{{ Str::limit(auth()->user()->email, 24) }}</div>
             </div>
         </a>
         <form method="POST" action="{{ route('logout') }}" style="margin-top:4px;">
             @csrf
-            <button type="submit" class="nav-item" style="width:100%; cursor:pointer; background:none; border:none; text-align:left;">
-                <span>🚪</span> <span style="color:var(--text-3)">Abmelden</span>
+            <button type="submit" class="nav-item" style="width:100%; cursor:pointer; background:none; border:none; text-align:left; color:var(--text-3); font-size:13px;">
+                <span>🚪</span> Abmelden
             </button>
         </form>
     </div>
