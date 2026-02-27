@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de" class="dark">
+<html lang="de">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,72 +7,45 @@
     <title>{{ $title ?? 'SEOmaster' }}</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
     :root {
-        --bg:           #07070f;
-        --card-bg:      #0e0e1a;
-        --card-border:  rgba(124,58,237,0.2);
-        --accent:       #7c3aed;
-        --accent-light: #a78bfa;
-        --accent-glow:  rgba(124,58,237,0.2);
-        --text-1:       #f0eeff;
-        --text-2:       #9d9bbf;
-        --text-3:       #3d3b5a;
-        --success:      #10b981;
-        --danger:       #f43f5e;
-        --warning:      #f59e0b;
+        --bg:           #f8f9fa;
+        --card-bg:      #fff;
+        --card-border:  #dadce0;
+        --accent:       #1a73e8;
+        --accent-hover: #1765cc;
+        --accent-light: #e8f0fe;
+        --text-1:       #202124;
+        --text-2:       #5f6368;
+        --text-3:       #80868b;
+        --success:      #1e8e3e;
+        --danger:       #d93025;
+        --warning:      #e37400;
+        --border:       #dadce0;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
-        font-family: 'Inter', system-ui, sans-serif;
+        font-family: 'Roboto', arial, sans-serif;
         background: var(--bg);
         color: var(--text-1);
         min-height: 100vh;
         display: flex;
+        flex-direction: column;
         align-items: center;
         justify-content: center;
         padding: 24px;
         -webkit-font-smoothing: antialiased;
-        position: relative;
-        overflow: hidden;
-    }
-
-    /* ── Animated background ─────────────────────────────────── */
-    body::before {
-        content: '';
-        position: fixed;
-        inset: 0;
-        background:
-            radial-gradient(ellipse 60% 50% at 20% 20%, rgba(124,58,237,0.12) 0%, transparent 60%),
-            radial-gradient(ellipse 50% 40% at 80% 80%, rgba(147,51,234,0.08) 0%, transparent 60%);
-        pointer-events: none;
-        z-index: 0;
-    }
-
-    /* Subtle grid */
-    body::after {
-        content: '';
-        position: fixed;
-        inset: 0;
-        background-image:
-            linear-gradient(rgba(124,58,237,0.04) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(124,58,237,0.04) 1px, transparent 1px);
-        background-size: 60px 60px;
-        pointer-events: none;
-        z-index: 0;
     }
 
     .auth-wrapper {
-        position: relative;
-        z-index: 1;
         width: 100%;
-        max-width: 440px;
+        max-width: 400px;
     }
 
     /* ── Logo ─────────────────────────────────────────────────── */
@@ -81,87 +54,80 @@
         align-items: center;
         justify-content: center;
         gap: 10px;
-        margin-bottom: 32px;
+        margin-bottom: 28px;
         text-decoration: none;
     }
 
     .logo-icon {
-        width: 40px; height: 40px;
-        background: linear-gradient(135deg, var(--accent), #9333ea);
-        border-radius: 10px;
+        width: 36px; height: 36px;
+        background: var(--accent);
+        border-radius: 8px;
         display: flex; align-items: center; justify-content: center;
-        font-size: 20px;
-        box-shadow: 0 0 30px rgba(124,58,237,0.4);
+        font-size: 18px;
     }
 
     .logo-name {
-        font-family: 'Syne', sans-serif;
-        font-size: 22px; font-weight: 800;
-        letter-spacing: -0.03em;
-        background: linear-gradient(135deg, #f0eeff 30%, #a78bfa);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
+        font-family: 'Google Sans', sans-serif;
+        font-size: 20px; font-weight: 500;
+        color: var(--text-1);
+        letter-spacing: -0.01em;
     }
 
     /* ── Card ─────────────────────────────────────────────────── */
     .auth-card {
         background: var(--card-bg);
         border: 1px solid var(--card-border);
-        border-radius: 16px;
-        padding: 36px 40px;
-        box-shadow:
-            0 0 0 1px rgba(124,58,237,0.05),
-            0 24px 64px rgba(0,0,0,0.6),
-            0 0 80px rgba(124,58,237,0.06);
-        backdrop-filter: blur(12px);
+        border-radius: 8px;
+        padding: 40px 40px 36px;
+        box-shadow: 0 1px 3px rgba(60,64,67,.1), 0 4px 8px rgba(60,64,67,.08);
     }
 
     .auth-header {
-        margin-bottom: 28px;
+        margin-bottom: 24px;
+        text-align: center;
     }
 
     .auth-title {
-        font-family: 'Syne', sans-serif;
-        font-size: 20px; font-weight: 700;
-        letter-spacing: -0.02em;
+        font-family: 'Google Sans', sans-serif;
+        font-size: 24px; font-weight: 400;
         color: var(--text-1);
-        margin-bottom: 6px;
+        margin-bottom: 8px;
     }
 
     .auth-subtitle {
-        font-size: 13px;
+        font-size: 14px;
         color: var(--text-2);
         line-height: 1.5;
     }
 
     /* ── Form Elements ────────────────────────────────────────── */
     .form-group {
-        margin-bottom: 18px;
+        margin-bottom: 20px;
     }
 
     .form-label {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        font-size: 12px; font-weight: 500;
-        color: var(--text-2);
-        margin-bottom: 7px;
-        letter-spacing: 0.02em;
+        font-size: 13px; font-weight: 500;
+        color: var(--text-1);
+        margin-bottom: 6px;
     }
 
     .form-label a {
-        color: var(--accent-light);
+        color: var(--accent);
         text-decoration: none;
-        font-size: 11px;
+        font-size: 13px;
+        font-weight: 400;
     }
     .form-label a:hover { text-decoration: underline; }
 
     .form-input {
         width: 100%;
         padding: 10px 14px;
-        background: rgba(255,255,255,0.04);
-        border: 1px solid rgba(255,255,255,0.1);
-        border-radius: 9px;
+        background: #fff;
+        border: 1px solid var(--border);
+        border-radius: 4px;
         color: var(--text-1);
         font-size: 14px;
         font-family: inherit;
@@ -169,33 +135,25 @@
         outline: none;
     }
 
-    .form-input:hover {
-        border-color: rgba(124,58,237,0.3);
-    }
+    .form-input:hover { border-color: #b8bdc3; }
 
     .form-input:focus {
         border-color: var(--accent);
-        box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
-        background: rgba(124,58,237,0.05);
+        box-shadow: 0 0 0 2px rgba(26,115,232,0.15);
     }
 
     .form-input::placeholder { color: var(--text-3); }
 
-    .form-input.error {
-        border-color: rgba(244,63,94,0.5);
-    }
-    .form-input.error:focus {
-        box-shadow: 0 0 0 3px rgba(244,63,94,0.12);
-    }
+    .form-input.error { border-color: var(--danger); }
+    .form-input.error:focus { box-shadow: 0 0 0 2px rgba(217,48,37,0.12); }
 
     .form-error {
-        font-size: 11px; color: #fb7185;
+        font-size: 12px; color: var(--danger);
         margin-top: 5px;
-        display: flex; align-items: center; gap: 4px;
     }
 
     .form-hint {
-        font-size: 11px; color: var(--text-3);
+        font-size: 12px; color: var(--text-3);
         margin-top: 5px;
         line-height: 1.4;
     }
@@ -216,71 +174,55 @@
         cursor: pointer;
     }
 
-    .form-check a { color: var(--accent-light); text-decoration: none; }
+    .form-check a { color: var(--accent); text-decoration: none; }
     .form-check a:hover { text-decoration: underline; }
 
     /* ── Submit Button ─────────────────────────────────────────── */
     .btn-submit {
         width: 100%;
-        padding: 11px 20px;
+        padding: 10px 20px;
         background: var(--accent);
         color: white;
         border: none;
-        border-radius: 9px;
-        font-size: 14px; font-weight: 600;
+        border-radius: 4px;
+        font-family: 'Google Sans', sans-serif;
+        font-size: 14px; font-weight: 500;
         cursor: pointer;
-        transition: all 0.2s;
+        transition: all 0.15s;
         margin-top: 8px;
-        box-shadow: 0 0 24px rgba(124,58,237,0.3);
-        letter-spacing: 0.01em;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .btn-submit::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(to right, transparent 0%, rgba(255,255,255,0.07) 50%, transparent 100%);
-        transform: translateX(-100%);
-        transition: transform 0.5s;
+        box-shadow: 0 1px 2px rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
     }
 
     .btn-submit:hover {
-        background: #6d28d9;
-        transform: translateY(-1px);
-        box-shadow: 0 4px 32px rgba(124,58,237,0.45);
+        background: var(--accent-hover);
+        box-shadow: 0 1px 3px rgba(60,64,67,.3), 0 4px 8px 3px rgba(60,64,67,.15);
     }
 
-    .btn-submit:hover::after {
-        transform: translateX(100%);
-    }
-
-    .btn-submit:active { transform: translateY(0); }
-    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .btn-submit:active { background: #1558b0; }
+    .btn-submit:disabled { opacity: 0.6; cursor: not-allowed; }
 
     /* ── Divider ───────────────────────────────────────────────── */
     .divider {
         display: flex; align-items: center; gap: 12px;
         margin: 24px 0;
-        font-size: 11px; color: var(--text-3);
-        text-transform: uppercase; letter-spacing: 0.08em;
+        font-size: 12px; color: var(--text-3);
+        text-transform: uppercase; letter-spacing: 0.06em;
     }
     .divider::before, .divider::after {
         content: ''; flex: 1;
         height: 1px;
-        background: rgba(255,255,255,0.07);
+        background: var(--border);
     }
 
     /* ── Footer Link ───────────────────────────────────────────── */
     .auth-footer {
         text-align: center;
-        margin-top: 24px;
+        margin-top: 20px;
         font-size: 13px;
         color: var(--text-2);
     }
     .auth-footer a {
-        color: var(--accent-light);
+        color: var(--accent);
         text-decoration: none;
         font-weight: 500;
     }
@@ -289,19 +231,19 @@
     /* ── Alert ─────────────────────────────────────────────────── */
     .alert {
         padding: 12px 16px;
-        border-radius: 9px;
+        border-radius: 4px;
         font-size: 13px;
         margin-bottom: 20px;
         line-height: 1.5;
     }
-    .alert-danger  { background: rgba(244,63,94,0.08);  border: 1px solid rgba(244,63,94,0.25);  color: #fb7185; }
-    .alert-success { background: rgba(16,185,129,0.08); border: 1px solid rgba(16,185,129,0.25); color: #34d399; }
-    .alert-info    { background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.25); color: var(--accent-light); }
+    .alert-danger  { background: #fce8e6; border-left: 4px solid var(--danger);  color: #c5221f; }
+    .alert-success { background: #e6f4ea; border-left: 4px solid var(--success); color: #137333; }
+    .alert-info    { background: var(--accent-light); border-left: 4px solid var(--accent); color: #174ea6; }
 
     /* ── Password strength ─────────────────────────────────────── */
     .strength-bar {
         height: 3px;
-        background: rgba(255,255,255,0.08);
+        background: var(--border);
         border-radius: 999px;
         margin-top: 6px;
         overflow: hidden;
@@ -313,9 +255,17 @@
         width: 0%;
     }
 
-    /* ── Scroll ────────────────────────────────────────────────── */
-    ::-webkit-scrollbar { width: 5px; }
-    ::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.3); border-radius: 999px; }
+    /* ── Footer nav ────────────────────────────────────────────── */
+    .page-footer {
+        margin-top: 28px;
+        display: flex;
+        justify-content: center;
+        gap: 24px;
+        font-size: 12px;
+        color: var(--text-3);
+    }
+    .page-footer a { color: var(--text-3); text-decoration: none; }
+    .page-footer a:hover { text-decoration: underline; }
     </style>
 </head>
 <body>
@@ -333,6 +283,12 @@
         @if(isset($footer))
             <div class="auth-footer">{{ $footer }}</div>
         @endif
+
+        <div class="page-footer">
+            <a href="#">Datenschutz</a>
+            <a href="#">Impressum</a>
+            <a href="#">Hilfe</a>
+        </div>
 
     </div>
 </body>
