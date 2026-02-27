@@ -140,7 +140,7 @@
                 @php $sub = auth()->user()->activeSubscription; @endphp
                 Du bist auf dem <strong style="color:var(--accent-light)">{{ $sub->plan->name }}</strong>-Plan.
                 @if($sub->isOnTrial())
-                    Trial läuft noch {{ $sub->trial_ends_at->diffForHumans() }}.
+                    Testphase endet {{ $sub->trial_ends_at->locale("de")->diffForHumans() }}.
                 @endif
             @else
                 <span style="color:var(--warning)">⚠️ Kein aktives Abo.</span>
