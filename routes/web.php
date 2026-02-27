@@ -124,3 +124,7 @@ Route::name('legal.')->group(function () {
 Route::get('/favicon.ico', function() {
     return response()->file(public_path('favicon.svg'), ['Content-Type' => 'image/svg+xml']);
 });
+
+Route::get('/imprint', fn() => view('legal.imprint'))->name('imprint');
+Route::get('/privacy', fn() => view('legal.privacy'))->name('privacy');
+Route::get('/terms', fn() => view('legal.terms'))->name('terms');
