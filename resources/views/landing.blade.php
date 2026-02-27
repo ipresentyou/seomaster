@@ -465,8 +465,10 @@
 <!-- NAV -->
 <nav>
     <a href="/" class="nav-brand">
-        <div class="nav-logo">📊</div>
-        SEO<span>master</span>
+{{--        <div class="nav-logo">--}}
+{{--            --}}
+{{--        </div>--}}
+        shopware6<span>seomaster</span>
     </a>
     <div class="nav-links">
         <a href="#features" class="nav-link">Features</a>
@@ -725,7 +727,7 @@
                     <li><span class="check">✓</span> API-Zugang</li>
                     <li><span class="check">✓</span> Dedicated Support</li>
                 </ul>
-                <a href="mailto:hello@seomaster.app" class="btn btn-outline" style="text-align:center; justify-content:center">Kontakt aufnehmen</a>
+                <a href="mailto:hello@shopware-seomaster.com" class="btn btn-outline" style="text-align:center; justify-content:center">Kontakt aufnehmen</a>
             </div>
         </div>
     </div>
@@ -798,19 +800,19 @@
                 </div>
                 <div class="footer-col">
                     <h4>Rechtliches</h4>
-                    <a href="/datenschutz">Datenschutz</a>
-                    <a href="/impressum">Impressum</a>
-                    <a href="/agb">AGB</a>
+                    <a href="{{ route('legal.impressum') }}">Impressum</a>
+                    <a href="{{ route('legal.datenschutz') }}">Datenschutz</a>
+                    <a href="{{ route('legal.agb') }}">AGB</a>
                 </div>
                 <div class="footer-col">
                     <h4>Kontakt</h4>
-                    <a href="mailto:hello@seomaster.app">hello@seomaster.app</a>
+                    <a href="mailto:hello@seomaster.app">hello@shopware-seomaster.com</a>
                 </div>
             </div>
         </div>
         <div class="footer-bottom">
-            <span>© 2026 SEOmaster. Alle Rechte vorbehalten.</span>
-            <span>Made with ☕ in Germany</span>
+            <span>© 2026 shopware-seomaster.com. Alle Rechte vorbehalten.</span>
+            <span>Made in Germany</span>
         </div>
     </div>
 </footer>

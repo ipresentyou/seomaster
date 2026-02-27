@@ -114,9 +114,13 @@ Route::post('/webhooks/paypal', [SubscriptionController::class, 'webhook'])
     ->name('webhooks.paypal')
     ->withoutMiddleware(['web']);
 
-Route::view('/terms', 'legal.terms')->name('terms');
-Route::view('/privacy', 'legal.privacy')->name('privacy');
+// ─── Legal Pages ─────────────────────────────────────────────────────────────
 
+Route::name('legal.')->group(function () {
+    Route::view('/impressum', 'impressum')->name('impressum');
+    Route::view('/datenschutz', 'legal.privacy')->name('datenschutz');
+    Route::view('/agb', 'legal.terms')->name('agb');
+});
 Route::get('/favicon.ico', function() {
     return response()->file(public_path('favicon.svg'), ['Content-Type' => 'image/svg+xml']);
 });
