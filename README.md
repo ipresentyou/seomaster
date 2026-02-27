@@ -1,4 +1,4 @@
-# ⚡ Lavarell — SEO Automation für Shopware
+# ⚡ SEO Automation für Shopware
 
 > KI-gestützte SEO-Plattform als Laravel 11 SaaS. Optimiert Produkte, Kategorien und Bild-Alt-Texte in Shopware-Shops automatisch per GPT — mit PayPal-Billing, Admin-Panel und Onboarding-Wizard.
 
