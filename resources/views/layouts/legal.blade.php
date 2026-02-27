@@ -19,7 +19,7 @@
 </head>
 <body>
 <nav>
-    <a href="{{ route('home') }}" class="nav-brand">shopware6<span>seomaster</span></a>
+    <a href="{{ url('/') }}" class="nav-brand">shopware6<span>seomaster</span></a>
 </nav>
 <main class="content">
     @yield('content')
