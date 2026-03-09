@@ -272,8 +272,7 @@
     <div class="auth-wrapper">
 
         <a href="{{ url('/') }}" class="auth-logo">
-            <div class="logo-icon">⚡</div>
-            <div class="logo-name">SEOmaster</div>
+            <img src="{{ asset('images/logo_seomaster.svg') }}" width="240" alt="Logo">
         </a>
 
         <div class="auth-card">
