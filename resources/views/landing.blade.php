@@ -465,10 +465,7 @@
 <!-- NAV -->
 <nav>
     <a href="/" class="nav-brand">
-{{--        <div class="nav-logo">--}}
-{{--            --}}
-{{--        </div>--}}
-        shopware6<span>seomaster</span>
+        <img src="{{ asset('images/logo_seomaster.svg') }}" width="240" alt="Logo">
     </a>
     <div class="nav-links">
         <a href="#features" class="nav-link">Features</a>
@@ -785,8 +782,8 @@
         <div class="footer-top">
             <div>
                 <div class="footer-brand">
-                    <div class="footer-brand-icon">📊</div>
-                    SEOmaster
+                    <img src="{{ asset('images/logo_seomaster.svg') }}" width="180" alt="Logo">
+
                 </div>
                 <div class="footer-tagline">KI-SEO für Shopware 6</div>
             </div>

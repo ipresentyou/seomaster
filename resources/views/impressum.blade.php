@@ -16,5 +16,5 @@
     <h3>Registereintrag</h3>
     <p>Registergericht: Amtsgericht Kempten (Allgäu)<br>Registernummer: HRB 13795</p>
     <h3>Umsatzsteuer-ID</h3>
-    <p>Umsatzsteuer-Identifikationsnummer gemäß §27 a Umsatzsteuergesetz:<br>[DEINE-ID]</p>
+    <p>Umsatzsteuer-Identifikationsnummer gemäß §27 a Umsatzsteuergesetz:<br>DE312635076</p>
 @endsection

@@ -332,8 +332,7 @@
     {{-- ── Sidebar ───────────────────────────────────────────────────────── --}}
     <aside class="ob-sidebar">
         <a href="{{ route('dashboard') }}" class="ob-logo">
-            <div class="ob-logo-icon">⚡</div>
-            <div class="ob-logo-name">SEOmaster</div>
+            <img src="{{ asset('images/logo_seomaster.svg') }}" width="240" alt="Logo">
         </a>
 
         <div class="ob-steps">

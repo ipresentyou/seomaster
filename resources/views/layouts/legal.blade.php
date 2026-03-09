@@ -19,7 +19,11 @@
 </head>
 <body>
 <nav>
-    <a href="{{ url('/') }}" class="nav-brand">shopware6<span>seomaster</span></a>
+    <a href="{{ url('/') }}" class="nav-brand">
+        <img src="{{ asset('images/logo_seomaster.svg') }}" width="240" alt="Logo">
+    </a>
+
+
 </nav>
 <main class="content">
     @yield('content')

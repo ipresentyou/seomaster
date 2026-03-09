@@ -77,7 +77,9 @@
 <body>
 <div class="card">
 
-    <div class="logo">⚡ SEOmaster</div>
+    <div class="logo">
+        <img src="{{ asset('images/logo_seomaster.svg') }}" width="240" alt="Logo">
+    </div>
 
     <div class="warning-badge">
         @if($daysLeft === 1) ⏰ Letzte Chance @else ⏳ Trial läuft ab @endif

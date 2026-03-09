@@ -72,7 +72,9 @@
 <body>
 <div class="card">
 
-    <div class="logo">⚡ SEOmaster</div>
+    <div class="logo">
+        <img src="{{ asset('images/logo_seomaster.svg') }}" width="240" alt="Logo">
+    </div>
 
     <div class="expired-badge">🔴 Trial abgelaufen</div>
 

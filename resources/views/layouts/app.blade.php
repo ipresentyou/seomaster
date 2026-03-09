@@ -350,8 +350,7 @@
 {{-- ── Sidebar ──────────────────────────────────────────────── --}}
 <aside class="sidebar">
     <a href="{{ route('dashboard') }}" class="sidebar-logo">
-        <div class="logo-icon">⚡</div>
-        <div class="logo-text">SEOmaster</div>
+            <img src="{{ asset('images/logo_seomaster.svg') }}" width="240" alt="Logo">
     </a>
 
     <div class="nav-section">

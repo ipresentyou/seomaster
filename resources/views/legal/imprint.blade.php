@@ -68,7 +68,9 @@
 </head>
 <body>
     <div class="topbar">
-        <a href="{{ url('/') }}" class="topbar-logo">SEO<span>master</span></a>
+        <a href="{{ url('/') }}" class="topbar-logo">
+            <img src="{{ asset('images/logo_seomaster.svg') }}" width="240" alt="Logo">
+        </a>
         <div class="topbar-divider"></div>
         <span class="topbar-title">Impressum</span>
     </div>
