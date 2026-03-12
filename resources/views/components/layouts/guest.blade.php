@@ -278,7 +278,6 @@
         <div class="auth-card">
             {{ $slot }}
         </div>
-
         @if(isset($footer))
             <div class="auth-footer">{{ $footer }}</div>
         @endif
