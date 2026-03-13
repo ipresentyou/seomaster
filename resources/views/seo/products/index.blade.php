@@ -79,14 +79,14 @@
 .ep-label { font-size: 12px; font-weight: 500; color: var(--text-2); margin-bottom: 5px; display: flex; justify-content: space-between; }
 .ep-input, .ep-textarea {
     width: 100%; padding: 9px 12px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 8px; color: var(--text-1);
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 8px; color: #000;
     font-family: inherit; font-size: 13px; outline: none;
     transition: border-color 0.2s;
 }
 .ep-textarea { resize: vertical; min-height: 100px; }
-.ep-input:focus, .ep-textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-glow); }
+.ep-input:focus, .ep-textarea:focus { border-color: #7c3aed; box-shadow: 0 0 0 2px rgba(124,58,237,0.2); }
 .char-bar {
     height: 3px; border-radius: 99px; margin-top: 4px;
     background: rgba(255,255,255,0.08); overflow: hidden;
@@ -110,8 +110,10 @@
 .ai-note {
     display: flex; align-items: center; gap: 8px;
     padding: 8px 12px; border-radius: 6px;
-    background: rgba(124,58,237,0.08); border: 1px solid rgba(124,58,237,0.2);
-    font-size: 12px; color: var(--accent-light); margin-bottom: 14px;
+    background: rgba(124,58,237,0.15); border: 1px solid rgba(124,58,237,0.4);
+    color: #a78bfa;
+    font-size: 11px; font-weight: 500;
+    margin-bottom: 12px;
 }
 
 /* Stats bar */
@@ -177,9 +179,20 @@
 <details style="margin-bottom:20px;" open>
     <summary style="font-size:12px;color:var(--text-3);cursor:pointer;padding:6px 0;">⚙️ KI-Anweisungen anpassen</summary>
     <textarea id="customPrompt" rows="8" class="form-input" style="margin-top:8px;font-size:12px;resize:vertical;"
-              placeholder="Passe die KI-Anweisungen an deine Brand-Anforderungen an…">{{ $project->seo_prompt ?? '' }}</textarea>
+              placeholder="Passe die KI-Anweisungen an deine Brand-Anforderungen an…">{{ $project->seo_prompt ?? 'Du bist ein SEO-Experte für Shopware-Shops. Erstelle für das Produkt "' . ($project->name ?? 'diesem Shop') . '" optimierte SEO-Texte.
+
+Berücksichtige dabei:
+• Zielgruppe: Kunden, die nach Produkten wie diesem suchen
+• Keywords: Relevante Suchbegriffe, die Kunden verwenden würden
+• Shop-Kontext: Produkte aus dem Sortiment von ' . ($project->name ?? 'diesem Shop') . '
+• Brand-Voice: Professionell, vertrauenswürdig und kundenorientiert
+• Länge: Meta-Titel 50-60 Zeichen, Meta-Beschreibung 150-160 Zeichen
+• Call-to-Action: Klare Handlungsaufforderung zum Kauf
+
+Fokus auf Conversion und hohe Klickraten in Suchmaschinen.' }}</textarea>
     <div style="display:flex;gap:8px;margin-top:6px;align-items:center;">
         <button onclick="savePrompt()" class="ep-btn ep-btn-primary" style="font-size:12px;padding:4px 12px;">💾 Prompt speichern</button>
+        <button onclick="resetPrompt()" class="ep-btn ep-btn-secondary" style="font-size:12px;padding:4px 12px;">🔄 Zurücksetzen</button>
         <span id="prompt-status" style="font-size:11px;color:var(--text-3);"></span>
     </div>
 </details>
@@ -257,6 +270,7 @@
 <script>
 const LANG_ID   = @json($selectedLang);
 const LANG_NAME = @json($languages[$selectedLang] ?? '');
+const PROJECT_NAME = @json($project->name ?? 'diesem Shop');
 const DOMAIN    = @json($storefrontUrl);
 const products  = @json($rows);
 
@@ -481,10 +495,28 @@ function updateSeoPreview(idx) {
 // ── Toast ──────────────────────────────────────────────────────
 function showToast(msg) {
     const t = document.createElement('div');
-    t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#111;border:1px solid rgba(124,58,237,.4);color:var(--al);padding:10px 18px;border-radius:8px;font-size:13px;z-index:999;';
+    t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:rgba(124,58,237,0.9);border:1px solid rgba(124,58,237,0.6);color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:999;box-shadow:0 4px 12px rgba(124,58,237,0.3);';
     t.textContent = msg;
     document.body.appendChild(t);
     setTimeout(() => t.remove(), 3000);
+}
+
+// ── Reset Prompt ─────────────────────────────────────────────────
+function resetPrompt() {
+    const defaultPrompt = `Du bist ein SEO-Experte für Shopware-Shops. Erstelle für das Produkt "${PROJECT_NAME}" optimierte SEO-Texte.
+
+Berücksichtige dabei:
+• Zielgruppe: Kunden, die nach Produkten wie diesem suchen
+• Keywords: Relevante Suchbegriffe, die Kunden verwenden würden
+• Shop-Kontext: Produkte aus dem Sortiment von ${PROJECT_NAME}
+• Brand-Voice: Professionell, vertrauenswürdig und kundenorientiert
+• Länge: Meta-Titel 50-60 Zeichen, Meta-Beschreibung 150-160 Zeichen
+• Call-to-Action: Klare Handlungsaufforderung zum Kauf
+
+Fokus auf Conversion und hohe Klickraten in Suchmaschinen.`;
+    
+    document.getElementById('customPrompt').value = defaultPrompt;
+    showToast('🔄 Prompt auf Standard zurückgesetzt');
 }
 </script>
 @endpush

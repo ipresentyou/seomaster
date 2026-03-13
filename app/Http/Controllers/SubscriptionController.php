@@ -36,6 +36,38 @@ class SubscriptionController extends Controller
         return view('subscription.index', compact('plans', 'subscription', 'invoices'));
     }
 
+    // ── Start Trial (Starter Plan) ─────────────────────────────────────────────────
+
+    public function startTrial()
+    {
+        $user = auth()->user();
+        
+        // Check if user already has an active subscription or trial
+        if ($user->activeSubscription) {
+            return redirect()->route('subscription.index')
+                ->with('info', 'Du hast bereits ein aktives Abonnement oder Trial.');
+        }
+
+        // Find Starter plan
+        $starterPlan = SubscriptionPlan::where('slug', 'starter')->first();
+        if (! $starterPlan) {
+            return redirect()->route('subscription.index')
+                ->withErrors(['plan' => 'Starter Plan nicht gefunden.']);
+        }
+
+        // Create trial subscription
+        Subscription::create([
+            'user_id'              => $user->id,
+            'subscription_plan_id' => $starterPlan->id,
+            'status'               => 'trial',
+            'trial_ends_at'        => now()->addDays(3),
+            'billing_cycle'        => 'monthly',
+        ]);
+
+        return redirect()->route('dashboard')
+            ->with('success', '🎉 3-Tage Trial gestartet! Viel Spaß mit SEOmaster.');
+    }
+
     // ── Checkout → PayPal ─────────────────────────────────────────────────────
 
     public function checkout(Request $request)
@@ -48,16 +80,32 @@ class SubscriptionController extends Controller
         $plan  = SubscriptionPlan::findOrFail($v['plan_id']);
         $cycle = $v['billing_cycle'];
 
+        // Debug logging
+        Log::info('Checkout attempt', [
+            'plan_name' => $plan->name,
+            'plan_slug' => $plan->slug,
+            'cycle' => $cycle,
+            'paypal_monthly' => $plan->paypal_plan_id_monthly,
+            'paypal_yearly' => $plan->paypal_plan_id_yearly,
+        ]);
+
         $paypalPlanId = $cycle === 'yearly'
             ? $plan->paypal_plan_id_yearly
             : $plan->paypal_plan_id_monthly;
 
         if (! $paypalPlanId) {
+            Log::error('PayPal plan ID missing', [
+                'plan' => $plan->name,
+                'cycle' => $cycle,
+                'monthly_id' => $plan->paypal_plan_id_monthly,
+                'yearly_id' => $plan->paypal_plan_id_yearly,
+            ]);
             return back()->withErrors(['plan' => 'Dieser Plan ist noch nicht für ' . $cycle . ' Abrechnung konfiguriert.']);
         }
 
         // Offene pending-Subs wegräumen
-        Subscription::where('user_id', auth()->id())->where('status', 'pending')->delete();
+        $deleted = Subscription::where('user_id', auth()->id())->where('status', 'pending')->delete();
+        Log::info('Pending subscriptions cleaned up', ['count' => $deleted]);
 
         $result = $this->paypal->createSubscription(
             paypalPlanId:   $paypalPlanId,
@@ -70,10 +118,16 @@ class SubscriptionController extends Controller
         );
 
         if (isset($result['error'])) {
+            Log::error('PayPal createSubscription failed', ['error' => $result['error']]);
             return back()->withErrors(['paypal' => 'PayPal-Fehler: ' . $result['error']]);
         }
 
-        Subscription::create([
+        Log::info('Creating subscription', [
+            'paypal_id' => $result['id'],
+            'approve_url' => $result['approve_url'],
+        ]);
+
+        $subscription = Subscription::create([
             'user_id'                => auth()->id(),
             'subscription_plan_id'   => $plan->id,
             'paypal_subscription_id' => $result['id'],
@@ -81,6 +135,8 @@ class SubscriptionController extends Controller
             'billing_cycle'          => $cycle,
             'status'                 => 'pending',
         ]);
+
+        Log::info('Subscription created', ['subscription_id' => $subscription->id]);
 
         return redirect($result['approve_url']);
     }
@@ -134,7 +190,11 @@ class SubscriptionController extends Controller
 
     public function cancel()
     {
-        Subscription::where('user_id', auth()->id())->where('status', 'pending')->delete();
+        Log::info('Cancel method called');
+        
+        $deleted = Subscription::where('user_id', auth()->id())->where('status', 'pending')->delete();
+        
+        Log::info('Pending subscriptions deleted in cancel', ['count' => $deleted]);
 
         return redirect()->route('subscription.index')
             ->with('info', 'Checkout abgebrochen. Dein aktueller Plan bleibt unverändert.');

@@ -430,6 +430,10 @@
            class="nav-item {{ request()->routeIs('subscription.*') ? 'active' : '' }}">
             <span>💳</span> Abonnement
         </a>
+        <a href="{{ route('profile.edit') }}"
+           class="nav-item {{ request()->routeIs('profile.*') ? 'active' : '' }}">
+            <span>👤</span> Profil
+        </a>
     </div>
 
     {{-- Subscription Badge --}}
@@ -487,6 +491,9 @@
     <div style="padding: 0 28px;">
         @if(session('success'))
             <div class="alert alert-success" style="margin-top:16px;">✅ {{ session('success') }}</div>
+        @endif
+        @if(session('info'))
+            <div class="alert alert-info" style="margin-top:16px;">ℹ️ {{ session('info') }}</div>
         @endif
         @if(session('warning'))
             <div class="alert alert-warning" style="margin-top:16px;">⚠️ {{ session('warning') }}</div>

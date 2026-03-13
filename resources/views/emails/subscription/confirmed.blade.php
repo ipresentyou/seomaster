@@ -5,7 +5,8 @@
     <style>
         body { font-family: -apple-system, sans-serif; background:#f4f4f5; margin:0; padding:24px; }
         .card { background:#fff; border-radius:12px; max-width:520px; margin:0 auto; padding:36px 40px; }
-        .logo { font-size:22px; font-weight:700; color:#7c3aed; margin-bottom:28px; }
+        .logo { text-align:center; margin-bottom:28px; }
+        .logo img { width:180px; height:auto; }
         h1 { font-size:20px; color:#111; margin:0 0 12px; }
         p { color:#555; font-size:15px; line-height:1.6; margin:0 0 16px; }
         .plan-box { background:#f5f3ff; border:1px solid #e0d9ff; border-radius:8px; padding:16px 20px; margin:20px 0; }
@@ -17,7 +18,9 @@
 </head>
 <body>
 <div class="card">
-    <div class="logo">⚡ SEOmaster</div>
+    <div class="logo">
+        <img src="{{ asset('images/logo_seomaster.svg') }}" alt="SEOmaster Logo">
+    </div>
     <h1>Willkommen! Dein Abonnement ist aktiv. 🎉</h1>
     <p>Hey {{ $subscription->user->name ?? 'da' }},<br>
        dein Abonnement wurde erfolgreich aktiviert. Du hast jetzt vollen Zugriff auf alle SEO-Tools.</p>
@@ -34,7 +37,7 @@
     <a href="{{ url('/dashboard') }}" class="btn">Zum Dashboard →</a>
 
     <div class="footer">
-        Bei Fragen: support@lavarell.com<br>
+        Bei Fragen: support@seomaster.de<br>
         © {{ date('Y') }} SEOmaster — SEO Automation für Shopware
     </div>
 </div>

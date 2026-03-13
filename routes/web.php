@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ApiCredentialController;
+use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\OnboardingController;
 use App\Http\Controllers\ProfileController;
@@ -100,6 +101,7 @@ Route::middleware(['auth', 'verified', 'user.active'])->group(function () {
 
     // Abonnements
     Route::prefix('subscription')->name('subscription.')->group(function () {
+        Route::get('/start-trial', [SubscriptionController::class, 'startTrial'])->name('start-trial');
         Route::get('/',             [SubscriptionController::class, 'index'])->name('index');
         Route::post('/checkout',    [SubscriptionController::class, 'checkout'])->name('checkout');
         Route::get('/success',      [SubscriptionController::class, 'success'])->name('success');
@@ -115,6 +117,10 @@ Route::post('/webhooks/paypal', [SubscriptionController::class, 'webhook'])
     ->withoutMiddleware(['web']);
 
 // ─── Legal Pages ─────────────────────────────────────────────────────────────
+
+// Kontaktformular (öffentlich zugänglich)
+Route::get('/kontakt', [ContactController::class, 'index'])->name('contact.index');
+Route::post('/kontakt', [ContactController::class, 'submit'])->name('contact.submit');
 
 Route::name('legal.')->group(function () {
     Route::view('/impressum', 'impressum')->name('impressum');

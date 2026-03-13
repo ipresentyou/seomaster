@@ -46,7 +46,7 @@ class RegisteredUserController extends Controller
             'status'   => 'active',
         ]);
 
-        // Auto-start 14-day trial on the starter plan
+        // Auto-start 3-day trial on the starter plan
         $plan = SubscriptionPlan::where('slug', 'starter')->first();
         if ($plan) {
             Subscription::create([
@@ -54,7 +54,7 @@ class RegisteredUserController extends Controller
                 'subscription_plan_id' => $plan->id,
                 'billing_cycle'        => 'monthly',
                 'status'               => 'trial',
-                'trial_ends_at'        => now()->addDays(14),
+                'trial_ends_at'        => now()->addDays(3),
             ]);
         }
 

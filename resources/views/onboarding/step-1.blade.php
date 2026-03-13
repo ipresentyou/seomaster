@@ -6,9 +6,7 @@
 
 <h1 class="ob-title">
     Willkommen bei<br>
-    <span style="background:linear-gradient(135deg,#a78bfa,#7c3aed);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">
-        SEOmaster
-    </span> ⚡
+    <img src="{{ asset('images/logo_seomaster.svg') }}" width="180" alt="SEOmaster Logo" style="margin-bottom: 16px;">
 </h1>
 
 <p class="ob-subtitle">
@@ -81,7 +79,7 @@
     @php $sub = $user->activeSubscription()->first(); @endphp
     @if($sub && $sub->isOnTrial())
         <div class="alert alert-info" style="margin-bottom: 24px;">
-            🎉 <strong>14-Tage-Trial aktiv</strong> —
+            🎉 <strong>3-Tage-Trial aktiv</strong> —
             endet am {{ $sub->trial_ends_at?->format('d.m.Y') }}.
             Kein Kreditkarte benötigt.
         </div>

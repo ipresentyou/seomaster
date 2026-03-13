@@ -724,7 +724,7 @@
                     <li><span class="check">✓</span> API-Zugang</li>
                     <li><span class="check">✓</span> Dedicated Support</li>
                 </ul>
-                <a href="mailto:hello@shopware-seomaster.com" class="btn btn-outline" style="text-align:center; justify-content:center">Kontakt aufnehmen</a>
+                <a href="{{ route('contact.index') }}" class="btn btn-outline" style="text-align:center; justify-content:center">Kontakt aufnehmen</a>
             </div>
         </div>
     </div>
@@ -803,7 +803,7 @@
                 </div>
                 <div class="footer-col">
                     <h4>Kontakt</h4>
-                    <a href="mailto:hello@seomaster.app">hello@shopware-seomaster.com</a>
+                    <a href="{{ route('contact.index') }}">📧 Kontaktformular</a>
                 </div>
             </div>
         </div>

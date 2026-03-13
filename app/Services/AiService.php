@@ -49,7 +49,13 @@ class AiService
             ->orderByRaw("CASE provider WHEN 'openai' THEN 0 ELSE 1 END")
             ->first();
 
+        // Check if user is on trial and has no credentials - use trial keys
         if (! $cred) {
+            $user = \App\Models\User::find($userId);
+            if ($user && $user->activeSubscription && $user->activeSubscription->isOnTrial()) {
+                return static::trialFallback($userId);
+            }
+            
             throw new \RuntimeException('Keine KI-Credentials gefunden. Bitte OpenAI oder Gemini verbinden.');
         }
 
@@ -71,6 +77,41 @@ class AiService
             model:       'gpt-4o-mini',
             visionModel: 'gpt-4o',
         );
+    }
+
+    /**
+     * Trial fallback with default API keys
+     */
+    private static function trialFallback(int $userId): static
+    {
+        // Check daily limit for trial users
+        $service = env('OPENAI_API_KEY') ? 'openai' : 'gemini';
+        if (!\App\Models\ApiUsage::trackAndCheckLimit($userId, $service, 'trial_fallback', 10)) {
+            throw new \RuntimeException('Tägliches Limit von 10 API-Calls erreicht. Bitte morgen wieder versuchen oder eigene API-Keys einrichten.');
+        }
+        
+        // Use environment variables for trial API keys
+        $apiKey = env('OPENAI_API_KEY', env('GEMINI_API_KEY'));
+        
+        if (env('OPENAI_API_KEY')) {
+            return new static(
+                apiKey:      env('OPENAI_API_KEY'),
+                apiUrl:      'https://api.openai.com/v1/chat/completions',
+                model:       'gpt-4o-mini',
+                visionModel: 'gpt-4o',
+            );
+        }
+        
+        if (env('GEMINI_API_KEY')) {
+            return new static(
+                apiKey:      env('GEMINI_API_KEY'),
+                apiUrl:      'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
+                model:       'gemini-1.5-flash',
+                visionModel: 'gemini-1.5-pro',
+            );
+        }
+        
+        throw new \RuntimeException('Keine Trial-API-Keys konfiguriert. Bitte OPENAI_API_KEY oder GEMINI_API_KEY setzen.');
     }
 
     // ──────────────────────────────────────────────────────────

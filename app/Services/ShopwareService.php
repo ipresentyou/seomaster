@@ -143,7 +143,10 @@ class ShopwareService
     public function saveProduct(string $productId, string $langId, array $payload): bool
     {
         $res = $this->patch('/product/' . $productId, $payload, $langId);
-        \Illuminate\Support\Facades\Log::info("PATCH category status: " . $res->status() . " body: " . substr($res->body(), 0, 200)); return in_array($res->status(), [200, 204]);
+        $ok = in_array($res->status(), [200, 204]);
+        if ($ok) $this->clearHttpCache();
+        
+        return $ok;
     }
 
     // ── Categories ────────────────────────────────────────────────────────────
@@ -206,7 +209,10 @@ class ShopwareService
     public function saveMediaAlt(string $mediaId, string $langId, string $alt): bool
     {
         $res = $this->patch('/media/' . $mediaId, ['alt' => strip_tags($alt)], $langId);
-        \Illuminate\Support\Facades\Log::info("PATCH category status: " . $res->status() . " body: " . substr($res->body(), 0, 200)); return in_array($res->status(), [200, 204]);
+        $ok = in_array($res->status(), [200, 204]);
+        if ($ok) $this->clearHttpCache();
+        
+        return $ok;
     }
 
     // ── SEO URLs ──────────────────────────────────────────────────────────────
@@ -247,15 +253,25 @@ class ShopwareService
     private function post(string $path, array $body, string $langId = ''): Response
     {
         return Http::withHeaders($this->headers($langId))
-            ->timeout(20)
+            ->timeout(60) // Increased from 20 to 60 seconds
+            ->retry(2, 1000) // Retry 2 times with 1s delay
             ->post($this->apiUrl . $path, $body);
     }
 
     private function patch(string $path, array $body, string $langId = ''): Response
     {
         return Http::withHeaders($this->headers($langId))
-            ->timeout(20)
+            ->timeout(60) // Increased from 20 to 60 seconds
+            ->retry(2, 1000) // Retry 2 times with 1s delay
             ->patch($this->apiUrl . $path, $body);
+    }
+
+    private function get(string $path, string $langId = ''): Response
+    {
+        return Http::withHeaders($this->headers($langId))
+            ->timeout(60) // Increased from 20 to 60 seconds
+            ->retry(2, 1000) // Retry 2 times with 1s delay
+            ->get($this->apiUrl . $path);
     }
 
 

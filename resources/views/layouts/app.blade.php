@@ -87,7 +87,7 @@
 
     .nav-label {
         padding: 0 10px 5px;
-        font-size: 10px; font-weight: 600;
+        font-size: 10px;
         letter-spacing: 0.1em; text-transform: uppercase;
         color: var(--text-3);
     }
@@ -116,7 +116,7 @@
         margin-left: auto;
         background: rgba(124,58,237,0.2);
         color: var(--accent-light);
-        font-size: 10px; font-weight: 600;
+        font-size: 10px;
         padding: 1px 6px;
         border-radius: 999px;
     }
@@ -142,7 +142,7 @@
         background: linear-gradient(135deg, var(--accent), #9333ea);
         border-radius: 50%;
         display: flex; align-items: center; justify-content: center;
-        font-size: 12px; font-weight: 600;
+        font-size: 12px;
         flex-shrink: 0;
     }
 
@@ -216,7 +216,7 @@
     }
 
     .page-title {
-        font-size: 22px; font-weight: 600;
+        font-size: 22px;
         letter-spacing: -0.03em;
     }
 
@@ -227,7 +227,7 @@
         display: inline-flex; align-items: center; gap: 7px;
         padding: 8px 16px;
         border-radius: 8px;
-        font-size: 13px; font-weight: 500;
+        font-size: 13px;
         cursor: pointer; border: none;
         text-decoration: none;
         transition: all 0.15s;
@@ -270,7 +270,7 @@
         display: flex; align-items: center; justify-content: space-between;
     }
 
-    .card-title { font-size: 14px; font-weight: 600; }
+    .card-title { font-size: 14px; }
     .card-subtitle { font-size: 12px; color: var(--text-3); margin-top: 2px; }
     .card-body { padding: 20px; }
 

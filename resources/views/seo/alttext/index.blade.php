@@ -63,17 +63,17 @@
 .img-edit { padding:12px 14px;border-top:1px solid rgba(255,255,255,0.05);display:none; }
 .ai-note {
     display:flex;align-items:center;gap:7px;padding:7px 10px;border-radius:6px;
-    background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);
-    font-size:11px;color:var(--accent-light);margin-bottom:10px;
+    background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.4);
+    font-size:11px;color:#a78bfa;font-weight:500;margin-bottom:10px;
 }
 
 .ep-input {
-    width:100%;padding:8px 11px;background:rgba(255,255,255,0.04);
-    border:1px solid rgba(255,255,255,0.1);border-radius:8px;
-    color:var(--text-1);font-family:inherit;font-size:13px;outline:none;
+    width:100%;padding:8px 11px;background:#fff;
+    border:1px solid #ccc;border-radius:8px;
+    color:#000;font-family:inherit;font-size:13px;outline:none;
     transition:border-color 0.2s;
 }
-.ep-input:focus { border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-glow); }
+.ep-input:focus { border-color:#7c3aed;box-shadow:0 0 0 2px rgba(124,58,237,0.2); }
 .char-info { font-size:11px;margin-top:4px;display:flex;justify-content:space-between; }
 .char-info.good { color:var(--success); }
 .char-info.warn { color:var(--warning); }
@@ -148,7 +148,12 @@
 <details style="margin-bottom:20px;">
     <summary style="font-size:12px;color:var(--text-3);cursor:pointer;padding:6px 0;">⚙️ KI-Anweisungen anpassen</summary>
     <textarea id="customPrompt" rows="3" class="form-input" style="margin-top:8px;font-size:12px;resize:vertical;"
->Erstelle präzise, SEO-optimierte Alt-Texte (50–125 Zeichen). Beschreibe was sichtbar ist, integriere relevante Keywords natürlich. Kein "Bild von" oder "Zeigt". Sprache: {{ $languages[$selectedLang] ?? 'Deutsch' }}.</textarea>
+>Erstelle präzise, SEO-optimierte Alt-Texte (50–125 Zeichen) für Produkte aus "' . ($project->name ?? 'diesem Shop') . '". Beschreibe was sichtbar ist, integriere relevante Keywords natürlich. Kein "Bild von" oder "Zeigt". Sprache: {{ $languages[$selectedLang] ?? 'Deutsch' }}.</textarea>
+    <div style="display:flex;gap:8px;margin-top:6px;align-items:center;">
+        <button onclick="savePrompt()" class="ep-btn ep-btn-primary" style="font-size:12px;padding:4px 12px;">💾 Speichern</button>
+        <button onclick="resetPrompt()" class="ep-btn ep-btn-secondary" style="font-size:12px;padding:4px 12px;">🔄 Zurücksetzen</button>
+        <span id="prompt-status" style="font-size:11px;color:var(--text-3);"></span>
+    </div>
 </details>
 
 @if($rows)
@@ -215,6 +220,7 @@
 <script>
 const LANG_ID   = @json($selectedLang);
 const LANG_NAME = @json($languages[$selectedLang] ?? '');
+const PROJECT_NAME = @json($project->name ?? 'diesem Shop');
 const DOMAIN    = @json($storefrontUrl);
 const DOMAIN_NAME = @json($domainName);
 const images    = @json($rows);
@@ -428,8 +434,16 @@ function updateAltCounter(idx) {
 
 function showToast(msg) {
     const t=document.createElement('div');
-    t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#111;border:1px solid rgba(124,58,237,.4);color:var(--al);padding:10px 20px;border-radius:8px;font-size:13px;z-index:998;';
+    t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:rgba(124,58,237,0.9);border:1px solid rgba(124,58,237,0.6);color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;z-index:998;box-shadow:0 4px 12px rgba(124,58,237,0.3);';
     t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),3000);
+}
+
+// ── Reset Prompt ─────────────────────────────────────────────────
+function resetPrompt() {
+    const defaultPrompt = `Erstelle präzise, SEO-optimierte Alt-Texte (50–125 Zeichen) für Produkte aus "${PROJECT_NAME}". Beschreibe was sichtbar ist, integriere relevante Keywords natürlich. Kein "Bild von" oder "Zeigt". Sprache: ${LANG_NAME}.`;
+    
+    document.getElementById('customPrompt').value = defaultPrompt;
+    showToast('🔄 Prompt auf Standard zurückgesetzt');
 }
 </script>
 @endpush

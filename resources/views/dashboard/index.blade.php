@@ -73,7 +73,7 @@
     display: flex; align-items: center; justify-content: center;
     font-size: 18px; flex-shrink: 0;
 }
-.project-name { font-size: 14px; font-weight: 600; }
+.project-name { font-size: 14px; }
 .project-url  { font-size: 11px; color: var(--text-3); margin-top: 2px; }
 
 .project-tools {
@@ -138,9 +138,22 @@
         <div style="font-size:12px; color:var(--text-2); margin-top:3px;">
             @if(auth()->user()->hasActiveSubscription())
                 @php $sub = auth()->user()->activeSubscription; @endphp
-                Du bist auf dem <strong style="color:var(--accent-light)">{{ $sub->plan->name }}</strong>-Plan.
+                Du bist auf dem <strong style="color:#4285f4">{{ $sub->plan->name }}</strong>-Plan.
                 @if($sub->isOnTrial())
                     Testphase endet {{ $sub->trial_ends_at->locale("de")->diffForHumans() }}.
+                    @php
+                        $todayUsage = \App\Models\ApiUsage::getTodayUsage(auth()->id(), 'openai') + \App\Models\ApiUsage::getTodayUsage(auth()->id(), 'gemini');
+                        $remaining = max(0, 10 - $todayUsage);
+                    @endphp
+                    @if($remaining > 0)
+                        <div style="margin-top:4px; font-size:11px; color:var(--success);">
+                            🤖 {{ $remaining }} von 10 KI-Calls heute verfügbar
+                        </div>
+                    @else
+                        <div style="margin-top:4px; font-size:11px; color:var(--warning);">
+                            ⚠️ Tägliches Limit erreicht (10/10)
+                        </div>
+                    @endif
                 @endif
             @else
                 <span style="color:var(--warning)">⚠️ Kein aktives Abo.</span>

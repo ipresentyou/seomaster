@@ -174,7 +174,7 @@
         cursor: pointer;
     }
 
-    .form-check a { color: var(--accent); text-decoration: none; }
+    .form-check a { color: var(--accent); text-decoration: none; display: contents; }
     .form-check a:hover { text-decoration: underline; }
 
     /* ── Submit Button ─────────────────────────────────────────── */

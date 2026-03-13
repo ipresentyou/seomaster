@@ -244,7 +244,7 @@
 
         @if($subscription->isOnTrial())
             @php
-                $trialDays = 14;
+                $trialDays = 3;
                 $daysLeft = max(0, now()->diffInDays($subscription->trial_ends_at, false));
                 $progress = round((1 - $daysLeft / $trialDays) * 100);
             @endphp
@@ -273,7 +273,7 @@
 {{-- ── Pricing Toggle ─────────────────────────────────────── --}}
 <div class="pricing-header">
     <h2>Plan wählen oder wechseln</h2>
-    <div style="color:var(--text-3);font-size:13px;">Alle Pläne inklusive 14-Tage-Trial</div>
+    <div style="color:var(--text-3);font-size:13px;">Starter Plan: 3 Tage gratis testen | Pro & Agency: PayPal Abrechnung</div>
     <div style="display:flex;align-items:center;justify-content:center;margin-top:10px;">
         <div class="billing-toggle">
             <button class="toggle-btn active" id="btn-monthly" onclick="setBilling('monthly')">Monatlich</button>
@@ -353,7 +353,14 @@
 
             @if($isCurrent)
                 <button class="pricing-cta cta-current">✓ Aktueller Plan</button>
+            @elseif($plan->slug === 'starter')
+                {{-- Starter Plan: Local Trial --}}
+                <a href="{{ route('subscription.start-trial') }}" 
+                   class="pricing-cta {{ $isPopular ? 'cta-primary' : 'cta-secondary' }}">
+                    3 Tage gratis testen
+                </a>
             @else
+                {{-- Pro/Agency Plans: PayPal Checkout --}}
                 <form method="POST" action="{{ route('subscription.checkout') }}">
                     @csrf
                     <input type="hidden" name="plan_id" value="{{ $plan->id }}">
@@ -363,7 +370,7 @@
                         @if($subscription && $subscription->isActive())
                             Wechseln zu {{ $plan->name }}
                         @else
-                            14 Tage gratis testen
+                            Mit PayPal starten
                         @endif
                     </button>
                 </form>
@@ -429,8 +436,8 @@
 <div style="margin-top:32px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
     @foreach([
         ['❓', 'Kann ich jederzeit kündigen?', 'Ja. Du kannst dein Abo jederzeit kündigen. Es bleibt bis zum Ende des aktuellen Abrechnungszeitraums aktiv.'],
-        ['🔄', 'Was passiert nach dem Trial?', 'Nach dem 14-tägigen Trial wird automatisch abgerechnet – es sei denn, du kündigst vorher.'],
-        ['💳', 'Welche Zahlungsmethoden?', 'Aktuell PayPal und PayPal-Kreditkarte. Weitere Methoden folgen.'],
+        ['🔄', 'Was passiert nach dem Trial?', 'Nach dem 3-tägigen Trial für den Starter Plan musst du einen Pro oder Agency Plan wählen, um weiter Zugriff zu haben.'],
+        ['💳', 'Welche Zahlungsmethoden?', 'Aktuell PayPal und PayPal-Kreditkarte für Pro & Agency Pläne. Starter Plan hat lokales Trial.'],
         ['📤', 'Kann ich meinen Plan wechseln?', 'Ja. Du kannst jederzeit upgraden oder downgraden. Die Änderung wird sofort wirksam.'],
     ] as $faq)
     <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:10px; padding:16px;">

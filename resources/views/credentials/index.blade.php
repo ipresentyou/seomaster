@@ -36,7 +36,7 @@
 .icon-gsc      { background: rgba(234,88,12,0.12);  }
 
 .provider-meta { flex: 1; min-width: 0; }
-.provider-name { font-size: 14px; font-weight: 600; }
+.provider-name { font-size: 14px; }
 .provider-desc { font-size: 11px; color: var(--text-3); margin-top: 1px; }
 
 .credential-list { padding: 0; }
@@ -73,14 +73,19 @@
     padding: 8px 14px;
     margin: 12px 18px;
     border-radius: 8px;
-    background: rgba(124,58,237,0.08);
-    border: 1px dashed rgba(124,58,237,0.3);
-    color: var(--accent-light);
-    font-size: 12px; font-weight: 500;
+    background: rgba(124,58,237,0.12);
+    border: 1px solid rgba(124,58,237,0.4);
+    color: #8b5cf6;
+    font-size: 12px;
     text-decoration: none;
     transition: all 0.15s;
 }
-.add-btn:hover { background: rgba(124,58,237,0.15); border-style: solid; }
+.add-btn:hover { 
+    background: rgba(124,58,237,0.2); 
+    border-color: rgba(124,58,237,0.6);
+    color: #7c3aed;
+    transform: translateY(-1px);
+}
 
 /* Test button */
 .btn-test {

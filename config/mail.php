@@ -113,4 +113,22 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Markdown Mail Components
+    |--------------------------------------------------------------------------
+    |
+    | Here you may customize the markdown components that are used when the
+    | framework renders a markdown email. Feel free to customize the
+    | components or even add new ones to your mail views.
+    |
+    */
+
+    'markdown' => [
+        'theme' => 'default',
+        'paths' => [
+            resource_path('views/vendor/mail'),
+        ],
+    ],
+
 ];

@@ -54,19 +54,19 @@
 .ep-field { margin-bottom:16px; }
 .ep-label { font-size:12px;font-weight:500;color:var(--text-2);margin-bottom:5px;display:flex;justify-content:space-between; }
 .ep-input,.ep-textarea {
-    width:100%;padding:9px 12px;background:rgba(255,255,255,0.04);
-    border:1px solid rgba(255,255,255,0.1);border-radius:8px;
-    color:var(--text-1);font-family:inherit;font-size:13px;outline:none;transition:border-color 0.2s;
+    width:100%;padding:9px 12px;background:#fff;
+    border:1px solid #ccc;border-radius:8px;
+    color:#000;font-family:inherit;font-size:13px;outline:none;transition:border-color 0.2s;
 }
 .ep-textarea { resize:vertical;min-height:90px; }
-.ep-input:focus,.ep-textarea:focus { border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-glow); }
+.ep-input:focus,.ep-textarea:focus { border-color:#7c3aed;box-shadow:0 0 0 2px rgba(124,58,237,0.2); }
 .char-bar { height:3px;border-radius:99px;margin-top:4px;background:rgba(255,255,255,0.08);overflow:hidden; }
 .char-bar-fill { height:100%;border-radius:99px;transition:width 0.2s,background 0.2s; }
 .char-hint { font-size:11px;color:var(--text-3);margin-top:3px;display:flex;justify-content:space-between; }
 .char-hint.good { color:var(--success); }
 .char-hint.warn { color:var(--warning); }
 .char-hint.over { color:var(--danger); }
-.ai-note { display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:6px;background:rgba(124,58,237,0.08);border:1px solid rgba(124,58,237,0.2);font-size:12px;color:var(--accent-light);margin-bottom:14px; }
+.ai-note { display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:6px;background:rgba(124,58,237,0.15);border:1px solid rgba(124,58,237,0.4);font-size:11px;color:#a78bfa;font-weight:500;margin-bottom:12px; }
 .seo-preview-box { background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:14px;margin-top:8px;font-size:13px;line-height:1.7; }
 .seo-preview-box h2,h3 { margin:12px 0 6px; }
 .seo-preview-box p { margin:6px 0; }
@@ -128,9 +128,20 @@
 <details style="margin-bottom:20px;" open>
     <summary style="font-size:12px;color:var(--text-3);cursor:pointer;padding:6px 0;">⚙️ KI-Anweisungen anpassen</summary>
     <textarea id="customPrompt" rows="8" class="form-input" style="margin-top:8px;font-size:12px;resize:vertical;"
->{{ $project->seo_prompt ?? '' }}</textarea>
+>{{ $project->seo_prompt ?? 'Du bist ein SEO-Experte für Shopware-Shops. Erstelle für die Kategorie "' . ($project->name ?? 'diesem Shop') . '" optimierte SEO-Texte.
+
+Berücksichtige dabei:
+• Zielgruppe: Kunden, die nach Produktkategorien wie dieser suchen
+• Keywords: Relevante Suchbegriffe für diese Kategorie
+• Shop-Kontext: Kategorie aus dem Sortiment von ' . ($project->name ?? 'diesem Shop') . '
+• Brand-Voice: Professionell, vertrauenswürdig und kundenorientiert
+• Länge: Meta-Titel 50-60 Zeichen, Meta-Beschreibung 150-160 Zeichen
+• Call-to-Action: Klare Handlungsaufforderung zum Entdecken der Produkte
+
+Fokus auf hohe Sichtbarkeit in Suchmaschinen und gute Klickraten.' }}</textarea>
     <div style="display:flex;gap:8px;margin-top:6px;align-items:center;">
         <button onclick="savePrompt()" class="ep-btn ep-btn-primary" style="font-size:12px;padding:4px 12px;">💾 Prompt speichern</button>
+        <button onclick="resetPrompt()" class="ep-btn ep-btn-secondary" style="font-size:12px;padding:4px 12px;">🔄 Zurücksetzen</button>
         <span id="prompt-status" style="font-size:11px;color:var(--text-3);"></span>
     </div>
     <div style="font-size:11px;color:var(--text-3);margin-top:4px;">
@@ -138,6 +149,18 @@
     </div>
 </details>
 
+@isset($connectionError)
+<div style="text-align:center;padding:60px;color:var(--text-3);">
+    <div style="font-size:40px;margin-bottom:12px;">🔌</div>
+    <div style="font-size:15px;color:var(--text-2);margin-bottom:8px;">Verbindungsproblem</div>
+    <div style="font-size:13px;line-height:1.5;">{{ $connectionError }}</div>
+    <div style="margin-top:16px;">
+        <a href="{{ route('projects.edit', $project) }}" class="btn btn-secondary">
+            ⚙️ Projekteinstellungen überprüfen
+        </a>
+    </div>
+</div>
+@else
 @if($rows)
 <div class="stats-bar">
     <span>Kategorien: <strong>{{ count($rows) }}</strong></span>
@@ -213,11 +236,14 @@
     <div style="font-size:15px;color:var(--text-2);">Keine Kategorien gefunden</div>
 </div>
 @endforelse
+@endif
+@endisset
 
 @push('scripts')
 <script>
 const LANG_ID   = @json($selectedLang);
 const LANG_NAME = @json($languages[$selectedLang] ?? '');
+const PROJECT_NAME = @json($project->name ?? 'diesem Shop');
 const DOMAIN    = @json($storefrontUrl);
 const categories = @json($rows);
 
@@ -462,8 +488,26 @@ function updateSeoPreview(idx) {
 
 function showToast(msg) {
     const t=document.createElement('div');
-    t.style.cssText='position:fixed;bottom:24px;right:24px;background:#111;border:1px solid rgba(124,58,237,.4);color:var(--al);padding:10px 18px;border-radius:8px;font-size:13px;z-index:999;';
+    t.style.cssText='position:fixed;bottom:24px;right:24px;background:rgba(124,58,237,0.9);border:1px solid rgba(124,58,237,0.6);color:#fff;padding:10px 18px;border-radius:8px;font-size:13px;z-index:999;box-shadow:0 4px 12px rgba(124,58,237,0.3);';
     t.textContent=msg; document.body.appendChild(t); setTimeout(()=>t.remove(),3000);
+}
+
+// ── Reset Prompt ─────────────────────────────────────────────────
+function resetPrompt() {
+    const defaultPrompt = `Du bist ein SEO-Experte für Shopware-Shops. Erstelle für die Kategorie "${PROJECT_NAME}" optimierte SEO-Texte.
+
+Berücksichtige dabei:
+• Zielgruppe: Kunden, die nach Produktkategorien wie dieser suchen
+• Keywords: Relevante Suchbegriffe für diese Kategorie
+• Shop-Kontext: Kategorie aus dem Sortiment von ${PROJECT_NAME}
+• Brand-Voice: Professionell, vertrauenswürdig und kundenorientiert
+• Länge: Meta-Titel 50-60 Zeichen, Meta-Beschreibung 150-160 Zeichen
+• Call-to-Action: Klare Handlungsaufforderung zum Entdecken der Produkte
+
+Fokus auf hohe Sichtbarkeit in Suchmaschinen und gute Klickraten.`;
+    
+    document.getElementById('customPrompt').value = defaultPrompt;
+    showToast('🔄 Prompt auf Standard zurückgesetzt');
 }
 </script>
 @endpush

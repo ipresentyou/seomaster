@@ -15,27 +15,28 @@ class CategorySeoController extends BaseSeoController
 
     public function index(Request $request, SeoProject $project)
     {
-        $this->bootProject($project);
+        try {
+            $this->bootProject($project);
 
-        $selectedSc   = $request->input('sc', '');
-        $selectedLang = $request->input('lang', '');
-        $limit        = (int) $request->input('max', 50);
+            $selectedSc   = $request->input('sc', '');
+            $selectedLang = $request->input('lang', '');
+            $limit        = (int) $request->input('max', 50);
 
-        $meta = $this->buildPageMeta($selectedSc, $selectedLang);
-        $salesChannels = $meta['salesChannels'];
+            $meta = $this->buildPageMeta($selectedSc, $selectedLang);
+            $salesChannels = $meta['salesChannels'];
 
-        if (! $selectedSc) $selectedSc   = array_key_first($salesChannels) ?? '';
-        if (! $selectedLang) $selectedLang = array_key_first($meta['domains'][$selectedSc] ?? []) ?? '';
+            if (! $selectedSc) $selectedSc   = array_key_first($salesChannels) ?? '';
+            if (! $selectedLang) $selectedLang = array_key_first($meta['domains'][$selectedSc] ?? []) ?? '';
 
-        $rows = [];
-        $storefrontDomain = $meta['domains'][$selectedSc][$selectedLang]['url'] ?? '';
-        if ($selectedSc && $selectedLang && isset($salesChannels[$selectedSc])) {
-            $navRootId   = $salesChannels[$selectedSc]['navigationCategoryId'] ?? '';
-            $rawCategories = $navRootId ? $this->shopware->getCategories($selectedLang, $navRootId, $limit) : [];
-            $categoryIds = array_column($rawCategories, 'id');
-            $seoUrls     = $categoryIds ? $this->shopware->getSeoUrls($categoryIds, $selectedSc, $selectedLang) : [];
-            $base        = $meta['domains'][$selectedSc][$selectedLang]['url'] ?? '';
-            $storefrontDomain = $base;
+            $rows = [];
+            $storefrontDomain = $meta['domains'][$selectedSc][$selectedLang]['url'] ?? '';
+            if ($selectedSc && $selectedLang && isset($salesChannels[$selectedSc])) {
+                $navRootId   = $salesChannels[$selectedSc]['navigationCategoryId'] ?? '';
+                $rawCategories = $navRootId ? $this->shopware->getCategories($selectedLang, $navRootId, $limit) : [];
+                $categoryIds = array_column($rawCategories, 'id');
+                $seoUrls     = $categoryIds ? $this->shopware->getSeoUrls($categoryIds, $selectedSc, $selectedLang) : [];
+                $base        = $meta['domains'][$selectedSc][$selectedLang]['url'] ?? '';
+                $storefrontDomain = $base;
 
             foreach ($rawCategories as $cat) {
                 $a = $cat;
@@ -55,6 +56,31 @@ class CategorySeoController extends BaseSeoController
         return view('seo.categories.index', array_merge($meta, compact(
             'project', 'rows', 'selectedSc', 'selectedLang', 'limit', 'salesChannels', 'storefrontDomain'
         )));
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            // Connection timeout or network error
+            return view('seo.categories.index', array_merge($meta, [
+                'project' => $project,
+                'rows' => [],
+                'selectedSc' => $selectedSc ?? '',
+                'selectedLang' => $selectedLang ?? '',
+                'limit' => $limit,
+                'salesChannels' => $salesChannels ?? [],
+                'storefrontDomain' => '',
+                'connectionError' => 'Verbindung zum Shopware-Shop fehlgeschlagen. Bitte überprüfen Sie, ob der Shop erreichbar ist und die API-Zugangsdaten korrekt sind.'
+            ]));
+        } catch (\Exception $e) {
+            // Other errors
+            return view('seo.categories.index', array_merge($meta, [
+                'project' => $project,
+                'rows' => [],
+                'selectedSc' => $selectedSc ?? '',
+                'selectedLang' => $selectedLang ?? '',
+                'limit' => $limit,
+                'salesChannels' => $salesChannels ?? [],
+                'storefrontDomain' => '',
+                'connectionError' => 'Fehler beim Laden der Kategorien: ' . $e->getMessage()
+            ]));
+        }
     }
 
     // ── Analyze ───────────────────────────────────────────────────────────────

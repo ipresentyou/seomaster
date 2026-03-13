@@ -6,7 +6,8 @@
     <style>
         body { font-family: -apple-system, 'Segoe UI', sans-serif; background: #f4f4f5; margin: 0; padding: 24px; }
         .card { background: #fff; border-radius: 12px; max-width: 520px; margin: 0 auto; padding: 36px 40px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
-        .logo  { font-size: 22px; font-weight: 700; color: #7c3aed; margin-bottom: 28px; }
+        .logo  { text-align:center; margin-bottom:28px; }
+        .logo img { width:180px; height:auto; }
         h1     { font-size: 20px; color: #111; margin: 0 0 12px; }
         p      { color: #555; font-size: 15px; line-height: 1.6; margin: 0 0 16px; }
 
@@ -95,7 +96,9 @@
 <body>
 <div class="card">
 
-    <div class="logo">⚡ SEOmaster</div>
+    <div class="logo">
+        <img src="{{ asset('images/logo_seomaster.svg') }}" alt="SEOmaster Logo">
+    </div>
 
     <div class="urgent-badge {{ $daysSinceFailed >= 7 ? 'badge-danger' : 'badge-warning' }}">
         @if($daysSinceFailed >= 7)
@@ -170,7 +173,7 @@
 
     <p style="font-size:13px; color:#6b7280; text-align:center;">
         Probleme? Wir helfen dir gerne:
-        <a href="mailto:support@lavarell.com" style="color:#7c3aed;">support@lavarell.com</a>
+        <a href="mailto:support@seomaster.de" style="color:#7c3aed;">support@seomaster.de</a>
     </p>
 
     <div class="footer">

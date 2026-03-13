@@ -110,7 +110,7 @@ Register → E-Mail-Verifizierung → Login
 | Pro | €49 | €490 | 3 | 300 |
 | Agency | €149 | €1.490 | 20 | 2.000 |
 
-→ 14-Tage-Trial auf Starter nach Registrierung (keine Kreditkarte nötig).
+→ 3-Tage-Trial auf Starter nach Registrierung (keine Kreditkarte nötig).
 
 ---
 
