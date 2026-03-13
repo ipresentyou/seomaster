@@ -330,8 +330,11 @@ function togglePw(id, btn) {
 // Override: Vor Submit alle nicht-aktiven Provider-Felder disablen
 document.addEventListener('DOMContentLoaded', function() {
     document.querySelector('form').addEventListener('submit', function(e) {
-        document.querySelectorAll('.provider-fields:not(.visible) input, .provider-fields:not(.visible) textarea').forEach(function(el) {
-            el.disabled = true;
+        // Nur die Felder deaktivieren, die wirklich nicht sichtbar sind
+        document.querySelectorAll('.provider-fields:not(.visible)').forEach(function(container) {
+            container.querySelectorAll('input, textarea').forEach(function(el) {
+                el.disabled = true;
+            });
         });
     });
 });
