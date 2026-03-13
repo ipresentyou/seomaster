@@ -156,6 +156,18 @@
     </div>
 </details>
 
+@isset($connectionError)
+<div style="text-align:center;padding:60px;color:var(--text-3);">
+    <div style="font-size:40px;margin-bottom:12px;">🔌</div>
+    <div style="font-size:15px;color:var(--text-2);margin-bottom:8px;">Verbindungsproblem</div>
+    <div style="font-size:13px;line-height:1.5;">{{ $connectionError }}</div>
+    <div style="margin-top:16px;">
+        <a href="{{ route('projects.edit', $project) }}" class="btn btn-secondary">
+            ⚙️ Projekteinstellungen überprüfen
+        </a>
+    </div>
+</div>
+@else
 @if($rows)
 <div class="stats-bar">
     <span>Bilder gesamt: <strong>{{ count($rows) }}</strong></span>
@@ -207,6 +219,7 @@
     @endforeach
 </div>
 @endif
+@endisset
 
 {{-- Batch progress overlay (hidden by default) --}}
 <div class="batch-overlay" id="batchOverlay" style="display:none;">

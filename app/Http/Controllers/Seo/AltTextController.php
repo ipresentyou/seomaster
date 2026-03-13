@@ -12,34 +12,35 @@ class AltTextController extends BaseSeoController
 
     public function index(Request $request, SeoProject $project)
     {
-        $this->bootProject($project);
+        try {
+            $this->bootProject($project);
 
-        $selectedSc   = $request->input('sc', '');
-        $selectedLang = $request->input('lang', '');
-        $limit        = (int) $request->input('max', 50);
-        $filterType   = $request->input('filter', 'missing');
+            $selectedSc   = $request->input('sc', '');
+            $selectedLang = $request->input('lang', '');
+            $limit        = (int) $request->input('max', 50);
+            $filterType   = $request->input('filter', 'missing');
 
-        $meta = $this->buildPageMeta($selectedSc, $selectedLang);
-        $salesChannels = $meta['salesChannels'];
+            $meta = $this->buildPageMeta($selectedSc, $selectedLang);
+            $salesChannels = $meta['salesChannels'];
 
-        if (! $selectedSc)   $selectedSc   = array_key_first($salesChannels) ?? '';
-        if (! $selectedLang) $selectedLang = array_key_first($meta['domains'][$selectedSc] ?? []) ?? '';
+            if (! $selectedSc)   $selectedSc   = array_key_first($salesChannels) ?? '';
+            if (! $selectedLang) $selectedLang = array_key_first($meta['domains'][$selectedSc] ?? []) ?? '';
 
-        $rows = [];
-        $totalSize    = 0;
-        $missingCount = 0;
+            $rows = [];
+            $totalSize    = 0;
+            $missingCount = 0;
 
-        if ($selectedSc && $selectedLang) {
-            $mediaData = $this->shopware->getMedia($selectedLang, $limit, $filterType === 'missing');
-            $included  = $mediaData['included'] ?? [];
+            if ($selectedSc && $selectedLang) {
+                $mediaData = $this->shopware->getMedia($selectedLang, $limit, $filterType === 'missing');
+                $included  = $mediaData['included'] ?? [];
 
-            // Build product context lookup
-            $includedProducts = [];
-            foreach ($included as $inc) {
-                if ($inc['type'] === 'product') {
-                    $includedProducts[$inc['id']] = $inc;
+                // Build product context lookup
+                $includedProducts = [];
+                foreach ($included as $inc) {
+                    if ($inc['type'] === 'product') {
+                        $includedProducts[$inc['id']] = $inc;
+                    }
                 }
-            }
 
             foreach (($mediaData['data'] ?? []) as $media) {
                 $a = $media;
@@ -77,6 +78,70 @@ class AltTextController extends BaseSeoController
             'project', 'rows', 'selectedSc', 'selectedLang',
             'limit', 'filterType', 'totalSize', 'missingCount', 'salesChannels'
         )));
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            // Connection timeout or network error
+            return view('seo.alttext.index', [
+                'project' => $project,
+                'rows' => [],
+                'selectedSc' => $selectedSc ?? '',
+                'selectedLang' => $selectedLang ?? '',
+                'limit' => $limit ?? 50,
+                'filterType' => $filterType ?? 'missing',
+                'totalSize' => 0,
+                'missingCount' => 0,
+                'salesChannels' => [],
+                'connectionError' => 'Verbindung zum Shopware-Shop fehlgeschlagen. Bitte überprüfen Sie, ob der Shop erreichbar ist und die API-Zugangsdaten korrekt sind.',
+                'languages' => [],
+                'domainName' => $project->name ?? '',
+                'domains' => [],
+                'storefrontUrl' => ''
+            ]);
+        } catch (\Illuminate\Http\Client\RequestException $e) {
+            // HTTP errors (401, 403, 500, etc.)
+            $errorMessage = 'API-Anfrage fehlgeschlagen';
+            if ($e->response->status() === 401) {
+                $errorMessage = 'API-Anmeldung fehlgeschlagen. Bitte überprüfen Sie die Shopware API-Zugangsdaten.';
+            } elseif ($e->response->status() === 403) {
+                $errorMessage = 'Keine Berechtigung für diese Shopware-API-Ressource.';
+            } elseif ($e->response->status() >= 500) {
+                $errorMessage = 'Shopware-Serverfehler. Bitte versuchen Sie es später erneut.';
+            }
+            
+            return view('seo.alttext.index', [
+                'project' => $project,
+                'rows' => [],
+                'selectedSc' => $selectedSc ?? '',
+                'selectedLang' => $selectedLang ?? '',
+                'limit' => $limit ?? 50,
+                'filterType' => $filterType ?? 'missing',
+                'totalSize' => 0,
+                'missingCount' => 0,
+                'salesChannels' => [],
+                'connectionError' => $errorMessage,
+                'languages' => [],
+                'domainName' => $project->name ?? '',
+                'domains' => [],
+                'storefrontUrl' => ''
+            ]);
+        } catch (\Exception $e) {
+            // Other errors
+            return view('seo.alttext.index', [
+                'project' => $project,
+                'rows' => [],
+                'selectedSc' => $selectedSc ?? '',
+                'selectedLang' => $selectedLang ?? '',
+                'limit' => $limit ?? 50,
+                'filterType' => $filterType ?? 'missing',
+                'totalSize' => 0,
+                'missingCount' => 0,
+                'salesChannels' => [],
+                'connectionError' => 'Fehler beim Laden der Bilder: ' . $e->getMessage(),
+                'languages' => [],
+                'domainName' => $project->name ?? '',
+                'domains' => [],
+                'storefrontUrl' => ''
+            ]);
+        }
     }
 
     // ── AI Generate Alt-Text ──────────────────────────────────────────────────
