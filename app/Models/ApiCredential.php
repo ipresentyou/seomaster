@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Crypt;
 class ApiCredential extends Model
 {
     use HasFactory, SoftDeletes;
+    
+    protected $table = 'api_credentials';
 
     protected $fillable = [
         'user_id',

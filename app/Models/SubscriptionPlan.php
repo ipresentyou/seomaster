@@ -7,6 +7,8 @@ use App\Models\Subscription;
 
 class SubscriptionPlan extends Model
 {
+    protected $table = 'subscription_plans';
+    
     protected $fillable = [
         'name', 'slug', 'description',
         'price_monthly', 'price_yearly',

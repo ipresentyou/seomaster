@@ -13,6 +13,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class SeoProject extends Model
 {
     use HasFactory, SoftDeletes;
+    
+    protected $table = 'seo_projects';
 
     protected $fillable = [
         'user_id', 'shopware_credential_id',
