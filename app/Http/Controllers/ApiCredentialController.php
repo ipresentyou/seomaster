@@ -21,6 +21,13 @@ class ApiCredentialController extends Controller
 
     public function store(Request $request)
     {
+        // Debug: Log all incoming data
+        \Log::info('API Credential Store Request:', [
+            'all_data' => $request->all(),
+            'credentials' => $request->input('credentials'),
+            'provider' => $request->input('provider')
+        ]);
+
         $data = $request->validate([
             'provider' => ['required', 'in:shopware,openai,gemini,google_search_console'],
             'label'    => ['nullable', 'string', 'max:100'],
