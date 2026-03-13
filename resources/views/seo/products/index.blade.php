@@ -197,6 +197,18 @@ Fokus auf Conversion und hohe Klickraten in Suchmaschinen.' }}</textarea>
     </div>
 </details>
 
+@isset($connectionError)
+<div style="text-align:center;padding:60px;color:var(--text-3);">
+    <div style="font-size:40px;margin-bottom:12px;">🔌</div>
+    <div style="font-size:15px;color:var(--text-2);margin-bottom:8px;">Verbindungsproblem</div>
+    <div style="font-size:13px;line-height:1.5;">{{ $connectionError }}</div>
+    <div style="margin-top:16px;">
+        <a href="{{ route('projects.edit', $project) }}" class="btn btn-secondary">
+            ⚙️ Projekteinstellungen überprüfen
+        </a>
+    </div>
+</div>
+@else
 {{-- Stats --}}
 @if($rows)
 <div class="stats-bar">
@@ -265,6 +277,8 @@ Fokus auf Conversion und hohe Klickraten in Suchmaschinen.' }}</textarea>
     <div style="font-size:13px;margin-top:6px;">Lade den Sales Channel oder passe die Suche an.</div>
 </div>
 @endforelse
+@endif
+@endisset
 
 @push('scripts')
 <script>

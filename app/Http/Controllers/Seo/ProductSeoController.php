@@ -15,33 +15,34 @@ class ProductSeoController extends BaseSeoController
 
     public function index(Request $request, SeoProject $project)
     {
-        $this->bootProject($project);
+        try {
+            $this->bootProject($project);
 
-        $selectedSc   = $request->input('sc', '');
-        $selectedLang = $request->input('lang', '');
-        $limit        = (int) $request->input('max', 50);
-        $search       = $request->input('search', '');
+            $selectedSc   = $request->input('sc', '');
+            $selectedLang = $request->input('lang', '');
+            $limit        = (int) $request->input('max', 50);
+            $search       = $request->input('search', '');
 
-        $meta = $this->buildPageMeta($selectedSc, $selectedLang);
-        if (! $selectedSc)   $selectedSc   = array_key_first($meta['salesChannels']) ?? '';
-        if (! $selectedLang) $selectedLang = array_key_first($meta['domains'][$selectedSc] ?? []) ?? '';
+            $meta = $this->buildPageMeta($selectedSc, $selectedLang);
+            if (! $selectedSc)   $selectedSc   = array_key_first($meta['salesChannels']) ?? '';
+            if (! $selectedLang) $selectedLang = array_key_first($meta['domains'][$selectedSc] ?? []) ?? '';
 
-        $rows = [];
-        if ($selectedSc && $selectedLang) {
-            $rawProducts = $this->shopware->getProducts($selectedLang, $limit, $search);
-            $productIds  = array_column($rawProducts, 'id');
-            $seoUrls     = $productIds ? $this->shopware->getSeoUrls($productIds, $selectedSc, $selectedLang) : [];
-            $base        = $meta['domains'][$selectedSc][$selectedLang]['url'] ?? '';
+            $rows = [];
+            if ($selectedSc && $selectedLang) {
+                $rawProducts = $this->shopware->getProducts($selectedLang, $limit, $search);
+                $productIds  = array_column($rawProducts, 'id');
+                $seoUrls     = $productIds ? $this->shopware->getSeoUrls($productIds, $selectedSc, $selectedLang) : [];
+                $base        = $meta['domains'][$selectedSc][$selectedLang]['url'] ?? '';
 
-            foreach ($rawProducts as $prod) {
-                $a = $prod;
-                $rows[] = [
-                    'id'            => $prod['id'],
-                    'name'          => $a['translated']['name']            ?? $a['name']            ?? '',
-                    'productNumber' => $a['productNumber']                 ?? '',
-                    'title'         => $a['translated']['metaTitle']       ?? $a['metaTitle']       ?? '',
-                    'metaDesc'      => $a['translated']['metaDescription'] ?? $a['metaDescription'] ?? '',
-                    'description'   => $a['translated']['description']     ?? $a['description']     ?? '',
+                foreach ($rawProducts as $prod) {
+                    $a = $prod;
+                    $rows[] = [
+                        'id'            => $prod['id'],
+                        'name'          => $a['translated']['name']            ?? $a['name']            ?? '',
+                        'productNumber' => $a['productNumber']                 ?? '',
+                        'title'         => $a['translated']['metaTitle']       ?? $a['metaTitle']       ?? '',
+                        'metaDesc'      => $a['translated']['metaDescription'] ?? $a['metaDescription'] ?? '',
+                        'description'   => $a['translated']['description']     ?? $a['description']     ?? '',
                     'keywords'      => $a['translated']['keywords']          ?? $a['keywords']          ?? '',
                     'url'           => isset($seoUrls[$prod['id']]) ? $base . '/' . ltrim($seoUrls[$prod['id']], '/') : '',
                 ];
@@ -51,6 +52,55 @@ class ProductSeoController extends BaseSeoController
         return view('seo.products.index', array_merge($meta, compact(
             'project', 'rows', 'selectedSc', 'selectedLang', 'limit', 'search'
         )));
+        } catch (\Illuminate\Http\Client\ConnectionException $e) {
+            // Connection timeout or network error
+            return view('seo.products.index', [
+                'project' => $project,
+                'rows' => [],
+                'selectedSc' => $selectedSc ?? '',
+                'selectedLang' => $selectedLang ?? '',
+                'limit' => $limit ?? 50,
+                'search' => $search ?? '',
+                'connectionError' => 'Verbindung zum Shopware-Shop fehlgeschlagen. Bitte überprüfen Sie, ob der Shop erreichbar ist und die API-Zugangsdaten korrekt sind.',
+                'languages' => [],
+                'domainName' => $project->name ?? ''
+            ]);
+        } catch (\Illuminate\Http\Client\RequestException $e) {
+            // HTTP errors (401, 403, 500, etc.)
+            $errorMessage = 'API-Anfrage fehlgeschlagen';
+            if ($e->response->status() === 401) {
+                $errorMessage = 'API-Anmeldung fehlgeschlagen. Bitte überprüfen Sie die Shopware API-Zugangsdaten.';
+            } elseif ($e->response->status() === 403) {
+                $errorMessage = 'Keine Berechtigung für diese Shopware-API-Ressource.';
+            } elseif ($e->response->status() >= 500) {
+                $errorMessage = 'Shopware-Serverfehler. Bitte versuchen Sie es später erneut.';
+            }
+            
+            return view('seo.products.index', [
+                'project' => $project,
+                'rows' => [],
+                'selectedSc' => $selectedSc ?? '',
+                'selectedLang' => $selectedLang ?? '',
+                'limit' => $limit ?? 50,
+                'search' => $search ?? '',
+                'connectionError' => $errorMessage,
+                'languages' => [],
+                'domainName' => $project->name ?? ''
+            ]);
+        } catch (\Exception $e) {
+            // Other errors
+            return view('seo.products.index', [
+                'project' => $project,
+                'rows' => [],
+                'selectedSc' => $selectedSc ?? '',
+                'selectedLang' => $selectedLang ?? '',
+                'limit' => $limit ?? 50,
+                'search' => $search ?? '',
+                'connectionError' => 'Fehler beim Laden der Produkte: ' . $e->getMessage(),
+                'languages' => [],
+                'domainName' => $project->name ?? ''
+            ]);
+        }
     }
 
     // ── Analyze storefront page ───────────────────────────────────────────────
