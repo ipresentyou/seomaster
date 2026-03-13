@@ -68,7 +68,9 @@ class CategorySeoController extends BaseSeoController
                 'storefrontDomain' => '',
                 'connectionError' => 'Verbindung zum Shopware-Shop fehlgeschlagen. Bitte überprüfen Sie, ob der Shop erreichbar ist und die API-Zugangsdaten korrekt sind.',
                 'languages' => [],
-                'domainName' => $project->name ?? ''
+                'domainName' => $project->name ?? '',
+                'domains' => [],
+                'storefrontUrl' => ''
             ]);
         } catch (\Exception $e) {
             // Other errors
@@ -82,7 +84,9 @@ class CategorySeoController extends BaseSeoController
                 'storefrontDomain' => '',
                 'connectionError' => 'Fehler beim Laden der Kategorien: ' . $e->getMessage(),
                 'languages' => [],
-                'domainName' => $project->name ?? ''
+                'domainName' => $project->name ?? '',
+                'domains' => [],
+                'storefrontUrl' => ''
             ]);
         }
     }
