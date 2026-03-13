@@ -14,9 +14,10 @@ class ApiCredentialController extends Controller
         return view('credentials.index', compact('credentials'));
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        return view('credentials.create');
+        $preselected = $request->get('provider', 'shopware'); // Default to shopware
+        return view('credentials.create', compact('preselected'));
     }
 
     public function store(Request $request)

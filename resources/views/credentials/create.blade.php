@@ -106,6 +106,9 @@
 <form method="POST" action="{{ route('credentials.store') }}" id="credForm">
 @csrf
 
+<!-- Hidden provider field to ensure provider is always submitted -->
+<input type="hidden" name="provider" id="selected-provider" value="{{ $preselected ?? 'shopware' }}">
+
 <div class="create-grid">
 
     {{-- ── Provider Selector ────────────────────────────────── --}}
@@ -332,4 +335,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Update hidden provider field when provider changes
+function selectProvider(key) {
+    // Update hidden field
+    document.getElementById('selected-provider').value = key;
+    
+    // Update UI
+    document.querySelectorAll('.provider-option').forEach(el => el.classList.remove('selected'));
+    const option = document.querySelector('[data-provider="' + key + '"]');
+    if (option) option.classList.add('selected');
+
+    // Fields toggle
+    document.querySelectorAll('.provider-fields').forEach(el => el.classList.remove('visible'));
+    const fields = document.getElementById('fields-' + key);
+    if (fields) fields.classList.add('visible');
+}
 </script>
