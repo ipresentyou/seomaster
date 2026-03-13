@@ -88,10 +88,10 @@ class ActivityLogResource extends Resource
                 Tables\Columns\BadgeColumn::make('action')
                     ->label('Aktion')
                     ->colors([
-                        'success' => fn($s) => str_contains($s, 'saved'),
-                        'primary' => fn($s) => str_contains($s, 'generated'),
-                        'info'    => fn($s) => str_contains($s, 'alt_text'),
-                        'warning' => fn($s) => str_contains($s, 'error'),
+                        'success' => fn($state) => str_contains($state, 'saved'),
+                        'primary' => fn($state) => str_contains($state, 'generated'),
+                        'info'    => fn($state) => str_contains($state, 'alt_text'),
+                        'warning' => fn($state) => str_contains($state, 'error'),
                     ])
                     ->formatStateUsing(fn(string $state) => match(true) {
                         str_contains($state, 'alt_text.saved')      => '🖼️ Alt gespeichert',
@@ -105,11 +105,11 @@ class ActivityLogResource extends Resource
                     ->label('Typ')
                     ->badge()
                     ->color('gray')
-                    ->formatStateUsing(fn($s) => match($s) {
+                    ->formatStateUsing(fn($state) => match($state) {
                         'product'  => '🛍️ Produkt',
                         'category' => '📁 Kategorie',
                         'media'    => '🖼️ Media',
-                        default    => $s,
+                        default    => $state,
                     }),
 
                 Tables\Columns\TextColumn::make('ai_tokens_used')

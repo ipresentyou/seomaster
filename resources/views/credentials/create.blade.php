@@ -256,15 +256,15 @@
 
             <div class="form-group">
                 <label class="form-label">OAuth Client ID</label>
-                <input type="text" name="credentials[client_id]" class="form-input"
+                <input type="text" name="credentials[gsc_client_id]" class="form-input"
                        placeholder="XXXXXX.apps.googleusercontent.com"
-                       value="{{ old('credentials.client_id') }}">
+                       value="{{ old('credentials.gsc_client_id') }}">
             </div>
 
             <div class="form-group">
                 <label class="form-label">OAuth Client Secret</label>
                 <div class="password-wrapper">
-                    <input type="password" name="credentials[client_secret]" id="gsc-secret" class="form-input"
+                    <input type="password" name="credentials[gsc_client_secret]" id="gsc-secret" class="form-input"
                            placeholder="GOCSPX-••••••••••••••••"
                            autocomplete="off" style="padding-right:40px;">
                     <button type="button" class="password-toggle" onclick="togglePw('gsc-secret', this)">👁</button>
@@ -274,7 +274,7 @@
             <div class="form-group">
                 <label class="form-label">Refresh Token</label>
                 <div class="password-wrapper">
-                    <input type="password" name="credentials[refresh_token]" id="gsc-rt" class="form-input"
+                    <input type="password" name="credentials[gsc_refresh_token]" id="gsc-rt" class="form-input"
                            placeholder="1//XXXXXXXX…"
                            autocomplete="off" style="padding-right:40px;">
                     <button type="button" class="password-toggle" onclick="togglePw('gsc-rt', this)">👁</button>
@@ -329,14 +329,15 @@ function togglePw(id, btn) {
 <script>
 // Override: Vor Submit alle nicht-aktiven Provider-Felder disablen
 document.addEventListener('DOMContentLoaded', function() {
-    document.querySelector('form').addEventListener('submit', function(e) {
-        // Nur die Felder deaktivieren, die wirklich nicht sichtbar sind
-        document.querySelectorAll('.provider-fields:not(.visible)').forEach(function(container) {
-            container.querySelectorAll('input, textarea').forEach(function(el) {
-                el.disabled = true;
-            });
-        });
-    });
+    // TEMPORARILY DISABLED FOR TESTING
+    // document.querySelector('form').addEventListener('submit', function(e) {
+    //     // Nur die Felder deaktivieren, die wirklich nicht sichtbar sind
+    //     document.querySelectorAll('.provider-fields:not(.visible)').forEach(function(container) {
+    //         container.querySelectorAll('input, textarea').forEach(function(el) {
+    //             el.disabled = true;
+    //         });
+    //     });
+    // });
 });
 
 // Update hidden provider field when provider changes
@@ -352,6 +353,20 @@ function selectProvider(key) {
     // Fields toggle
     document.querySelectorAll('.provider-fields').forEach(el => el.classList.remove('visible'));
     const fields = document.getElementById('fields-' + key);
-    if (fields) fields.classList.add('visible');
+    if (fields) {
+        fields.classList.add('visible');
+        console.log('Fields made visible:', fields.id, 'with classes:', fields.className);
+    }
 }
+
+// Debug: Check initial visibility
+document.addEventListener('DOMContentLoaded', function() {
+    const shopwareFields = document.getElementById('fields-shopware');
+    if (shopwareFields) {
+        console.log('Initial shopware fields:', shopwareFields.className);
+    }
+    
+    // Manually call selectProvider to ensure fields are visible
+    selectProvider('{{ $preselected ?? "shopware" }}');
+});
 </script>

@@ -17,6 +17,7 @@ class ApiCredentialController extends Controller
     public function create(Request $request)
     {
         $preselected = $request->get('provider', 'shopware'); // Default to shopware
+        \Log::info('API Credential Create:', ['preselected' => $preselected, 'request_provider' => $request->get('provider')]);
         return view('credentials.create', compact('preselected'));
     }
 
@@ -86,13 +87,31 @@ class ApiCredentialController extends Controller
     {
         try {
             $creds = $cred->credentials;
-            $res = Http::timeout(5)->post($creds['shop_url'] . '/api/oauth/token', [
+            $shopUrl = rtrim($creds['shop_url'], '/'); // Remove trailing slash
+            $url = $shopUrl . '/api/oauth/token';
+            
+            \Log::info('Shopware API Test:', [
+                'url' => $url,
+                'client_id' => $creds['client_id'],
+                'has_client_secret' => !empty($creds['client_secret'])
+            ]);
+            
+            $res = Http::timeout(5)->post($url, [
                 'grant_type'    => 'client_credentials',
                 'client_id'     => $creds['client_id'],
                 'client_secret' => $creds['client_secret'],
             ]);
+            
+            \Log::info('Shopware API Response:', [
+                'status' => $res->status(),
+                'successful' => $res->successful(),
+                'body' => $res->body(),
+                'json' => $res->json()
+            ]);
+            
             return $res->successful() && isset($res->json()['access_token']);
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            \Log::error('Shopware API Test Exception:', ['error' => $e->getMessage()]);
             return false;
         }
     }
@@ -136,7 +155,7 @@ class ApiCredentialController extends Controller
             'shopware'               => ['shop_url', 'client_id', 'client_secret'],
             'openai'                 => ['api_key'],
             'gemini'                 => ['api_key'],
-            'google_search_console'  => ['client_id', 'client_secret', 'refresh_token'],
+            'google_search_console'  => ['gsc_client_id', 'gsc_client_secret', 'gsc_refresh_token'],
         };
 
         $errs = [];

@@ -26,12 +26,12 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->brandName('SEOmaster')
             ->colors([
-                'primary'   => Color::Blue,
-                'gray'      => Color::Slate,
-                'danger'    => Color::Red,
-                'info'      => Color::Blue,
-                'success'   => Color::Green,
-                'warning'   => Color::Orange,
+                'primary'   => Color::hex('#1a73e8'),  // Google Blue
+                'gray'      => Color::hex('#5f6368'),  // Google Gray
+                'danger'    => Color::hex('#d93025'),  // Google Red
+                'info'      => Color::hex('#1a73e8'),  // Google Blue
+                'success'   => Color::hex('#1e8e3e'),  // Google Green
+                'warning'   => Color::hex('#e37400'),  // Google Orange
             ])
             ->font('Roboto', 'https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap')
             ->login()
@@ -44,112 +44,237 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([])
             ->renderHook('panels::head.end', fn () => '
                 <style>
-                    header.fi-topbar, .fi-topbar {
-                        background-color: #fff !important;
-                        border-bottom: 1px solid #dadce0 !important;
-                        box-shadow: none !important;
+                    /* Complete Google Material Design Theme */
+                    :root {
+                        --primary: 26, 115, 232;
+                        --primary-rgb: 26, 115, 232;
+                        --gray: 95, 99, 104;
+                        --danger: 217, 48, 37;
+                        --success: 30, 142, 62;
+                        --warning: 227, 116, 0;
+                        --info: 26, 115, 232;
                     }
-                    aside.fi-sidebar, .fi-sidebar, .fi-sidebar-nav {
-                        background-color: #fff !important;
-                        border-right: 1px solid #dadce0 !important;
+                    
+                    /* Override all Filament colors */
+                    .fi-btn-primary { 
+                        background: rgb(var(--primary)) !important; 
+                        border-color: rgb(var(--primary)) !important;
+                        color: #fff !important;
                     }
-                    .fi-sidebar-header {
-                        background-color: #fff !important;
-                        border-bottom: 1px solid #dadce0 !important;
+                    .fi-btn-primary:hover { 
+                        background: rgb(var(--primary-rgb) / 0.9) !important; 
+                        border-color: rgb(var(--primary-rgb) / 0.9) !important;
                     }
-                    .fi-logo-text, .fi-brand-name,
-                    .fi-sidebar-header a, .fi-sidebar-header span {
-                        color: #202124 !important;
+                    
+                    /* Dark mode overrides */
+                    .dark .fi-btn-primary {
+                        background: rgb(var(--primary)) !important;
+                        border-color: rgb(var(--primary)) !important;
                     }
-                    .fi-sidebar-nav-item-label,
-                    .fi-sidebar-nav-item span,
-                    .fi-sidebar-nav-item a {
-                        color: #3c4043 !important;
-                    }
-                    .fi-sidebar-nav-item.fi-active .fi-sidebar-nav-item-label {
-                        color: #1a73e8 !important;
-                        font-weight: 500 !important;
-                    }
-                    .fi-sidebar-nav-item.fi-active {
-                        background-color: #e8f0fe !important;
-                    }
-                    .fi-sidebar-nav-item:hover {
-                        background-color: #f1f3f4 !important;
-                    }
-                    .fi-sidebar-nav-item svg { color: #5f6368 !important; }
-                    .fi-sidebar-nav-item.fi-active svg { color: #1a73e8 !important; }
-                    .fi-sidebar-group-label {
-                        color: #5f6368 !important;
-                        font-size: 11px !important;
-                        text-transform: uppercase !important;
-                        letter-spacing: 0.08em !important;
-                        font-weight: 500 !important;
-                    }
-                    main.fi-main, .fi-main, .fi-body, body {
-                        background-color: #f8f9fa !important;
-                    }
-                    .fi-header-heading, h1.fi-header-heading {
-                        color: #202124 !important;
-                        font-weight: 400 !important;
-                    }
+                    
+                    /* Remove all shadows and borders */
                     .fi-section, .fi-card, .fi-wi {
-                        background-color: #fff !important;
+                        background: #fff !important;
                         border: 1px solid #dadce0 !important;
                         box-shadow: none !important;
                         border-radius: 8px !important;
                     }
-                    .fi-section-header-heading,
-                    .fi-card-header-heading {
-                        color: #202124 !important;
-                        font-weight: 500 !important;
+                    
+                    .dark .fi-section, .dark .fi-card, .dark .fi-wi {
+                        background: #202124 !important;
+                        border: 1px solid #3c4043 !important;
                     }
-                    p, span, label, td, th,
-                    .fi-fo-field-wrp-label,
-                    .fi-ta-cell { color: #202124 !important; }
-                    .fi-fo-field-wrp-helper-text { color: #5f6368 !important; }
-                    input, select, textarea, .fi-input {
-                        background-color: #fff !important;
-                        border: 1px solid #dadce0 !important;
-                        color: #202124 !important;
-                        border-radius: 4px !important;
-                    }
-                    input:focus, select:focus, textarea:focus {
-                        border-color: #1a73e8 !important;
-                        box-shadow: 0 0 0 2px rgba(26,115,232,0.2) !important;
-                    }
-                    .fi-ta-header-cell, th {
-                        background-color: #f8f9fa !important;
-                        color: #5f6368 !important;
-                        font-size: 12px !important;
-                        font-weight: 500 !important;
-                        text-transform: uppercase !important;
-                    }
+                    
+                    /* Widget specific styling */
                     .fi-wi-stats-overview-stat {
                         background: #fff !important;
                         border: 1px solid #dadce0 !important;
                         border-radius: 8px !important;
                         box-shadow: none !important;
+                        padding: 20px !important;
                     }
+                    
+                    .dark .fi-wi-stats-overview-stat {
+                        background: #202124 !important;
+                        border: 1px solid #3c4043 !important;
+                    }
+                    
                     .fi-wi-stats-overview-stat-value {
                         color: #202124 !important;
                         font-weight: 500 !important;
+                        font-size: 24px !important;
                     }
+                    
+                    .dark .fi-wi-stats-overview-stat-value {
+                        color: #fff !important;
+                    }
+                    
                     .fi-wi-stats-overview-stat-label,
                     .fi-wi-stats-overview-stat-description {
                         color: #5f6368 !important;
+                        font-size: 14px !important;
                     }
-                    .fi-btn-primary {
-                        background-color: #1a73e8 !important;
+                    
+                    .dark .fi-wi-stats-overview-stat-label,
+                    .dark .fi-wi-stats-overview-stat-description {
+                        color: #9aa0a6 !important;
+                    }
+                    
+                    /* Typography */
+                    .fi-header-heading, h1.fi-header-heading {
+                        color: #202124 !important;
+                        font-weight: 400 !important;
+                    }
+                    
+                    .dark .fi-header-heading, .dark h1.fi-header-heading {
                         color: #fff !important;
-                        border-radius: 4px !important;
+                    }
+                    
+                    /* Sidebar */
+                    .fi-sidebar {
+                        background: #fff !important;
+                        border-right: 1px solid #dadce0 !important;
+                    }
+                    
+                    .dark .fi-sidebar {
+                        background: #202124 !important;
+                        border-right: 1px solid #3c4043 !important;
+                    }
+                    
+                    /* Topbar */
+                    .fi-topbar {
+                        background: #fff !important;
+                        border-bottom: 1px solid #dadce0 !important;
                         box-shadow: none !important;
                     }
-                    .fi-dropdown-panel {
-                        background: #fff !important;
-                        border: 1px solid #dadce0 !important;
-                        border-radius: 8px !important;
+                    
+                    .dark .fi-topbar {
+                        background: #202124 !important;
+                        border-bottom: 1px solid #3c4043 !important;
                     }
-                    .fi-dropdown-list-item-label { color: #202124 !important; }
+                    
+                    /* Main content */
+                    .fi-main, .fi-body, body {
+                        background: #f8f9fa !important;
+                    }
+                    
+                    .dark .fi-main, .dark .fi-body, .dark body {
+                        background: #121212 !important;
+                    }
+                    
+                    /* Dashboard grid spacing */
+                    .fi-wi {
+                        margin-bottom: 24px !important;
+                    }
+                    
+                    .fi-wi-stats-overview {
+                        gap: 24px !important;
+                    }
+                    
+                    /* Fix widget grid gaps */
+                    .fi-wi-grid {
+                        gap: 24px !important;
+                    }
+                    
+                    .grid.gap-6 {
+                        gap: 24px !important;
+                    }
+                    
+                    .grid.md\\:grid-cols-3.gap-6 {
+                        gap: 24px !important;
+                    }
+                    
+                    /* Stats overview specific */
+                    .fi-wi-stats-overview-stats-ctn {
+                        gap: 24px !important;
+                    }
+                    
+                    .fi-wi-stats-overview-stats-ctn.md\:grid-cols-3 {
+                        gap: 24px !important;
+                    }
+                    
+                    /* Individual stat widgets spacing */
+                    .fi-wi-stats-overview-stat {
+                        margin-bottom: 0 !important;
+                    }
+                    
+                    .fi-wi-stats-overview .fi-wi-stats-overview-stat {
+                        margin: 0 !important;
+                        padding: 20px !important;
+                    }
+                    
+                    /* Ensure proper spacing in grid */
+                    .fi-wi-stats-overview-stats-ctn .fi-wi-stats-overview-stat {
+                        margin: 0 !important;
+                    }
+                    
+                    /* Grid layout improvements */
+                    .fi-wi-grid {
+                        gap: 24px !important;
+                    }
+                    
+                    .fi-wi > div {
+                        margin-bottom: 0 !important;
+                    }
+                    
+                    /* Widget container spacing */
+                    .fi-section {
+                        margin-bottom: 24px !important;
+                    }
+                    
+                    /* Stats overview specific */
+                    .fi-wi-stats-overview .fi-wi-stats-overview-stat {
+                        margin: 0 !important;
+                    }
+                    
+                    /* Chart widgets */
+                    .fi-wi-chart {
+                        padding: 20px !important;
+                    }
+                    
+                    /* Activity feed */
+                    .fi-wi-activity-feed {
+                        padding: 20px !important;
+                    }
+                    
+                    /* All pages - consistent spacing */
+                    .fi-page {
+                        padding: 24px !important;
+                    }
+                    
+                    .fi-page-content {
+                        gap: 24px !important;
+                    }
+                    
+                    /* Resource pages */
+                    .fi-resource-page {
+                        padding: 24px !important;
+                    }
+                    
+                    /* Tables */
+                    .fi-table-container {
+                        margin-bottom: 24px !important;
+                    }
+                    
+                    /* Forms */
+                    .fi-form-container {
+                        padding: 24px !important;
+                    }
+                    
+                    /* Cards and sections everywhere */
+                    .fi-card, .fi-section {
+                        margin-bottom: 24px !important;
+                    }
+                    
+                    /* List pages */
+                    .fi-list-page {
+                        padding: 24px !important;
+                    }
+                    
+                    /* Edit/Create pages */
+                    .fi-record-page {
+                        padding: 24px !important;
+                    }
                 </style>
             ')
             ->middleware([

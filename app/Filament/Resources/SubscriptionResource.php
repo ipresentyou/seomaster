@@ -133,7 +133,7 @@ class SubscriptionResource extends Resource
                     ->colors([
                         'success' => 'active',
                         'info'    => 'trial',
-                        'danger'  => fn($s) => in_array($s, ['cancelled', 'suspended']),
+                        'danger'  => fn($state) => in_array($state, ['cancelled', 'suspended']),
                         'warning' => 'pending',
                     ])
                     ->formatStateUsing(fn(string $state) => match($state) {
@@ -147,7 +147,7 @@ class SubscriptionResource extends Resource
 
                 Tables\Columns\TextColumn::make('billing_cycle')
                     ->label('Rhythmus')
-                    ->formatStateUsing(fn($s) => $s === 'yearly' ? '📆 Jährlich' : '📅 Monatlich'),
+                    ->formatStateUsing(fn($state) => $state === 'yearly' ? '📆 Jährlich' : '📅 Monatlich'),
 
                 Tables\Columns\TextColumn::make('current_period_end')
                     ->label('Läuft bis')

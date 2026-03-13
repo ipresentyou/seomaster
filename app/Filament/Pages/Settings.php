@@ -22,9 +22,9 @@ class Settings extends Page
     {
         $this->form->fill([
             'app_name'              => config('app.name'),
-            'trial_days'            => 14,
-            'max_login_attempts'    => 5,
-            'require_2fa_for_admin' => true,
+            'trial_days'            => config('app.trial_days', 3),
+            'max_login_attempts'    => config('app.max_login_attempts', 5),
+            'require_2fa_for_admin' => config('app.require_2fa_for_admin', true),
         ]);
     }
 
@@ -69,11 +69,26 @@ class Settings extends Page
     {
         $data = $this->form->getState();
 
-        // Hier: In DB oder .env speichern (z.B. via spatie/laravel-settings)
-        // Settings::set('trial_days', $data['trial_days']);
+        // Update .env file
+        $envPath = base_path('.env');
+        $envContent = file_get_contents($envPath);
+        
+        // Update trial_days
+        if (isset($data['trial_days'])) {
+            $envContent = preg_replace('/^TRIAL_DAYS=.*$/m', "TRIAL_DAYS={$data['trial_days']}", $envContent);
+            if (!str_contains($envContent, 'TRIAL_DAYS=')) {
+                $envContent .= "\nTRIAL_DAYS={$data['trial_days']}\n";
+            }
+        }
+        
+        file_put_contents($envPath, $envContent);
+        
+        // Clear config cache
+        \Artisan::call('config:clear');
 
         Notification::make()
             ->title('✅ Einstellungen gespeichert')
+            ->body('Trial-Tage wurden auf ' . $data['trial_days'] . ' Tage gesetzt.')
             ->success()
             ->send();
     }
