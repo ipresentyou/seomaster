@@ -97,17 +97,25 @@
 }
 
 .project-tools {
-    display: flex; gap: 8px; flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px;
 }
 .tool-chip {
-    display: flex; align-items: center; gap: 6px;
-    padding: 8px 14px; border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 12px;
+    border-radius: 10px;
     background: rgba(255,255,255,0.06);
     border: 1px solid rgba(255,255,255,0.1);
-    font-size: 12px; color: var(--text-2);
+    font-size: 11px;
+    color: var(--text-2);
     text-decoration: none;
     transition: all 0.2s;
     font-weight: 500;
+    text-align: center;
+    justify-content: center;
 }
 .tool-chip:hover {
     background: rgba(124,58,237,0.15);
@@ -244,6 +252,11 @@
                 <a href="{{ route('seo.products', $project) }}" class="tool-chip">🏷️ Produkte</a>
                 <a href="{{ route('seo.categories', $project) }}" class="tool-chip">📁 Kategorien</a>
                 <a href="{{ route('seo.alttext', $project) }}" class="tool-chip">🖼️ Alt-Text</a>
+                <a href="{{ route('seo.meta', $project) }}" class="tool-chip">📝 Meta-Titel</a>
+                <a href="{{ route('seo.descriptions', $project) }}" class="tool-chip">📄 Beschreibungen</a>
+                <a href="{{ route('seo.keywords', $project) }}" class="tool-chip">🔑 Keywords</a>
+                <a href="{{ route('seo.analytics', $project) }}" class="tool-chip">📊 Analytics</a>
+                <a href="{{ route('seo.export', $project) }}" class="tool-chip">📤 Export</a>
             </div>
         </div>
     @empty
