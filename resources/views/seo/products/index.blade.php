@@ -277,7 +277,6 @@ Fokus auf Conversion und hohe Klickraten in Suchmaschinen.' }}</textarea>
     <div style="font-size:13px;margin-top:6px;">Lade den Sales Channel oder passe die Suche an.</div>
 </div>
 @endforelse
-@endif
 @endisset
 
 @push('scripts')
