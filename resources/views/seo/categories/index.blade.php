@@ -236,7 +236,6 @@ Fokus auf hohe Sichtbarkeit in Suchmaschinen und gute Klickraten.' }}</textarea>
     <div style="font-size:15px;color:var(--text-2);">Keine Kategorien gefunden</div>
 </div>
 @endforelse
-@endif
 @endisset
 
 @push('scripts')
