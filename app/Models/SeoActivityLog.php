@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class SeoActivityLog extends Model
 {
+    protected $table = 'seo_activity_logs';
+    
     protected $fillable = [
         'user_id', 'seo_project_id', 'action',
         'entity_type', 'entity_id',

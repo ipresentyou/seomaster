@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\Model;
 
 class ApiUsage extends Model
 {
+    protected $table = 'api_usages';
+    
     protected $fillable = [
         'user_id',
         'service',
