@@ -28,7 +28,10 @@ class ApiCredentialController extends Controller
         ]);
 
         // Provider-spezifische Validierung
-        $this->validateProviderCredentials($data['provider'], $data['credentials']);
+        $validationResult = $this->validateProviderCredentials($data['provider'], $data['credentials']);
+        if ($validationResult !== true) {
+            return $validationResult; // Return the redirect with errors
+        }
 
         auth()->user()->apiCredentials()->updateOrCreate(
             ['provider' => $data['provider'], 'label' => $data['label']],
@@ -137,5 +140,7 @@ class ApiCredentialController extends Controller
         if (!empty($errs)) {
             return back()->withInput()->withErrors($errs);
         }
+        
+        return true; // Success
     }
 }
