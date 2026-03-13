@@ -42,16 +42,28 @@ class ApiCredentialController extends Controller
             return $validationResult; // Return the redirect with errors
         }
 
-        auth()->user()->apiCredentials()->updateOrCreate(
-            ['provider' => $data['provider'], 'label' => $data['label']],
-            [
-            'provider'    => $data['provider'],
-            'label'       => $data['label'],
-            'credentials' => $data['credentials'],
-        ]);
+        try {
+            auth()->user()->apiCredentials()->updateOrCreate(
+                ['provider' => $data['provider'], 'label' => $data['label']],
+                [
+                'provider'    => $data['provider'],
+                'label'       => $data['label'],
+                'credentials' => $data['credentials'],
+            ]);
 
-        return redirect()->route('credentials.index')
-            ->with('success', '✅ API-Credentials gespeichert.');
+            return redirect()->route('credentials.index')
+                ->with('success', '✅ API-Credentials gespeichert.');
+
+        } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+            return back()
+                ->withInput()
+                ->withErrors(['label' => '⚠️ Eine API-Credential mit diesem Label und Provider existiert bereits. Bitte wähle ein anderes Label.']);
+        } catch (\Exception $e) {
+            \Log::error('API Credential Store Error:', ['error' => $e->getMessage()]);
+            return back()
+                ->withInput()
+                ->withErrors(['general' => '⚠️ Ein Fehler ist aufgetreten. Bitte versuche es erneut.']);
+        }
     }
 
     public function destroy(ApiCredential $credential)
