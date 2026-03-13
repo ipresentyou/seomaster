@@ -63,7 +63,10 @@ class ProductSeoController extends BaseSeoController
                 'search' => $search ?? '',
                 'connectionError' => 'Verbindung zum Shopware-Shop fehlgeschlagen. Bitte überprüfen Sie, ob der Shop erreichbar ist und die API-Zugangsdaten korrekt sind.',
                 'languages' => [],
-                'domainName' => $project->name ?? ''
+                'domainName' => $project->name ?? '',
+                'salesChannels' => [],
+                'domains' => [],
+                'storefrontUrl' => ''
             ]);
         } catch (\Illuminate\Http\Client\RequestException $e) {
             // HTTP errors (401, 403, 500, etc.)
@@ -85,7 +88,10 @@ class ProductSeoController extends BaseSeoController
                 'search' => $search ?? '',
                 'connectionError' => $errorMessage,
                 'languages' => [],
-                'domainName' => $project->name ?? ''
+                'domainName' => $project->name ?? '',
+                'salesChannels' => [],
+                'domains' => [],
+                'storefrontUrl' => ''
             ]);
         } catch (\Exception $e) {
             // Other errors
@@ -98,7 +104,10 @@ class ProductSeoController extends BaseSeoController
                 'search' => $search ?? '',
                 'connectionError' => 'Fehler beim Laden der Produkte: ' . $e->getMessage(),
                 'languages' => [],
-                'domainName' => $project->name ?? ''
+                'domainName' => $project->name ?? '',
+                'salesChannels' => [],
+                'domains' => [],
+                'storefrontUrl' => ''
             ]);
         }
     }
