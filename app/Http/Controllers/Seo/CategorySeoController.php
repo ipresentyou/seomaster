@@ -58,28 +58,32 @@ class CategorySeoController extends BaseSeoController
         )));
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
             // Connection timeout or network error
-            return view('seo.categories.index', array_merge($meta, [
+            return view('seo.categories.index', [
                 'project' => $project,
                 'rows' => [],
                 'selectedSc' => $selectedSc ?? '',
                 'selectedLang' => $selectedLang ?? '',
-                'limit' => $limit,
-                'salesChannels' => $salesChannels ?? [],
+                'limit' => $limit ?? 50,
+                'salesChannels' => [],
                 'storefrontDomain' => '',
-                'connectionError' => 'Verbindung zum Shopware-Shop fehlgeschlagen. Bitte überprüfen Sie, ob der Shop erreichbar ist und die API-Zugangsdaten korrekt sind.'
-            ]));
+                'connectionError' => 'Verbindung zum Shopware-Shop fehlgeschlagen. Bitte überprüfen Sie, ob der Shop erreichbar ist und die API-Zugangsdaten korrekt sind.',
+                'languages' => [],
+                'domainName' => $project->name ?? ''
+            ]);
         } catch (\Exception $e) {
             // Other errors
-            return view('seo.categories.index', array_merge($meta, [
+            return view('seo.categories.index', [
                 'project' => $project,
                 'rows' => [],
                 'selectedSc' => $selectedSc ?? '',
                 'selectedLang' => $selectedLang ?? '',
-                'limit' => $limit,
-                'salesChannels' => $salesChannels ?? [],
+                'limit' => $limit ?? 50,
+                'salesChannels' => [],
                 'storefrontDomain' => '',
-                'connectionError' => 'Fehler beim Laden der Kategorien: ' . $e->getMessage()
-            ]));
+                'connectionError' => 'Fehler beim Laden der Kategorien: ' . $e->getMessage(),
+                'languages' => [],
+                'domainName' => $project->name ?? ''
+            ]);
         }
     }
 
