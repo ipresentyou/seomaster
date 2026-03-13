@@ -133,7 +133,7 @@ class ApiCredentialController extends Controller
 
         $errs = [];
         foreach ($required as $field) {
-            if (empty($creds[$field])) {
+            if (!isset($creds[$field]) || $creds[$field] === '' || trim($creds[$field]) === '') {
                 $errs["credentials.{$field}"] = "Bitte {$field} ausfuellen.";
             }
         }
