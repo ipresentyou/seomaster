@@ -192,10 +192,18 @@
                            autocomplete="off" style="padding-right:40px;">
                     <button type="button" class="password-toggle" onclick="togglePw('sw-secret', this)">👁</button>
                 </div>
-                <div class="form-hint">
-                    Zu finden unter: Shopware Admin → Einstellungen → System → Integrationen →
-                    <a href="#" class="help-link">Neue Integration erstellen</a>
-                </div>
+                <div class="form-hint">Client ID und Secret aus dem nächsten Schritt eintragen.</div>
+            </div>
+
+            <div style="background:rgba(124,58,237,0.06);border:1px solid rgba(124,58,237,0.2);border-radius:10px;padding:14px 16px;font-size:12px;color:var(--text-2);line-height:1.8;">
+                <div style="font-weight:600;color:var(--text-1);margin-bottom:8px;">📋 So erstellst du eine Shopware-Integration:</div>
+                <ol style="margin:0;padding-left:18px;">
+                    <li>Shopware Admin öffnen (z.B. <code style="font-size:11px;">dein-shop.de/admin</code>)</li>
+                    <li><strong>Einstellungen</strong> → <strong>System</strong> → <strong>Integrationen</strong></li>
+                    <li>Oben rechts <strong>„Integration hinzufügen"</strong> klicken</li>
+                    <li>Name vergeben (z.B. „SEOmaster"), Zugriffsrechte auf <strong>Administrator</strong> setzen</li>
+                    <li><strong>Speichern</strong> → <strong>Client ID</strong> und <strong>Client Secret</strong> kopieren</li>
+                </ol>
             </div>
         </div>
 
@@ -213,11 +221,19 @@
                     <button type="button" class="password-toggle" onclick="togglePw('oai-key', this)">👁</button>
                 </div>
                 <div class="form-hint">
-                    <a href="https://platform.openai.com/api-keys" target="_blank" class="help-link">
-                        → API Key bei OpenAI erstellen
-                    </a>
-                    · Modelle: GPT-4o (Vision für Alt-Text), GPT-3.5-turbo (Meta/Text)
+                    <a href="https://platform.openai.com/api-keys" target="_blank" class="help-link">→ platform.openai.com/api-keys</a>
                 </div>
+            </div>
+
+            <div style="background:rgba(16,185,129,0.06);border:1px solid rgba(16,185,129,0.2);border-radius:10px;padding:14px 16px;font-size:12px;color:var(--text-2);line-height:1.8;margin-bottom:12px;">
+                <div style="font-weight:600;color:var(--text-1);margin-bottom:8px;">📋 So erstellst du einen OpenAI API Key:</div>
+                <ol style="margin:0;padding-left:18px;">
+                    <li><a href="https://platform.openai.com" target="_blank" class="help-link">platform.openai.com</a> öffnen und einloggen (oder Konto erstellen)</li>
+                    <li>Links im Menü auf <strong>„API Keys"</strong> klicken</li>
+                    <li><strong>„Create new secret key"</strong> klicken, Namen vergeben</li>
+                    <li>Key kopieren – <strong>er wird nur einmal angezeigt!</strong></li>
+                    <li>Unter <strong>Billing → Add payment method</strong> Guthaben aufladen</li>
+                </ol>
             </div>
 
             <div style="background:rgba(16,185,129,0.06); border:1px solid rgba(16,185,129,0.2); border-radius:8px; padding:12px 14px; font-size:12px; color:var(--text-2);">
@@ -239,9 +255,21 @@
                     <button type="button" class="password-toggle" onclick="togglePw('gem-key', this)">👁</button>
                 </div>
                 <div class="form-hint">
-                    <a href="https://aistudio.google.com/app/apikey" target="_blank" class="help-link">
-                        → API Key bei Google AI Studio erstellen
-                    </a>
+                    <a href="https://aistudio.google.com/app/apikey" target="_blank" class="help-link">→ aistudio.google.com/app/apikey</a>
+                </div>
+            </div>
+
+            <div style="background:rgba(66,133,244,0.06);border:1px solid rgba(66,133,244,0.2);border-radius:10px;padding:14px 16px;font-size:12px;color:var(--text-2);line-height:1.8;">
+                <div style="font-weight:600;color:var(--text-1);margin-bottom:8px;">📋 So erstellst du einen Gemini API Key:</div>
+                <ol style="margin:0;padding-left:18px;">
+                    <li><a href="https://aistudio.google.com/app/apikey" target="_blank" class="help-link">aistudio.google.com/app/apikey</a> öffnen</li>
+                    <li>Mit Google-Konto einloggen</li>
+                    <li><strong>„Create API key"</strong> klicken</li>
+                    <li>Bestehendes Google Cloud Projekt wählen oder neues erstellen</li>
+                    <li>Key kopieren und hier einfügen</li>
+                </ol>
+                <div style="margin-top:8px;padding-top:8px;border-top:1px solid rgba(66,133,244,0.15);">
+                    💡 Gemini ist <strong>kostenlos nutzbar</strong> (Free Tier mit Rate Limits). Gut für SEO-Texte und Meta-Daten.
                 </div>
             </div>
         </div>
