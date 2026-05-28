@@ -283,9 +283,9 @@
         @endif
 
         <div class="page-footer">
-            <a href="#">Datenschutz</a>
-            <a href="#">Impressum</a>
-            <a href="#">Hilfe</a>
+            <a href="{{ route('legal.datenschutz') }}">Datenschutz</a>
+            <a href="{{ route('legal.impressum') }}">Impressum</a>
+            <a href="mailto:support@shopware-seomaster.com">Hilfe</a>
         </div>
 
     </div>
