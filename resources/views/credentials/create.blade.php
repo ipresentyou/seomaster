@@ -208,7 +208,8 @@
                 <div class="password-wrapper">
                     <input type="password" name="credentials[api_key]" id="oai-key" class="form-input"
                            placeholder="sk-proj-••••••••••••••••••"
-                           autocomplete="off" style="padding-right:40px;">
+                           autocomplete="off" style="padding-right:40px;"
+                           value="{{ old('credentials.api_key') }}">
                     <button type="button" class="password-toggle" onclick="togglePw('oai-key', this)">👁</button>
                 </div>
                 <div class="form-hint">
@@ -233,7 +234,8 @@
                 <div class="password-wrapper">
                     <input type="password" name="credentials[api_key]" id="gem-key" class="form-input"
                            placeholder="AIzaSy••••••••••••••••••••••"
-                           autocomplete="off" style="padding-right:40px;">
+                           autocomplete="off" style="padding-right:40px;"
+                           value="{{ old('credentials.api_key') }}">
                     <button type="button" class="password-toggle" onclick="togglePw('gem-key', this)">👁</button>
                 </div>
                 <div class="form-hint">
@@ -300,6 +302,9 @@
 function selectProvider(key) {
     // Radio update
     document.querySelectorAll('input[name="provider"]').forEach(r => r.checked = r.value === key);
+    
+    // Hidden field update
+    document.getElementById('selected-provider').value = key;
 
     // UI update
     document.querySelectorAll('.provider-option').forEach(el => {
@@ -326,47 +331,3 @@ function togglePw(id, btn) {
 @endpush
 
 </x-layouts.app>
-<script>
-// Override: Vor Submit alle nicht-aktiven Provider-Felder disablen
-document.addEventListener('DOMContentLoaded', function() {
-    // TEMPORARILY DISABLED FOR TESTING
-    // document.querySelector('form').addEventListener('submit', function(e) {
-    //     // Nur die Felder deaktivieren, die wirklich nicht sichtbar sind
-    //     document.querySelectorAll('.provider-fields:not(.visible)').forEach(function(container) {
-    //         container.querySelectorAll('input, textarea').forEach(function(el) {
-    //             el.disabled = true;
-    //         });
-    //     });
-    // });
-});
-
-// Update hidden provider field when provider changes
-function selectProvider(key) {
-    // Update hidden field
-    document.getElementById('selected-provider').value = key;
-    
-    // Update UI
-    document.querySelectorAll('.provider-option').forEach(el => el.classList.remove('selected'));
-    const option = document.querySelector('[data-provider="' + key + '"]');
-    if (option) option.classList.add('selected');
-
-    // Fields toggle
-    document.querySelectorAll('.provider-fields').forEach(el => el.classList.remove('visible'));
-    const fields = document.getElementById('fields-' + key);
-    if (fields) {
-        fields.classList.add('visible');
-        console.log('Fields made visible:', fields.id, 'with classes:', fields.className);
-    }
-}
-
-// Debug: Check initial visibility
-document.addEventListener('DOMContentLoaded', function() {
-    const shopwareFields = document.getElementById('fields-shopware');
-    if (shopwareFields) {
-        console.log('Initial shopware fields:', shopwareFields.className);
-    }
-    
-    // Manually call selectProvider to ensure fields are visible
-    selectProvider('{{ $preselected ?? "shopware" }}');
-});
-</script>
