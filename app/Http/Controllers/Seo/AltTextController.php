@@ -19,6 +19,9 @@ class AltTextController extends BaseSeoController
             $selectedLang = $request->input('lang', '');
             $limit        = (int) $request->input('max', 50);
             $filterType   = $request->input('filter', 'missing');
+            $search       = trim($request->input('search', ''));
+            $hideSvg      = $request->boolean('hide_svg', true);
+            $hideEmpty    = $request->boolean('hide_empty', true);
 
             $meta = $this->buildPageMeta($selectedSc, $selectedLang);
             $salesChannels = $meta['salesChannels'];
@@ -68,6 +71,10 @@ class AltTextController extends BaseSeoController
                     'productContext' => implode(', ', array_unique($productCtx)),
                 ];
 
+                if ($hideSvg && ($row['mimeType'] === 'image/svg+xml')) continue;
+                if ($hideEmpty && $row['fileSize'] === 0) continue;
+                if ($search && stripos($row['fileName'], $search) === false) continue;
+
                 $rows[]     = $row;
                 $totalSize  += $row['fileSize'];
                 if (empty($row['alt'])) $missingCount++;
@@ -76,7 +83,8 @@ class AltTextController extends BaseSeoController
 
         return view('seo.alttext.index', array_merge($meta, compact(
             'project', 'rows', 'selectedSc', 'selectedLang',
-            'limit', 'filterType', 'totalSize', 'missingCount', 'salesChannels'
+            'limit', 'filterType', 'totalSize', 'missingCount', 'salesChannels',
+            'search', 'hideSvg', 'hideEmpty'
         )));
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
             // Connection timeout or network error

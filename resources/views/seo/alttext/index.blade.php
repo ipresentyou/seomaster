@@ -123,7 +123,16 @@
             <option value="missing" {{ $filterType === 'missing' ? 'selected' : '' }}>❌ Nur fehlende Alt-Texte</option>
             <option value="all"     {{ $filterType === 'all'     ? 'selected' : '' }}>📸 Alle Bilder</option>
         </select>
+        <input type="text" class="seo-input" name="search" value="{{ $search ?? '' }}" placeholder="🔍 Dateiname suchen…" style="min-width:160px;">
         <input type="number" class="seo-input" name="max" value="{{ $limit }}">
+        <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-2);cursor:pointer;white-space:nowrap;">
+            <input type="checkbox" name="hide_svg" value="1" {{ ($hideSvg ?? true) ? 'checked' : '' }} onchange="this.form.submit()">
+            SVG aus
+        </label>
+        <label style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text-2);cursor:pointer;white-space:nowrap;">
+            <input type="checkbox" name="hide_empty" value="1" {{ ($hideEmpty ?? true) ? 'checked' : '' }} onchange="this.form.submit()">
+            0 KB aus
+        </label>
         <button type="submit" class="btn btn-primary" style="padding:7px 14px;font-size:13px;">Laden</button>
         <div class="toolbar-right">
             <button type="button" class="btn btn-secondary" style="padding:7px 14px;font-size:13px;" onclick="generateAll()">
