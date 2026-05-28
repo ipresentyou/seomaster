@@ -151,7 +151,7 @@ class ProductSeoController extends BaseSeoController
 
         try {
             if (in_array('title', $v['generate']) || in_array('desc', $v['generate'])) {
-                $meta = $this->ai->generateMeta(
+                $meta = $this->getAi()->generateMeta(
                     entityName:         $v['name'],
                     entityType:         'product',
                     pageContent:        $v['content']  ?? '',
@@ -173,7 +173,7 @@ class ProductSeoController extends BaseSeoController
             }
 
             if (in_array('text', $v['generate'])) {
-                $seo = $this->ai->generateSeoText(
+                $seo = $this->getAi()->generateSeoText(
                     entityName:         $v['name'],
                     entityType:         'product',
                     pageContent:        $v['content']  ?? '',

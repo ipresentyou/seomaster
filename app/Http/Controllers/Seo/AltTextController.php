@@ -160,7 +160,7 @@ class AltTextController extends BaseSeoController
         ]);
 
         try {
-            $result = $this->ai->generateAltText(
+            $result = $this->getAi()->generateAltText(
                 imageUrl:           $v['imageUrl'],
                 fileName:           $v['fileName'],
                 targetLanguage:     $v['targetLang']         ?? '',

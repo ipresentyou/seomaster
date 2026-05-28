@@ -13,7 +13,7 @@ abstract class BaseSeoController extends Controller
 {
     protected SeoProject $project;
     protected ShopwareService $shopware;
-    protected AiService $ai;
+    private ?AiService $ai = null;
 
     // ── Boot ──────────────────────────────────────────────────────────────────
 
@@ -24,7 +24,12 @@ abstract class BaseSeoController extends Controller
 
         $this->project  = $project;
         $this->shopware = ShopwareService::forProject($project);
-        $this->ai       = AiService::forUser(auth()->id());
+        // AI is initialized lazily via getAi() — avoids 500 on pages that don't need it
+    }
+
+    protected function getAi(): AiService
+    {
+        return $this->ai ??= AiService::forUser(auth()->id());
     }
 
     // ── Activity Log ──────────────────────────────────────────────────────────

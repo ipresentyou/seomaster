@@ -128,7 +128,7 @@ class CategorySeoController extends BaseSeoController
 
         try {
             if (in_array('title', $v['generate']) || in_array('desc', $v['generate']) || in_array('keywords', $v['generate'])) {
-                $meta = $this->ai->generateMeta(
+                $meta = $this->getAi()->generateMeta(
                     entityName:         $v['name'],
                     entityType:         'category',
                     pageContent:        $v['content']          ?? '',
@@ -147,7 +147,7 @@ class CategorySeoController extends BaseSeoController
             }
 
             if (in_array('text', $v['generate'])) {
-                $seo = $this->ai->generateSeoText(
+                $seo = $this->getAi()->generateSeoText(
                     entityName:         $v['name'],
                     entityType:         'category',
                     pageContent:        $v['content']          ?? '',

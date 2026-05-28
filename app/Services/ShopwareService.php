@@ -36,7 +36,13 @@ class ShopwareService
      */
     public static function forProject(SeoProject $project): self
     {
-        $credential = ApiCredential::shopwareFor($project->user_id);
+        if ($project->shopware_credential_id) {
+            $credential = ApiCredential::where('id', $project->shopware_credential_id)
+                                       ->where('is_active', true)
+                                       ->first();
+        } else {
+            $credential = ApiCredential::shopwareFor($project->user_id);
+        }
 
         if (! $credential) {
             throw new \RuntimeException('Keine Shopware-Credentials für dieses Projekt gefunden.');
