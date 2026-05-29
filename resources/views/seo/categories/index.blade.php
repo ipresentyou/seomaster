@@ -220,7 +220,7 @@ Fokus auf hohe Sichtbarkeit in Suchmaschinen und gute Klickraten.' }}</textarea>
 
     <div class="result-actions">
         @if($cat['url'])
-            <button class="btn btn-secondary" onclick="analyzePage({{ $idx }}, '{{ addslashes($cat['url']) }}')">
+            <button class="btn btn-secondary" onclick="analyzePage({{ $idx }}, {{ json_encode($cat['url']) }})">
                 🔍 Analysieren
             </button>
         @endif

@@ -260,7 +260,7 @@ Fokus auf Conversion und hohe Klickraten in Suchmaschinen.' }}</textarea>
 
     <div class="result-actions">
         @if($prod['url'])
-            <button class="btn btn-secondary" onclick="analyzePage({{ $idx }}, '{{ addslashes($prod['url']) }}')">
+            <button class="btn btn-secondary" onclick="analyzePage({{ $idx }}, {{ json_encode($prod['url']) }})">
                 🔍 Analysieren
             </button>
         @endif
