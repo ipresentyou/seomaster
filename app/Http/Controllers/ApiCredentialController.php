@@ -30,6 +30,12 @@ class ApiCredentialController extends Controller
             'provider' => $request->input('provider')
         ]);
 
+        // Normalize openai/gemini credentials from provider-specific field names
+        $provider = $request->input('provider');
+        if (in_array($provider, ['openai', 'gemini'])) {
+            $request->merge(['credentials' => $request->input('cred_' . $provider, [])]);
+        }
+
         $data = $request->validate([
             'provider' => ['required', 'in:shopware,openai,gemini,google_search_console'],
             'label'    => ['nullable', 'string', 'max:100'],

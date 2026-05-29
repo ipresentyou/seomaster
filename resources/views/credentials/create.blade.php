@@ -214,10 +214,10 @@
             <div class="form-group">
                 <label class="form-label">API Key</label>
                 <div class="password-wrapper">
-                    <input type="password" name="credentials[api_key]" id="oai-key" class="form-input"
+                    <input type="password" name="cred_openai[api_key]" id="oai-key" class="form-input"
                            placeholder="sk-proj-••••••••••••••••••"
                            autocomplete="off" style="padding-right:40px;"
-                           value="{{ old('credentials.api_key') }}">
+                           value="{{ old('cred_openai.api_key') }}">
                     <button type="button" class="password-toggle" onclick="togglePw('oai-key', this)">👁</button>
                 </div>
                 <div class="form-hint">
@@ -248,10 +248,10 @@
             <div class="form-group">
                 <label class="form-label">API Key</label>
                 <div class="password-wrapper">
-                    <input type="password" name="credentials[api_key]" id="gem-key" class="form-input"
+                    <input type="password" name="cred_gemini[api_key]" id="gem-key" class="form-input"
                            placeholder="AIzaSy••••••••••••••••••••••"
                            autocomplete="off" style="padding-right:40px;"
-                           value="{{ old('credentials.api_key') }}">
+                           value="{{ old('cred_gemini.api_key') }}">
                     <button type="button" class="password-toggle" onclick="togglePw('gem-key', this)">👁</button>
                 </div>
                 <div class="form-hint">
