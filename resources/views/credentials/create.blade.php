@@ -328,22 +328,25 @@
 @push('scripts')
 <script>
 function selectProvider(key) {
-    // Radio update
     document.querySelectorAll('input[name="provider"]').forEach(r => r.checked = r.value === key);
-    
-    // Hidden field update
     document.getElementById('selected-provider').value = key;
-
-    // UI update
     document.querySelectorAll('.provider-option').forEach(el => {
         el.classList.toggle('selected', el.querySelector('input').value === key);
     });
-
-    // Fields toggle
     document.querySelectorAll('.provider-fields').forEach(el => el.classList.remove('visible'));
     const fields = document.getElementById('fields-' + key);
     if (fields) fields.classList.add('visible');
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelector('form').addEventListener('submit', function () {
+        document.querySelectorAll('.provider-fields:not(.visible)').forEach(function (container) {
+            container.querySelectorAll('input, textarea, select').forEach(function (el) {
+                el.disabled = true;
+            });
+        });
+    });
+});
 
 function togglePw(id, btn) {
     const input = document.getElementById(id);
