@@ -21,6 +21,20 @@ class ProfileController extends Controller
     {
         $user = $request->user();
 
+        if ($request->input('_section') === 'billing') {
+            $validated = $request->validateWithBag('updateProfile', [
+                'billing_company' => ['nullable', 'string', 'max:255'],
+                'billing_name'    => ['nullable', 'string', 'max:255'],
+                'billing_address' => ['nullable', 'string', 'max:255'],
+                'billing_zip'     => ['nullable', 'string', 'max:20'],
+                'billing_city'    => ['nullable', 'string', 'max:255'],
+                'billing_country' => ['nullable', 'string', 'size:2'],
+                'billing_vat_id'  => ['nullable', 'string', 'max:50'],
+            ]);
+            $user->fill($validated)->save();
+            return redirect()->route('profile.edit')->with('status', 'billing-updated');
+        }
+
         $validated = $request->validateWithBag('updateProfile', [
             'name'  => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],

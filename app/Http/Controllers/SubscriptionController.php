@@ -9,6 +9,7 @@ use App\Mail\SubscriptionConfirmedMail;
 use App\Models\Subscription;
 use App\Models\SubscriptionInvoice;
 use App\Models\SubscriptionPlan;
+use App\Services\InvoiceService;
 use App\Services\PayPalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -284,6 +285,7 @@ class SubscriptionController extends Controller
             'current_period_start' => now(),
             'current_period_end'   => $sub->billing_cycle === 'yearly' ? now()->addYear() : now()->addMonth(),
         ]);
+        $this->generateInvoice($sub);
     }
 
     private function handleUpdated(array $r): void
@@ -356,6 +358,16 @@ class SubscriptionController extends Controller
             'current_period_start' => now(),
             'current_period_end'   => $sub->billing_cycle === 'yearly' ? now()->addYear() : now()->addMonth(),
         ]);
+        $this->generateInvoice($sub);
+    }
+
+    private function generateInvoice(Subscription $sub): void
+    {
+        try {
+            app(InvoiceService::class)->createForSubscription($sub->load(['user', 'plan']));
+        } catch (\Throwable $e) {
+            Log::error('Invoice generation failed', ['subscription_id' => $sub->id, 'error' => $e->getMessage()]);
+        }
     }
 
     private function handlePaymentRefunded(array $r): void

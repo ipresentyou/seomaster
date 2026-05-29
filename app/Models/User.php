@@ -36,6 +36,14 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         // Onboarding
         'onboarding_step',
         'onboarding_completed_at',
+        // Billing
+        'billing_company',
+        'billing_name',
+        'billing_address',
+        'billing_zip',
+        'billing_city',
+        'billing_country',
+        'billing_vat_id',
     ];
 
     protected $hidden = [

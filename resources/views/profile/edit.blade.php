@@ -127,6 +127,71 @@
         </div>
     </div>
 
+    {{-- ── Rechnungsadresse ─────────────────────────────────────────── --}}
+    <div class="card" style="margin-bottom: 20px;">
+        <div class="card-header">
+            <div>
+                <div class="card-title">🧾 Rechnungsadresse</div>
+                <div class="card-subtitle">Wird auf deinen Rechnungen (XRechnung + PDF) verwendet</div>
+            </div>
+        </div>
+        <div class="card-body">
+            <form method="POST" action="{{ route('profile.update') }}" style="max-width: 480px;">
+                @csrf
+                @method('PATCH')
+                <input type="hidden" name="_section" value="billing">
+
+                <div class="form-group">
+                    <label class="form-label">Firmenname</label>
+                    <input type="text" name="billing_company" class="form-input"
+                           value="{{ old('billing_company', auth()->user()->billing_company) }}"
+                           placeholder="Musterfirma GmbH">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Ansprechpartner (optional)</label>
+                    <input type="text" name="billing_name" class="form-input"
+                           value="{{ old('billing_name', auth()->user()->billing_name) }}"
+                           placeholder="Max Mustermann">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Straße &amp; Hausnummer</label>
+                    <input type="text" name="billing_address" class="form-input"
+                           value="{{ old('billing_address', auth()->user()->billing_address) }}"
+                           placeholder="Musterstraße 1">
+                </div>
+                <div style="display:grid; grid-template-columns:120px 1fr; gap:12px;">
+                    <div class="form-group">
+                        <label class="form-label">PLZ</label>
+                        <input type="text" name="billing_zip" class="form-input"
+                               value="{{ old('billing_zip', auth()->user()->billing_zip) }}"
+                               placeholder="12345">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Stadt</label>
+                        <input type="text" name="billing_city" class="form-input"
+                               value="{{ old('billing_city', auth()->user()->billing_city) }}"
+                               placeholder="Berlin">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Land (ISO-Code)</label>
+                    <input type="text" name="billing_country" class="form-input"
+                           value="{{ old('billing_country', auth()->user()->billing_country ?? 'DE') }}"
+                           placeholder="DE" maxlength="2" style="width:80px;">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">USt-IdNr. (optional)</label>
+                    <input type="text" name="billing_vat_id" class="form-input"
+                           value="{{ old('billing_vat_id', auth()->user()->billing_vat_id) }}"
+                           placeholder="DE123456789">
+                    <div class="form-hint">Pflichtfeld für vorsteuerabzugsberechtigte Unternehmen</div>
+                </div>
+
+                <button type="submit" class="btn btn-primary">💾 Rechnungsadresse speichern</button>
+            </form>
+        </div>
+    </div>
+
     {{-- ── Account löschen ─────────────────────────────────────────── --}}
     <div class="card" style="border-color: rgba(244,63,94,0.2);">
         <div class="card-header">
