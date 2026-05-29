@@ -75,8 +75,11 @@ abstract class BaseSeoController extends Controller
         $salesChannels = $this->shopware->getSalesChannels();
         $domains      = $this->shopware->getDomains();
 
-        // Resolve storefront base URL for the selected language
-        $storefrontUrl = $domains[$selectedSc][$selectedLang]['url'] ?? '';
+        // Auto-select first SC/lang if none given (for initial page load)
+        $sc   = $selectedSc   ?: (string) array_key_first($salesChannels ?? []);
+        $lang = $selectedLang ?: (string) array_key_first($domains[$sc] ?? []);
+
+        $storefrontUrl = $domains[$sc][$lang]['url'] ?? '';
         $domainName    = parse_url($storefrontUrl, PHP_URL_HOST) ?: 'Your Store';
         $domainName    = preg_replace('/^www\./', '', $domainName);
 
