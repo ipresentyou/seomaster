@@ -292,7 +292,6 @@ const ROUTES = {
     generate: "{{ route('seo.products.generate', $project) }}",
     save:     "{{ route('seo.products.save', $project) }}",
     prompt:   "{{ route('seo.prompt', $project) }}",
-    prompt:   "{{ route('seo.prompt', $project) }}",
 };
 
 async function savePrompt() {
@@ -300,11 +299,6 @@ async function savePrompt() {
     const status = document.getElementById('prompt-status');
     status.textContent = '⏳ Speichern...';
     const res = await fetch(ROUTES.prompt, {method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':csrf()},body:JSON.stringify({prompt})});
-    const data = await res.json();
-    status.textContent = data.success ? '✅ Gespeichert!' : '❌ Fehler';
-    setTimeout(() => status.textContent = '', 3000);
-}
-,body:JSON.stringify({prompt})});
     const data = await res.json();
     status.textContent = data.success ? '✅ Gespeichert!' : '❌ Fehler';
     setTimeout(() => status.textContent = '', 3000);
