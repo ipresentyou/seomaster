@@ -19,7 +19,7 @@ class AltTextController extends BaseSeoController
             $selectedLang = $request->input('lang', '');
             $limit        = (int) $request->input('max', 50);
             $filterType   = $request->input('filter', 'missing');
-            $search       = trim($request->input('search', ''));
+            $search       = trim((string) $request->input('search', ''));
             $hideSvg      = $request->boolean('hide_svg', true);
             $hideEmpty    = $request->boolean('hide_empty', true);
 

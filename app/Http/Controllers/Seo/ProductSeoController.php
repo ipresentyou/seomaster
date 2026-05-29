@@ -21,7 +21,7 @@ class ProductSeoController extends BaseSeoController
             $selectedSc   = $request->input('sc', '');
             $selectedLang = $request->input('lang', '');
             $limit        = (int) $request->input('max', 50);
-            $search       = $request->input('search', '');
+            $search       = (string) $request->input('search', '');
 
             $meta = $this->buildPageMeta($selectedSc, $selectedLang);
             if (! $selectedSc)   $selectedSc   = array_key_first($meta['salesChannels']) ?? '';
