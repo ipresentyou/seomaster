@@ -57,21 +57,30 @@ class ShopwareService
     {
         $cacheKey = 'sw_token_' . $this->project->id;
 
-        return Cache::remember($cacheKey, 1800, function () use ($shopUrl, $credential) {
-            $response = Http::asForm()->post($shopUrl . '/api/oauth/token', [
-                'grant_type'    => 'client_credentials',
-                'client_id'     => $credential->getCredential('client_id'),
-                'client_secret' => $credential->getCredential('client_secret'),
-            ]);
+        if ($cached = Cache::get($cacheKey)) {
+            return $cached;
+        }
 
-            if (! $response->successful()) {
-                throw new \RuntimeException(
-                    'Shopware OAuth-Fehler: HTTP ' . $response->status() . ' – ' . $response->body()
-                );
-            }
+        $response = Http::asForm()->post($shopUrl . '/api/oauth/token', [
+            'grant_type'    => 'client_credentials',
+            'client_id'     => $credential->getCredential('client_id'),
+            'client_secret' => $credential->getCredential('client_secret'),
+        ]);
 
-            return $response->json('access_token');
-        });
+        if (! $response->successful()) {
+            throw new \RuntimeException(
+                'Shopware OAuth-Fehler: HTTP ' . $response->status() . ' – ' . $response->body()
+            );
+        }
+
+        $token = $response->json('access_token');
+
+        // Shopware gibt die tatsächliche Gültigkeit vor (meist 600s) — 60s Sicherheitspuffer,
+        // damit wir nie mit einem von Shopware bereits abgelaufenen Token arbeiten.
+        $ttl = max(60, ((int) $response->json('expires_in', 600)) - 60);
+        Cache::put($cacheKey, $token, $ttl);
+
+        return $token;
     }
 
     // ── Language / SalesChannel ───────────────────────────────────────────────
