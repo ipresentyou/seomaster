@@ -54,7 +54,7 @@ class PayPalService
             'application_context' => [
                 'return_url'          => $returnUrl,
                 'cancel_url'          => $cancelUrl,
-                'shipping_preference' => 'NO_SHIPPING',
+                'shipping_preference' => 'GET_FROM_FILE',
                 'user_action'         => 'SUBSCRIBE_NOW',
                 'brand_name'          => config('app.name', 'SEOmaster'),
                 'locale'              => 'de-DE',

@@ -9,6 +9,7 @@ use App\Mail\SubscriptionConfirmedMail;
 use App\Models\Subscription;
 use App\Models\SubscriptionInvoice;
 use App\Models\SubscriptionPlan;
+use App\Models\User;
 use App\Services\InvoiceService;
 use App\Services\PayPalService;
 use Illuminate\Http\Request;
@@ -74,12 +75,18 @@ class SubscriptionController extends Controller
     public function checkout(Request $request)
     {
         $v = $request->validate([
-            'plan_id'       => 'required|exists:subscription_plans,id',
-            'billing_cycle' => 'required|in:monthly,yearly',
+            'plan_id'        => 'required|exists:subscription_plans,id',
+            'billing_cycle'  => 'required|in:monthly,yearly',
+            'billing_vat_id' => 'nullable|string|max:50',
         ]);
 
         $plan  = SubscriptionPlan::findOrFail($v['plan_id']);
         $cycle = $v['billing_cycle'];
+
+        // USt-ID kann PayPal nicht liefern — hier separat sichern, falls angegeben
+        if (! empty($v['billing_vat_id'])) {
+            auth()->user()->update(['billing_vat_id' => $v['billing_vat_id']]);
+        }
 
         // Debug logging
         Log::info('Checkout attempt', [
@@ -172,6 +179,8 @@ class SubscriptionController extends Controller
                     ? now()->addYear()
                     : now()->addMonth(),
             ]);
+
+            $this->syncBillingFromPayPal(auth()->user(), $details);
 
             try {
                 Mail::to(auth()->user())->send(new SubscriptionConfirmedMail($sub));
@@ -285,7 +294,38 @@ class SubscriptionController extends Controller
             'current_period_start' => now(),
             'current_period_end'   => $sub->billing_cycle === 'yearly' ? now()->addYear() : now()->addMonth(),
         ]);
+
+        // Webhook-Payload enthält den Subscriber meist schon inline, sonst nachladen
+        $details = $r['subscriber'] ?? null ? $r : $this->paypal->getSubscription($r['id'] ?? '');
+        if ($details) {
+            $this->syncBillingFromPayPal($sub->user, $details);
+        }
+
         $this->generateInvoice($sub);
+    }
+
+    /**
+     * PayPal liefert Name + Adresse aus dem Käuferkonto (shipping_preference: GET_FROM_FILE).
+     * USt-ID kennt PayPal nicht — die kommt separat aus dem Checkout-Formular.
+     */
+    private function syncBillingFromPayPal(User $user, array $details): void
+    {
+        $subscriber = $details['subscriber'] ?? [];
+        $address    = $subscriber['shipping_address']['address'] ?? null;
+        $fullName   = $subscriber['shipping_address']['name']['full_name']
+            ?? trim(($subscriber['name']['given_name'] ?? '') . ' ' . ($subscriber['name']['surname'] ?? ''));
+
+        $data = array_filter([
+            'billing_name'    => $fullName ?: null,
+            'billing_address' => $address['address_line_1'] ?? null,
+            'billing_zip'     => $address['postal_code'] ?? null,
+            'billing_city'    => $address['admin_area_2'] ?? null,
+            'billing_country' => $address['country_code'] ?? null,
+        ]);
+
+        if ($data) {
+            $user->update($data);
+        }
     }
 
     private function handleUpdated(array $r): void

@@ -284,6 +284,20 @@
     </div>
 </div>
 
+{{-- ── USt-ID (optional) ──────────────────────────────────── --}}
+<div style="max-width:420px; margin:0 auto 32px; text-align:center;">
+    <label for="vatIdInput" style="display:block; font-size:13px; color:var(--text-2); margin-bottom:6px;">
+        Umsatzsteuer-ID (optional, falls vorhanden)
+    </label>
+    <input type="text" id="vatIdInput" placeholder="z. B. DE123456789"
+           value="{{ old('billing_vat_id', auth()->user()->billing_vat_id) }}"
+           style="width:100%; padding:10px 14px; border:1px solid var(--border, var(--card-border)); border-radius:8px;
+                  background:var(--card-bg); color:var(--text-1); font-size:14px;">
+    <div style="font-size:12px; color:var(--text-3); margin-top:6px;">
+        Name und Rechnungsadresse übernehmen wir automatisch aus deinem PayPal-Konto.
+    </div>
+</div>
+
 {{-- ── Pricing Cards ──────────────────────────────────────── --}}
 <div class="pricing-grid">
     @php
@@ -361,10 +375,11 @@
                 </a>
             @else
                 {{-- Pro/Agency Plans: PayPal Checkout --}}
-                <form method="POST" action="{{ route('subscription.checkout') }}">
+                <form method="POST" action="{{ route('subscription.checkout') }}" class="paypal-checkout-form">
                     @csrf
                     <input type="hidden" name="plan_id" value="{{ $plan->id }}">
                     <input type="hidden" name="billing_cycle" id="cycle-{{ $plan->id }}" value="monthly">
+                    <input type="hidden" name="billing_vat_id" class="vat-id-field">
                     <button type="submit"
                             class="pricing-cta {{ $isPopular ? 'cta-primary' : 'cta-secondary' }}">
                         @if($subscription && $subscription->isActive())
@@ -478,6 +493,14 @@ function setBilling(cycle) {
         el.classList.toggle('show-yearly', cycle === 'yearly');
     });
 }
+
+// USt-ID aus dem gemeinsamen Feld vor dem Absenden in das jeweilige PayPal-Formular übernehmen
+document.querySelectorAll('.paypal-checkout-form').forEach(form => {
+    form.addEventListener('submit', () => {
+        const vatId = document.getElementById('vatIdInput')?.value ?? '';
+        form.querySelector('.vat-id-field').value = vatId;
+    });
+});
 </script>
 @endpush
 
