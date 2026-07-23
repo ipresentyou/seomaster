@@ -9,6 +9,7 @@ use App\Http\Controllers\SeoProjectController;
 use App\Http\Controllers\Seo\AltTextController;
 use App\Http\Controllers\Seo\CategorySeoController;
 use App\Http\Controllers\Seo\ProductSeoController;
+use App\Http\Controllers\Seo\Typo3PageSeoController;
 use App\Http\Controllers\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 
@@ -97,6 +98,12 @@ Route::middleware(['auth', 'verified', 'user.active'])->group(function () {
             Route::post('/alt-text/generate',   [AltTextController::class, 'generate'])->name('alttext.generate');
             Route::post('/alt-text/save',       [AltTextController::class, 'save'])->name('alttext.save');
             Route::post('/alt-text/batch',      [AltTextController::class, 'batchSave'])->name('alttext.batch');
+
+            // ── TYPO3 Seiten ───────────────────────────────────────────────────
+            Route::get('/typo3-pages',           [Typo3PageSeoController::class, 'index'])->name('typo3pages');
+            Route::get('/typo3-pages/analyze',   [Typo3PageSeoController::class, 'analyze'])->name('typo3pages.analyze');
+            Route::post('/typo3-pages/generate', [Typo3PageSeoController::class, 'generate'])->name('typo3pages.generate');
+            Route::post('/typo3-pages/save',     [Typo3PageSeoController::class, 'save'])->name('typo3pages.save');
         });
 
     // Abonnements
@@ -134,3 +141,13 @@ Route::get('/favicon.ico', function() {
 Route::get('/imprint', fn() => view('legal.imprint'))->name('imprint');
 Route::get('/privacy', fn() => view('legal.privacy'))->name('privacy');
 Route::get('/terms', fn() => view('legal.terms'))->name('terms');
+
+// ─── SEO Landingpages ────────────────────────────────────────────────────────
+
+Route::name('landing.')->group(function () {
+    Route::view('/shopware-seo',              'seo-landing.shopware-seo')->name('shopware-seo');
+    Route::view('/meta-tags-optimieren',      'seo-landing.meta-tags-optimieren')->name('meta-tags-optimieren');
+    Route::view('/produktbeschreibungen-seo', 'seo-landing.produktbeschreibungen-seo')->name('produktbeschreibungen-seo');
+    Route::view('/alt-text-generator',        'seo-landing.alt-text-generator')->name('alt-text-generator');
+    Route::view('/seo-audit',                 'seo-landing.seo-audit')->name('seo-audit');
+});

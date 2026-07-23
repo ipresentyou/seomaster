@@ -1,0 +1,10 @@
+User-agent: *
+Disallow: /dashboard
+Disallow: /profile
+Disallow: /credentials
+Disallow: /projects
+Disallow: /subscription
+Disallow: /onboarding
+Disallow: /admin
+
+Sitemap: https://shopware-seomaster.com/sitemap.xml

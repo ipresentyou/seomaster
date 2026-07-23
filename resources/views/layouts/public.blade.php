@@ -3,7 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ $title ?? 'SEOmaster' }} – SEO Platform</title>
+    <title>
+        @hasSection('title')
+            @yield('title')
+        @else
+            {{ $title ?? 'SEOmaster' }} – SEO Platform
+        @endif
+    </title>
+    <meta name="description" content="@yield('meta_description', 'SEOmaster optimiert automatisch Meta-Titel, Beschreibungen, Keywords und Alt-Texte in Ihrem Shopware-Shop – mit echter KI, in Sekunden.')">
+    <link rel="canonical" href="{{ url()->current() }}">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
