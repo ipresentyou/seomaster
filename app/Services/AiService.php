@@ -84,33 +84,33 @@ class AiService
      */
     private static function trialFallback(int $userId): static
     {
+        $openaiKey = config('services.openai_trial.key');
+        $geminiKey = config('services.gemini_trial.key');
+
         // Check daily limit for trial users
-        $service = env('OPENAI_API_KEY') ? 'openai' : 'gemini';
+        $service = $openaiKey ? 'openai' : 'gemini';
         if (!\App\Models\ApiUsage::trackAndCheckLimit($userId, $service, 'trial_fallback', 10)) {
             throw new \RuntimeException('Tägliches Limit von 10 API-Calls erreicht. Bitte morgen wieder versuchen oder eigene API-Keys einrichten.');
         }
-        
-        // Use environment variables for trial API keys
-        $apiKey = env('OPENAI_API_KEY', env('GEMINI_API_KEY'));
-        
-        if (env('OPENAI_API_KEY')) {
+
+        if ($openaiKey) {
             return new static(
-                apiKey:      env('OPENAI_API_KEY'),
+                apiKey:      $openaiKey,
                 apiUrl:      'https://api.openai.com/v1/chat/completions',
                 model:       'gpt-4o-mini',
                 visionModel: 'gpt-4o',
             );
         }
-        
-        if (env('GEMINI_API_KEY')) {
+
+        if ($geminiKey) {
             return new static(
-                apiKey:      env('GEMINI_API_KEY'),
+                apiKey:      $geminiKey,
                 apiUrl:      'https://generativelanguage.googleapis.com/v1beta/openai/chat/completions',
                 model:       'gemini-1.5-flash',
                 visionModel: 'gemini-1.5-pro',
             );
         }
-        
+
         throw new \RuntimeException('Keine Trial-API-Keys konfiguriert. Bitte OPENAI_API_KEY oder GEMINI_API_KEY setzen.');
     }
 

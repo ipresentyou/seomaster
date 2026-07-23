@@ -28,6 +28,14 @@ return [
         'key' => env('RESEND_KEY'),
     ],
 
+    'openai_trial' => [
+        'key' => env('OPENAI_API_KEY'),
+    ],
+
+    'gemini_trial' => [
+        'key' => env('GEMINI_API_KEY'),
+    ],
+
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
