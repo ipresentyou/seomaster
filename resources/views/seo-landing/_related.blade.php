@@ -5,6 +5,7 @@
         'produktbeschreibungen-seo'=> 'Produktbeschreibungen SEO',
         'alt-text-generator'       => 'Alt-Text Generator',
         'seo-audit'                => 'SEO Audit',
+        'seo-fuer-agenturen'       => 'SEO für Agenturen',
     ];
 @endphp
 <div class="sl-related">

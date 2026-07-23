@@ -150,4 +150,5 @@ Route::name('landing.')->group(function () {
     Route::view('/produktbeschreibungen-seo', 'seo-landing.produktbeschreibungen-seo')->name('produktbeschreibungen-seo');
     Route::view('/alt-text-generator',        'seo-landing.alt-text-generator')->name('alt-text-generator');
     Route::view('/seo-audit',                 'seo-landing.seo-audit')->name('seo-audit');
+    Route::view('/seo-fuer-agenturen',        'seo-landing.seo-fuer-agenturen')->name('seo-fuer-agenturen');
 });
