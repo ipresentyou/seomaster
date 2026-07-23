@@ -252,11 +252,6 @@
                 <a href="{{ route('seo.products', $project) }}" class="tool-chip">🏷️ Produkte</a>
                 <a href="{{ route('seo.categories', $project) }}" class="tool-chip">📁 Kategorien</a>
                 <a href="{{ route('seo.alttext', $project) }}" class="tool-chip">🖼️ Alt-Text</a>
-                <a href="#" class="tool-chip">📝 Meta-Titel</a>
-                <a href="#" class="tool-chip">📄 Beschreibungen</a>
-                <a href="#" class="tool-chip">🔑 Keywords</a>
-                <a href="#" class="tool-chip">📊 Analytics</a>
-                <a href="#" class="tool-chip">📤 Export</a>
             </div>
         </div>
     @empty
