@@ -55,7 +55,7 @@
 
     <div class="sl-cta-box">
         <h2>Bessere Produkttexte, weniger Aufwand</h2>
-        <p>14 Tage kostenlos testen, keine Kreditkarte nötig.</p>
+        <p>3 Tage kostenlos testen, keine Kreditkarte nötig.</p>
         <a href="{{ route('register') }}" class="sl-btn sl-btn-primary">Jetzt kostenlos starten →</a>
     </div>
 </div>

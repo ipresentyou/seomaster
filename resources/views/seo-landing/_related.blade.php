@@ -6,6 +6,10 @@
         'alt-text-generator'       => 'Alt-Text Generator',
         'seo-audit'                => 'SEO Audit',
         'seo-fuer-agenturen'       => 'SEO für Agenturen',
+        'kategorie-seo'            => 'Kategorie-SEO',
+        'shopware-seo-ohne-plugin' => 'Shopware SEO ohne Plugin',
+        'ki-brand-voice'           => 'KI mit Brand-Voice',
+        'mehrsprachiges-seo'       => 'Mehrsprachiges SEO',
     ];
 @endphp
 <div class="sl-related">

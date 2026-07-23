@@ -491,7 +491,7 @@
     </div>
     <div class="hero-trust">
         <div class="hero-trust-item"><span class="trust-icon">✓</span> Keine Kreditkarte nötig</div>
-        <div class="hero-trust-item"><span class="trust-icon">✓</span> 14 Tage gratis testen</div>
+        <div class="hero-trust-item"><span class="trust-icon">✓</span> 3 Tage gratis testen</div>
         <div class="hero-trust-item"><span class="trust-icon">✓</span> Direkte Shopware-API-Anbindung</div>
         <div class="hero-trust-item"><span class="trust-icon">✓</span> DSGVO-konform</div>
     </div>
@@ -680,18 +680,18 @@
         <div class="pricing-grid">
             <div class="pricing-card">
                 <div class="pricing-plan">Starter</div>
-                <div class="pricing-price"><sup>€</sup>0</div>
-                <div class="pricing-period">/ Monat, für immer</div>
-                <div class="pricing-desc">Perfekt zum Ausprobieren und für kleine Shops.</div>
+                <div class="pricing-price"><sup>€</sup>19</div>
+                <div class="pricing-period">/ Monat</div>
+                <div class="pricing-desc">Perfekt zum Ausprobieren und für kleine Shops. Start mit 3 Tagen kostenlosem Test.</div>
                 <ul class="pricing-features">
                     <li><span class="check">✓</span> 1 Projekt / Shop</li>
-                    <li><span class="check">✓</span> 50 SEO-Generierungen/Monat</li>
-                    <li><span class="check">✓</span> Produkt & Kategorie Editor</li>
+                    <li><span class="check">✓</span> 100 SEO-Generierungen/Tag</li>
+                    <li><span class="check">✓</span> Produkt- &amp; Kategorie-Editor</li>
                     <li><span class="check">✓</span> Alt-Text Generator</li>
                     <li><span class="cross">—</span> Batch-Optimierung</li>
                     <li><span class="cross">—</span> Priority Support</li>
                 </ul>
-                <a href="{{ route('register') }}" class="btn btn-outline" style="text-align:center; justify-content:center">Kostenlos starten</a>
+                <a href="{{ route('register') }}" class="btn btn-outline" style="text-align:center; justify-content:center">3 Tage kostenlos testen</a>
             </div>
 
             <div class="pricing-card pricing-card-featured">
@@ -699,14 +699,14 @@
                 <div class="pricing-plan">Professional</div>
                 <div class="pricing-price"><sup>€</sup>49</div>
                 <div class="pricing-period">/ Monat, jährlich abgerechnet</div>
-                <div class="pricing-desc">Für wachsende Shops mit mehreren Sprachen und Projekten.</div>
+                <div class="pricing-desc">Für wachsende Shops mit mehreren Projekten.</div>
                 <ul class="pricing-features">
-                    <li><span class="check">✓</span> 5 Projekte / Shops</li>
-                    <li><span class="check">✓</span> 500 SEO-Generierungen/Monat</li>
+                    <li><span class="check">✓</span> 3 Projekte / Shops</li>
+                    <li><span class="check">✓</span> 500 SEO-Generierungen/Tag</li>
                     <li><span class="check">✓</span> Alle Editoren</li>
                     <li><span class="check">✓</span> Batch-Optimierung</li>
-                    <li><span class="check">✓</span> Mehrsprachig</li>
-                    <li><span class="check">✓</span> Priority Support</li>
+                    <li><span class="check">✓</span> Google Search Console Integration</li>
+                    <li><span class="cross">—</span> Priority Support</li>
                 </ul>
                 <a href="{{ route('register') }}" class="btn btn-primary" style="text-align:center; justify-content:center">Jetzt starten →</a>
             </div>
@@ -717,14 +717,14 @@
                 <div class="pricing-period">/ Monat, jährlich abgerechnet</div>
                 <div class="pricing-desc">Für Agenturen, die mehrere Kundenshops verwalten.</div>
                 <ul class="pricing-features">
-                    <li><span class="check">✓</span> Unbegrenzte Projekte</li>
-                    <li><span class="check">✓</span> 2.000 Generierungen/Monat</li>
+                    <li><span class="check">✓</span> Bis zu 20 Projekte / Shops</li>
+                    <li><span class="check">✓</span> 2.000 SEO-Generierungen/Tag</li>
+                    <li><span class="check">✓</span> Alle Editoren + Batch-Optimierung</li>
+                    <li><span class="check">✓</span> CSV-Import</li>
                     <li><span class="check">✓</span> White-Label Option</li>
-                    <li><span class="check">✓</span> Team-Zugang</li>
-                    <li><span class="check">✓</span> API-Zugang</li>
-                    <li><span class="check">✓</span> Dedicated Support</li>
+                    <li><span class="check">✓</span> Priority Support</li>
                 </ul>
-                <a href="{{ route('contact.index') }}" class="btn btn-outline" style="text-align:center; justify-content:center">Kontakt aufnehmen</a>
+                <a href="{{ route('register') }}" class="btn btn-outline" style="text-align:center; justify-content:center">Jetzt starten →</a>
             </div>
         </div>
     </div>
@@ -773,7 +773,7 @@
         <a href="{{ route('register') }}" class="btn btn-white btn-xl">Kostenlos starten →</a>
         <a href="#faq" class="btn btn-ghost btn-lg">Mehr erfahren</a>
     </div>
-    <p class="cta-note">14 Tage alle Features gratis · Danach Starter-Plan kostenlos</p>
+    <p class="cta-note">3 Tage kostenlos testen · Danach ab €19/Monat</p>
 </section>
 
 <!-- FOOTER -->

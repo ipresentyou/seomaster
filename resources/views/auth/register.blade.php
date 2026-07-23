@@ -6,7 +6,7 @@
 
     <div class="auth-header">
         <div class="auth-title">Account erstellen</div>
-        <div class="auth-subtitle">Starte kostenlos — 14 Tage Trial inklusive, keine Kreditkarte nötig.</div>
+        <div class="auth-subtitle">Starte kostenlos — 3 Tage Trial inklusive, keine Kreditkarte nötig.</div>
     </div>
 
     @if($errors->any())
@@ -110,7 +110,7 @@
         </button>
 
         <div style="text-align:center; margin-top:14px; font-size:11px; color:var(--text-3);">
-            🔒 SSL-verschlüsselt · 14 Tage Trial · Jederzeit kündbar
+            🔒 SSL-verschlüsselt · 3 Tage Trial · Jederzeit kündbar
         </div>
     </form>
 

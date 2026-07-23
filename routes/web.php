@@ -151,4 +151,8 @@ Route::name('landing.')->group(function () {
     Route::view('/alt-text-generator',        'seo-landing.alt-text-generator')->name('alt-text-generator');
     Route::view('/seo-audit',                 'seo-landing.seo-audit')->name('seo-audit');
     Route::view('/seo-fuer-agenturen',        'seo-landing.seo-fuer-agenturen')->name('seo-fuer-agenturen');
+    Route::view('/kategorie-seo',             'seo-landing.kategorie-seo')->name('kategorie-seo');
+    Route::view('/shopware-seo-ohne-plugin',  'seo-landing.shopware-seo-ohne-plugin')->name('shopware-seo-ohne-plugin');
+    Route::view('/ki-brand-voice',            'seo-landing.ki-brand-voice')->name('ki-brand-voice');
+    Route::view('/mehrsprachiges-seo',        'seo-landing.mehrsprachiges-seo')->name('mehrsprachiges-seo');
 });
