@@ -27,6 +27,16 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        $exceptions->render(function (\Illuminate\Routing\Exceptions\InvalidSignatureException $e, $request) {
+            if ($request->routeIs('verification.verify')) {
+                return redirect()->route('verification.notice')
+                    ->with('status', 'verification-link-invalid');
+            }
+
+            return redirect()->route('login')
+                ->with('error', '⚠️ Dieser Link ist abgelaufen oder ungültig. Bitte fordere einen neuen an.');
+        });
+
         $exceptions->render(function (\RuntimeException $e, $request) {
             if (str_contains($e->getMessage(), 'KI-Credentials')) {
                 return redirect()->route('credentials.index')

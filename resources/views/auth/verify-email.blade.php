@@ -14,6 +14,13 @@
         </div>
     @endif
 
+    {{-- Expired / invalid link --}}
+    @if(session('status') === 'verification-link-invalid')
+        <div class="alert alert-danger">
+            ⚠️ Dieser Bestätigungslink ist abgelaufen oder ungültig (Links sind 60 Minuten gültig). Fordere unten einfach einen neuen an.
+        </div>
+    @endif
+
     {{-- Visual indicator --}}
     <div style="
         display: flex; flex-direction: column; align-items: center;
