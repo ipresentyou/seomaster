@@ -148,11 +148,61 @@ class ShopwareService
         $res = $this->post('/search/product', [
             'limit'    => $limit,
             'filter'   => $filters,
-            'includes' => ['product' => ['id', 'name', 'productNumber', 'translated', 'metaTitle', 'metaDescription', 'keywords', 'description']],
+            'includes' => ['product' => ['id', 'name', 'productNumber', 'translated', 'metaTitle', 'metaDescription', 'keywords', 'description', 'parentId']],
             'sort'     => [['field' => 'name', 'order' => 'ASC']],
         ], $langId);
 
-        return $res->json('data', []);
+        return $this->resolveInheritedFields(
+            $res->json('data', []),
+            $langId,
+            ['name', 'metaTitle', 'metaDescription', 'description', 'keywords']
+        );
+    }
+
+    /**
+     * Product variants often leave name/meta fields empty and inherit them from
+     * their parent product — the storefront resolves this automatically, but the
+     * plain Admin API /search endpoint returns the raw (null) value. We fetch the
+     * missing parents in one batched call and backfill the inherited values.
+     */
+    private function resolveInheritedFields(array $products, string $langId, array $fields): array
+    {
+        $parentIds = [];
+        foreach ($products as $p) {
+            if (empty($p['parentId'])) continue;
+            foreach ($fields as $f) {
+                if (($p['translated'][$f] ?? $p[$f] ?? '') === '') {
+                    $parentIds[] = $p['parentId'];
+                    break;
+                }
+            }
+        }
+        if (! $parentIds) return $products;
+
+        $res = $this->post('/search/product', [
+            'filter'   => [['type' => 'equalsAny', 'field' => 'id', 'value' => array_values(array_unique($parentIds))]],
+            'includes' => ['product' => array_merge(['id'], $fields, ['translated'])],
+        ], $langId);
+
+        $parents = [];
+        foreach ($res->json('data', []) as $parent) {
+            $parents[$parent['id']] = $parent;
+        }
+
+        foreach ($products as &$p) {
+            if (empty($p['parentId']) || ! isset($parents[$p['parentId']])) continue;
+            $parent = $parents[$p['parentId']];
+
+            foreach ($fields as $f) {
+                if (($p['translated'][$f] ?? $p[$f] ?? '') !== '') continue;
+                $value = $parent['translated'][$f] ?? $parent[$f] ?? '';
+                if ($value === '') continue;
+                $p[$f] = $value;
+                $p['translated'][$f] = $value;
+            }
+        }
+
+        return $products;
     }
 
     public function saveProduct(string $productId, string $langId, array $payload): bool
