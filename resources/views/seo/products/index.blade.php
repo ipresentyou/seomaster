@@ -183,20 +183,36 @@
 </div>
 
 {{-- AI Instructions textarea --}}
-<details style="margin-bottom:20px;" open>
-    <summary style="font-size:12px;color:var(--text-3);cursor:pointer;padding:6px 0;">⚙️ KI-Anweisungen anpassen</summary>
-    <textarea id="customPrompt" rows="8" class="form-input" style="margin-top:8px;font-size:12px;resize:vertical;"
-              placeholder="Passe die KI-Anweisungen an deine Brand-Anforderungen an…">{{ $project->seo_prompt ?? 'Du bist ein SEO-Experte für Shopware-Shops. Erstelle für das Produkt "' . ($project->name ?? 'diesem Shop') . '" optimierte SEO-Texte.
+@php
+    $shopLabel = $project->name ?? 'diesem Shop';
+    $defaultPromptDe = 'Du bist ein SEO-Experte für Shopware-Shops. Erstelle für das Produkt "' . $shopLabel . '" optimierte SEO-Texte.
 
 Berücksichtige dabei:
 • Zielgruppe: Kunden, die nach Produkten wie diesem suchen
 • Keywords: Relevante Suchbegriffe, die Kunden verwenden würden
-• Shop-Kontext: Produkte aus dem Sortiment von ' . ($project->name ?? 'diesem Shop') . '
+• Shop-Kontext: Produkte aus dem Sortiment von ' . $shopLabel . '
 • Brand-Voice: Professionell, vertrauenswürdig und kundenorientiert
 • Länge: Meta-Titel 50-60 Zeichen, Meta-Beschreibung 150-160 Zeichen
 • Call-to-Action: Klare Handlungsaufforderung zum Kauf
 
-Fokus auf Conversion und hohe Klickraten in Suchmaschinen.' }}</textarea>
+Fokus auf Conversion und hohe Klickraten in Suchmaschinen.';
+    $defaultPromptEn = 'You are an SEO expert for Shopware stores. Create optimized SEO copy for the product "' . $shopLabel . '".
+
+Please consider:
+• Target audience: customers searching for products like this one
+• Keywords: relevant search terms customers would use
+• Shop context: products from the range of ' . $shopLabel . '
+• Brand voice: professional, trustworthy, and customer-focused
+• Length: meta title 50–60 characters, meta description 150–160 characters
+• Call to action: a clear prompt to purchase
+
+Focus on conversion and high click-through rates in search engines.';
+    $defaultPrompt = $isGerman ? $defaultPromptDe : $defaultPromptEn;
+@endphp
+<details style="margin-bottom:20px;" open>
+    <summary style="font-size:12px;color:var(--text-3);cursor:pointer;padding:6px 0;">⚙️ KI-Anweisungen anpassen ({{ $isGerman ? 'Deutsch' : 'Englisch' }})</summary>
+    <textarea id="customPrompt" rows="8" class="form-input" style="margin-top:8px;font-size:12px;resize:vertical;"
+              placeholder="Passe die KI-Anweisungen an deine Brand-Anforderungen an…">{{ $customPrompt ?? $defaultPrompt }}</textarea>
     <div style="display:flex;gap:8px;margin-top:6px;align-items:center;">
         <button onclick="savePrompt()" class="ep-btn ep-btn-primary" style="font-size:12px;padding:4px 12px;">💾 Prompt speichern</button>
         <button onclick="resetPrompt()" class="ep-btn ep-btn-secondary" style="font-size:12px;padding:4px 12px;">🔄 Zurücksetzen</button>
@@ -290,9 +306,11 @@ Fokus auf Conversion und hohe Klickraten in Suchmaschinen.' }}</textarea>
 <script>
 const LANG_ID   = @json($selectedLang);
 const LANG_NAME = @json($languages[$selectedLang] ?? '');
-const PROJECT_NAME = @json($project->name ?? 'diesem Shop');
+const IS_GERMAN = @json($isGerman);
 const DOMAIN    = @json($storefrontUrl);
 const products  = @json($rows);
+const DEFAULT_PROMPT_DE = @json($defaultPromptDe);
+const DEFAULT_PROMPT_EN = @json($defaultPromptEn);
 
 const ROUTES = {
     analyze:  "{{ route('seo.products.analyze', $project) }}",
@@ -305,7 +323,7 @@ async function savePrompt() {
     const prompt = document.getElementById('customPrompt').value.trim();
     const status = document.getElementById('prompt-status');
     status.textContent = '⏳ Speichern...';
-    const res = await fetch(ROUTES.prompt, {method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':csrf()},body:JSON.stringify({prompt})});
+    const res = await fetch(ROUTES.prompt, {method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':csrf()},body:JSON.stringify({prompt, langId: LANG_ID})});
     const data = await res.json();
     status.textContent = data.success ? '✅ Gespeichert!' : '❌ Fehler';
     setTimeout(() => status.textContent = '', 3000);
@@ -517,20 +535,8 @@ function showToast(msg) {
 
 // ── Reset Prompt ─────────────────────────────────────────────────
 function resetPrompt() {
-    const defaultPrompt = `Du bist ein SEO-Experte für Shopware-Shops. Erstelle für das Produkt "${PROJECT_NAME}" optimierte SEO-Texte.
-
-Berücksichtige dabei:
-• Zielgruppe: Kunden, die nach Produkten wie diesem suchen
-• Keywords: Relevante Suchbegriffe, die Kunden verwenden würden
-• Shop-Kontext: Produkte aus dem Sortiment von ${PROJECT_NAME}
-• Brand-Voice: Professionell, vertrauenswürdig und kundenorientiert
-• Länge: Meta-Titel 50-60 Zeichen, Meta-Beschreibung 150-160 Zeichen
-• Call-to-Action: Klare Handlungsaufforderung zum Kauf
-
-Fokus auf Conversion und hohe Klickraten in Suchmaschinen.`;
-    
-    document.getElementById('customPrompt').value = defaultPrompt;
-    showToast('🔄 Prompt auf Standard zurückgesetzt');
+    document.getElementById('customPrompt').value = IS_GERMAN ? DEFAULT_PROMPT_DE : DEFAULT_PROMPT_EN;
+    showToast('🔄 Prompt auf Standard (' + (IS_GERMAN ? 'Deutsch' : 'Englisch') + ') zurückgesetzt');
 }
 </script>
 @endpush

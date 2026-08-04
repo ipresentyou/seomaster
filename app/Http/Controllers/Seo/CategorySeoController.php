@@ -61,8 +61,12 @@ class CategorySeoController extends BaseSeoController
             $rows = $this->sortRows($rows, $sort);
         }
 
+        $isGerman     = $this->isGermanLanguage($meta['languages'][$selectedLang] ?? '');
+        $customPrompt = $project->promptFor($selectedLang);
+
         return view('seo.categories.index', array_merge($meta, compact(
-            'project', 'rows', 'selectedSc', 'selectedLang', 'limit', 'salesChannels', 'storefrontDomain', 'search', 'sort'
+            'project', 'rows', 'selectedSc', 'selectedLang', 'limit', 'salesChannels', 'storefrontDomain',
+            'search', 'sort', 'isGerman', 'customPrompt'
         )));
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
             // Connection timeout or network error
@@ -76,6 +80,8 @@ class CategorySeoController extends BaseSeoController
                 'storefrontDomain' => '',
                 'search' => $search ?? '',
                 'sort' => $sort ?? 'name_asc',
+                'isGerman' => true,
+                'customPrompt' => $project->promptFor($selectedLang ?? '') ?? null,
                 'connectionError' => 'Verbindung zum Shopware-Shop fehlgeschlagen. Bitte überprüfen Sie, ob der Shop erreichbar ist und die API-Zugangsdaten korrekt sind.',
                 'languages' => [],
                 'domainName' => $project->name ?? '',
@@ -94,6 +100,8 @@ class CategorySeoController extends BaseSeoController
                 'storefrontDomain' => '',
                 'search' => $search ?? '',
                 'sort' => $sort ?? 'name_asc',
+                'isGerman' => true,
+                'customPrompt' => $project->promptFor($selectedLang ?? '') ?? null,
                 'connectionError' => 'Fehler beim Laden der Kategorien: ' . $e->getMessage(),
                 'languages' => [],
                 'domainName' => $project->name ?? '',
@@ -215,8 +223,20 @@ class CategorySeoController extends BaseSeoController
 
     public function savePrompt(Request $request, SeoProject $project): JsonResponse
     {
-        $v = $request->validate(['prompt' => 'nullable|string|max:5000']);
-        $project->update(['seo_prompt' => $v['prompt'] ?? '']);
+        $v = $request->validate([
+            'prompt' => 'nullable|string|max:5000',
+            'langId' => 'nullable|string',
+        ]);
+
+        if (! empty($v['langId'])) {
+            $prompts = $project->seo_prompts ?? [];
+            $prompts[$v['langId']] = $v['prompt'] ?? '';
+            $project->update(['seo_prompts' => $prompts]);
+        } else {
+            // Kein langId mitgeschickt (ältere Aufrufe) — Legacy-Feld als globalen Fallback pflegen.
+            $project->update(['seo_prompt' => $v['prompt'] ?? '']);
+        }
+
         return response()->json(['success' => true]);
     }
 }

@@ -56,8 +56,11 @@ class ProductSeoController extends BaseSeoController
             $rows = $this->sortRows($rows, $sort);
         }
 
+        $isGerman     = $this->isGermanLanguage($meta['languages'][$selectedLang] ?? '');
+        $customPrompt = $project->promptFor($selectedLang);
+
         return view('seo.products.index', array_merge($meta, compact(
-            'project', 'rows', 'selectedSc', 'selectedLang', 'limit', 'search', 'sort'
+            'project', 'rows', 'selectedSc', 'selectedLang', 'limit', 'search', 'sort', 'isGerman', 'customPrompt'
         )));
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
             // Connection timeout or network error
@@ -69,6 +72,8 @@ class ProductSeoController extends BaseSeoController
                 'limit' => $limit ?? 50,
                 'search' => $search ?? '',
                 'sort' => $sort ?? 'name_asc',
+                'isGerman' => true,
+                'customPrompt' => $project->promptFor($selectedLang ?? '') ?? null,
                 'connectionError' => 'Verbindung zum Shopware-Shop fehlgeschlagen. Bitte überprüfen Sie, ob der Shop erreichbar ist und die API-Zugangsdaten korrekt sind.',
                 'languages' => [],
                 'domainName' => $project->name ?? '',
@@ -95,6 +100,8 @@ class ProductSeoController extends BaseSeoController
                 'limit' => $limit ?? 50,
                 'search' => $search ?? '',
                 'sort' => $sort ?? 'name_asc',
+                'isGerman' => true,
+                'customPrompt' => $project->promptFor($selectedLang ?? '') ?? null,
                 'connectionError' => $errorMessage,
                 'languages' => [],
                 'domainName' => $project->name ?? '',
@@ -112,6 +119,8 @@ class ProductSeoController extends BaseSeoController
                 'limit' => $limit ?? 50,
                 'search' => $search ?? '',
                 'sort' => $sort ?? 'name_asc',
+                'isGerman' => true,
+                'customPrompt' => $project->promptFor($selectedLang ?? '') ?? null,
                 'connectionError' => 'Fehler beim Laden der Produkte: ' . $e->getMessage(),
                 'languages' => [],
                 'domainName' => $project->name ?? '',

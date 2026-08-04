@@ -65,6 +65,15 @@ abstract class BaseSeoController extends Controller
     }
 
     /**
+     * Heuristic for picking a German vs. English default AI prompt template
+     * based on the selected Shopware language's display name.
+     */
+    protected function isGermanLanguage(string $langName): bool
+    {
+        return str_contains(mb_strtolower($langName), 'deutsch') || str_contains(mb_strtolower($langName), 'german');
+    }
+
+    /**
      * Sorts an assembled row array (products/categories) by name, product
      * number, or "missing field first" — done in PHP since the underlying
      * Shopware search API only sorts by name.
