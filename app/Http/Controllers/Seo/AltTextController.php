@@ -81,10 +81,13 @@ class AltTextController extends BaseSeoController
             }
         }
 
+        $isGerman     = $this->isGermanLanguage($meta['languages'][$selectedLang] ?? '');
+        $customPrompt = $project->seo_prompts['alttext:' . $selectedLang] ?? null;
+
         return view('seo.alttext.index', array_merge($meta, compact(
             'project', 'rows', 'selectedSc', 'selectedLang',
             'limit', 'filterType', 'totalSize', 'missingCount', 'salesChannels',
-            'search', 'hideSvg', 'hideEmpty'
+            'search', 'hideSvg', 'hideEmpty', 'isGerman', 'customPrompt'
         )));
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
             // Connection timeout or network error
@@ -98,6 +101,8 @@ class AltTextController extends BaseSeoController
                 'totalSize' => 0,
                 'missingCount' => 0,
                 'salesChannels' => [],
+                'isGerman' => true,
+                'customPrompt' => $project->seo_prompts['alttext:' . ($selectedLang ?? '')] ?? null,
                 'connectionError' => 'Verbindung zum Shopware-Shop fehlgeschlagen. Bitte überprüfen Sie, ob der Shop erreichbar ist und die API-Zugangsdaten korrekt sind.',
                 'languages' => [],
                 'domainName' => $project->name ?? '',
@@ -125,6 +130,8 @@ class AltTextController extends BaseSeoController
                 'totalSize' => 0,
                 'missingCount' => 0,
                 'salesChannels' => [],
+                'isGerman' => true,
+                'customPrompt' => $project->seo_prompts['alttext:' . ($selectedLang ?? '')] ?? null,
                 'connectionError' => $errorMessage,
                 'languages' => [],
                 'domainName' => $project->name ?? '',
@@ -143,6 +150,8 @@ class AltTextController extends BaseSeoController
                 'totalSize' => 0,
                 'missingCount' => 0,
                 'salesChannels' => [],
+                'isGerman' => true,
+                'customPrompt' => $project->seo_prompts['alttext:' . ($selectedLang ?? '')] ?? null,
                 'connectionError' => 'Fehler beim Laden der Bilder: ' . $e->getMessage(),
                 'languages' => [],
                 'domainName' => $project->name ?? '',
@@ -234,5 +243,21 @@ class AltTextController extends BaseSeoController
 
             return $this->ok(['saved' => $saved, 'failed' => $failed]);
         });
+    }
+
+    // ── Save Prompt (per Sprache) ────────────────────────────────────────────
+
+    public function savePrompt(Request $request, SeoProject $project): JsonResponse
+    {
+        $v = $request->validate([
+            'prompt' => 'nullable|string|max:5000',
+            'langId' => 'required|string',
+        ]);
+
+        $prompts = $project->seo_prompts ?? [];
+        $prompts['alttext:' . $v['langId']] = $v['prompt'] ?? '';
+        $project->update(['seo_prompts' => $prompts]);
+
+        return $this->ok();
     }
 }

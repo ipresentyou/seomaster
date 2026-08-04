@@ -98,6 +98,7 @@ Route::middleware(['auth', 'verified', 'user.active'])->group(function () {
             Route::post('/alt-text/generate',   [AltTextController::class, 'generate'])->name('alttext.generate');
             Route::post('/alt-text/save',       [AltTextController::class, 'save'])->name('alttext.save');
             Route::post('/alt-text/batch',      [AltTextController::class, 'batchSave'])->name('alttext.batch');
+            Route::post('/alt-text/prompt',     [AltTextController::class, 'savePrompt'])->name('alttext.prompt');
 
             // ── TYPO3 Seiten ───────────────────────────────────────────────────
             Route::get('/typo3-pages',           [Typo3PageSeoController::class, 'index'])->name('typo3pages');

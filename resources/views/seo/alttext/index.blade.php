@@ -154,10 +154,16 @@
     </div>
 </div>
 
+@php
+    $shopLabel = $project->name ?? 'diesem Shop';
+    $defaultPromptDe = 'Erstelle präzise, SEO-optimierte Alt-Texte (50–125 Zeichen) für Produkte aus "' . $shopLabel . '". Beschreibe was sichtbar ist, integriere relevante Keywords natürlich. Kein "Bild von" oder "Zeigt". Sprache: Deutsch.';
+    $defaultPromptEn = 'Create precise, SEO-optimized alt text (50–125 characters) for products from "' . $shopLabel . '". Describe what is visible, naturally include relevant keywords. Avoid "Image of" or "Shows". Language: English.';
+    $defaultPrompt = $isGerman ? $defaultPromptDe : $defaultPromptEn;
+@endphp
 <details style="margin-bottom:20px;">
-    <summary style="font-size:12px;color:var(--text-3);cursor:pointer;padding:6px 0;">⚙️ KI-Anweisungen anpassen</summary>
+    <summary style="font-size:12px;color:var(--text-3);cursor:pointer;padding:6px 0;">⚙️ KI-Anweisungen anpassen ({{ $isGerman ? 'Deutsch' : 'Englisch' }})</summary>
     <textarea id="customPrompt" rows="3" class="form-input" style="margin-top:8px;font-size:12px;resize:vertical;"
->Erstelle präzise, SEO-optimierte Alt-Texte (50–125 Zeichen) für Produkte aus "' . ($project->name ?? 'diesem Shop') . '". Beschreibe was sichtbar ist, integriere relevante Keywords natürlich. Kein "Bild von" oder "Zeigt". Sprache: {{ $languages[$selectedLang] ?? 'Deutsch' }}.</textarea>
+>{{ $customPrompt ?? $defaultPrompt }}</textarea>
     <div style="display:flex;gap:8px;margin-top:6px;align-items:center;">
         <button onclick="savePrompt()" class="ep-btn ep-btn-primary" style="font-size:12px;padding:4px 12px;">💾 Speichern</button>
         <button onclick="resetPrompt()" class="ep-btn ep-btn-secondary" style="font-size:12px;padding:4px 12px;">🔄 Zurücksetzen</button>
@@ -242,16 +248,29 @@
 <script>
 const LANG_ID   = @json($selectedLang);
 const LANG_NAME = @json($languages[$selectedLang] ?? '');
-const PROJECT_NAME = @json($project->name ?? 'diesem Shop');
+const IS_GERMAN = @json($isGerman);
 const DOMAIN    = @json($storefrontUrl);
 const DOMAIN_NAME = @json($domainName);
 const images    = @json($rows);
+const DEFAULT_PROMPT_DE = @json($defaultPromptDe);
+const DEFAULT_PROMPT_EN = @json($defaultPromptEn);
 
 const ROUTES = {
     generate:   "{{ route('seo.alttext.generate', $project) }}",
     save:       "{{ route('seo.alttext.save', $project) }}",
     batchSave:  "{{ route('seo.alttext.batch', $project) }}",
+    prompt:     "{{ route('seo.alttext.prompt', $project) }}",
 };
+
+async function savePrompt() {
+    const prompt = document.getElementById('customPrompt').value.trim();
+    const status = document.getElementById('prompt-status');
+    status.textContent = '⏳ Speichern...';
+    const res = await fetch(ROUTES.prompt, {method:'POST',headers:{'Content-Type':'application/json','X-CSRF-TOKEN':csrf()},body:JSON.stringify({prompt, langId: LANG_ID})});
+    const data = await res.json();
+    status.textContent = data.success ? '✅ Gespeichert!' : '❌ Fehler';
+    setTimeout(() => status.textContent = '', 3000);
+}
 
 const csrf = () => document.querySelector('meta[name=csrf-token]').content;
 const esc  = t => { const d=document.createElement('div'); d.textContent=t; return d.innerHTML; };
@@ -462,10 +481,8 @@ function showToast(msg) {
 
 // ── Reset Prompt ─────────────────────────────────────────────────
 function resetPrompt() {
-    const defaultPrompt = `Erstelle präzise, SEO-optimierte Alt-Texte (50–125 Zeichen) für Produkte aus "${PROJECT_NAME}". Beschreibe was sichtbar ist, integriere relevante Keywords natürlich. Kein "Bild von" oder "Zeigt". Sprache: ${LANG_NAME}.`;
-    
-    document.getElementById('customPrompt').value = defaultPrompt;
-    showToast('🔄 Prompt auf Standard zurückgesetzt');
+    document.getElementById('customPrompt').value = IS_GERMAN ? DEFAULT_PROMPT_DE : DEFAULT_PROMPT_EN;
+    showToast('🔄 Prompt auf Standard (' + (IS_GERMAN ? 'Deutsch' : 'Englisch') + ') zurückgesetzt');
 }
 </script>
 @endpush
