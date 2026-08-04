@@ -37,10 +37,14 @@ class ProductSeoController extends BaseSeoController
 
                 foreach ($rawProducts as $prod) {
                     $a = $prod;
+                    $productNumber = $a['productNumber'] ?? '';
+                    // Manche Produkte haben keinen übersetzten Namen — Produktnummer als Fallback,
+                    // damit weder die Liste noch die KI-Generierung mit einem leeren Titel dastehen.
+                    $name = ($a['translated']['name'] ?? $a['name'] ?? '') ?: $productNumber;
                     $rows[] = [
                         'id'            => $prod['id'],
-                        'name'          => $a['translated']['name']            ?? $a['name']            ?? '',
-                        'productNumber' => $a['productNumber']                 ?? '',
+                        'name'          => $name,
+                        'productNumber' => $productNumber,
                         'title'         => $a['translated']['metaTitle']       ?? $a['metaTitle']       ?? '',
                         'metaDesc'      => $a['translated']['metaDescription'] ?? $a['metaDescription'] ?? '',
                         'description'   => $a['translated']['description']     ?? $a['description']     ?? '',
@@ -142,7 +146,7 @@ class ProductSeoController extends BaseSeoController
             $this->bootProject($project);
 
             $v = $request->validate([
-                'name'               => 'required|string|max:255',
+                'name'               => 'nullable|string|max:255',
                 'productNumber'      => 'nullable|string',
                 'content'            => 'nullable|string',
                 'h1'                 => 'nullable|string',
@@ -155,12 +159,16 @@ class ProductSeoController extends BaseSeoController
                 'generate.*'         => 'in:title,desc,text',
             ]);
 
+            // Shopware-Name kann für nicht übersetzte Produkte leer sein —
+            // Produktnummer/H1 dienen dann als Ersatz-Bezeichner für die KI.
+            $entityName = $v['name'] ?: ($v['h1'] ?: ($v['productNumber'] ?: 'Produkt'));
+
             $result = [];
             $tokens = 0;
 
             if (in_array('title', $v['generate']) || in_array('desc', $v['generate'])) {
                 $meta = $this->getAi()->generateMeta(
-                    entityName:         $v['name'],
+                    entityName:         $entityName,
                     entityType:         'product',
                     pageContent:        $v['content']  ?? '',
                     h1:                 $v['h1']        ?? '',
@@ -182,7 +190,7 @@ class ProductSeoController extends BaseSeoController
 
             if (in_array('text', $v['generate'])) {
                 $seo = $this->getAi()->generateSeoText(
-                    entityName:         $v['name'],
+                    entityName:         $entityName,
                     entityType:         'product',
                     pageContent:        $v['content']  ?? '',
                     h1:                 $v['h1']        ?? '',

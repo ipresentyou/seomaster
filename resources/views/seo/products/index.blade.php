@@ -413,7 +413,7 @@ async function optimizeProduct(idx) {
     if (!generate.length) { alert('Bitte mindestens eine Option auswählen.'); return; }
 
     const body = {
-        name:               p.name,
+        name:               p.name || scraped?.h1 || scraped?.title || p.productNumber,
         productNumber:      p.productNumber,
         content:            scraped?.content || '',
         h1:                 scraped?.h1      || '',
