@@ -35,21 +35,43 @@ class ProductSeoController extends BaseSeoController
                 $seoUrls     = $productIds ? $this->shopware->getSeoUrls($productIds, $selectedSc, $selectedLang) : [];
                 $base        = $meta['domains'][$selectedSc][$selectedLang]['url'] ?? '';
 
+                // Für alle anderen Sprachen dieses Sales Channels den Optimierungsstatus
+                // nachladen, damit die Liste "✅ DE optimiert / ⚠️ EN fehlt" anzeigen kann.
+                $domainLangIds = array_keys($meta['domains'][$selectedSc] ?? []);
+                $otherLangStatuses = [];
+                foreach ($domainLangIds as $otherLangId) {
+                    if ($otherLangId === $selectedLang) continue;
+                    $otherRaw = $this->shopware->getProducts($otherLangId, $limit, $search);
+                    foreach ($otherRaw as $p) {
+                        $b = $p;
+                        $otherLangStatuses[$p['id']][$otherLangId] = [
+                            'hasTitle' => ! empty($b['translated']['metaTitle']       ?? $b['metaTitle']       ?? ''),
+                            'hasDesc'  => ! empty($b['translated']['metaDescription'] ?? $b['metaDescription'] ?? ''),
+                        ];
+                    }
+                }
+
                 foreach ($rawProducts as $prod) {
                     $a = $prod;
                     $productNumber = $a['productNumber'] ?? '';
                     // Manche Produkte haben keinen übersetzten Namen — Produktnummer als Fallback,
                     // damit weder die Liste noch die KI-Generierung mit einem leeren Titel dastehen.
-                    $name = ($a['translated']['name'] ?? $a['name'] ?? '') ?: $productNumber;
+                    $name  = ($a['translated']['name'] ?? $a['name'] ?? '') ?: $productNumber;
+                    $title = $a['translated']['metaTitle']       ?? $a['metaTitle']       ?? '';
+                    $desc  = $a['translated']['metaDescription'] ?? $a['metaDescription'] ?? '';
                     $rows[] = [
                         'id'            => $prod['id'],
                         'name'          => $name,
                         'productNumber' => $productNumber,
-                        'title'         => $a['translated']['metaTitle']       ?? $a['metaTitle']       ?? '',
-                        'metaDesc'      => $a['translated']['metaDescription'] ?? $a['metaDescription'] ?? '',
+                        'title'         => $title,
+                        'metaDesc'      => $desc,
                         'description'   => $a['translated']['description']     ?? $a['description']     ?? '',
                     'keywords'      => $a['translated']['keywords']          ?? $a['keywords']          ?? '',
                     'url'           => isset($seoUrls[$prod['id']]) ? $base . '/' . ltrim($seoUrls[$prod['id']], '/') : '',
+                    'langStatus'    => $this->buildLangStatus(
+                        $selectedLang, ! empty($title), ! empty($desc),
+                        $otherLangStatuses[$prod['id']] ?? [], $meta['languages'], $domainLangIds
+                    ),
                 ];
             }
 

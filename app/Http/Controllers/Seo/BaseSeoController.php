@@ -74,6 +74,32 @@ abstract class BaseSeoController extends Controller
     }
 
     /**
+     * Builds the per-language "already optimized?" status list for one row,
+     * so the list view can show at a glance which configured storefront
+     * languages (e.g. DE/EN) still need Meta-Title/-Description.
+     *
+     * @param array<string> $domainLangIds  All language IDs with a storefront domain for this sales channel.
+     * @param array<string,array{hasTitle:bool,hasDesc:bool}> $otherStatuses  Precomputed status for this entity, keyed by langId (excluding the currently selected language).
+     */
+    protected function buildLangStatus(
+        string $selectedLang,
+        bool $hasTitle,
+        bool $hasDesc,
+        array $otherStatuses,
+        array $languageNames,
+        array $domainLangIds
+    ): array {
+        $statuses = [];
+        foreach ($domainLangIds as $langId) {
+            $statuses[$langId] = $langId === $selectedLang
+                ? ['langId' => $langId, 'name' => $languageNames[$langId] ?? $langId, 'hasTitle' => $hasTitle, 'hasDesc' => $hasDesc, 'isCurrent' => true]
+                : ['langId' => $langId, 'name' => $languageNames[$langId] ?? $langId, 'hasTitle' => $otherStatuses[$langId]['hasTitle'] ?? false, 'hasDesc' => $otherStatuses[$langId]['hasDesc'] ?? false, 'isCurrent' => false];
+        }
+
+        return $statuses;
+    }
+
+    /**
      * Custom AI prompt to show/use for the selected language. The legacy,
      * pre-multilingual seo_prompt field only applies as a fallback for German —
      * it was almost always written in that context (often with German-domain-

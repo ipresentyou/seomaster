@@ -40,21 +40,43 @@ class CategorySeoController extends BaseSeoController
                 $base        = $meta['domains'][$selectedSc][$selectedLang]['url'] ?? '';
                 $storefrontDomain = $base;
 
+            // Für alle anderen Sprachen dieses Sales Channels den Optimierungsstatus
+            // nachladen, damit die Liste "✅ DE optimiert / ⚠️ EN fehlt" anzeigen kann.
+            $domainLangIds = array_keys($meta['domains'][$selectedSc] ?? []);
+            $otherLangStatuses = [];
+            foreach ($domainLangIds as $otherLangId) {
+                if ($otherLangId === $selectedLang) continue;
+                $otherRaw = $navRootId ? $this->shopware->getCategories($otherLangId, $navRootId, $limit) : [];
+                foreach ($otherRaw as $c) {
+                    $b = $c;
+                    $otherLangStatuses[$c['id']][$otherLangId] = [
+                        'hasTitle' => ! empty($b['translated']['metaTitle']       ?? $b['metaTitle']       ?? ''),
+                        'hasDesc'  => ! empty($b['translated']['metaDescription'] ?? $b['metaDescription'] ?? ''),
+                    ];
+                }
+            }
+
             foreach ($rawCategories as $cat) {
                 $a = $cat;
-                $name = $a['translated']['name'] ?? $a['name'] ?? '';
+                $name  = $a['translated']['name']              ?? $a['name']              ?? '';
+                $title = $a['translated']['metaTitle']         ?? $a['metaTitle']         ?? '';
+                $desc  = $a['translated']['metaDescription']   ?? $a['metaDescription']   ?? '';
 
                 if ($search && stripos($name, $search) === false) continue;
 
                 $rows[] = [
                     'id'       => $cat['id'],
                     'name'     => $name,
-                    'title'    => $a['translated']['metaTitle']         ?? $a['metaTitle']         ?? '',
-                    'metaDesc' => $a['translated']['metaDescription']   ?? $a['metaDescription']   ?? '',
+                    'title'    => $title,
+                    'metaDesc' => $desc,
                     'keywords' => $a['translated']['keywords']          ?? $a['keywords']          ?? '',
                     'description' => $a['translated']['description']   ?? $a['description']       ?? '',
                     'type'     => $a['type'] ?? 'page',
                     'url'      => isset($seoUrls[$cat['id']]) ? $base . '/' . ltrim($seoUrls[$cat['id']], '/') : '',
+                    'langStatus' => $this->buildLangStatus(
+                        $selectedLang, ! empty($title), ! empty($desc),
+                        $otherLangStatuses[$cat['id']] ?? [], $meta['languages'], $domainLangIds
+                    ),
                 ];
             }
 

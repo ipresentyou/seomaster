@@ -33,6 +33,15 @@
 .result-desc { font-size:13px;color:var(--text-2);margin-top:4px;line-height:1.6;max-width:620px; }
 .result-meta { display:flex;gap:10px;margin-top:8px;font-size:11px;color:var(--text-3);flex-wrap:wrap; }
 .result-meta span { display:flex;align-items:center;gap:4px; }
+
+.lang-badges { display:flex;gap:6px;margin-top:8px;flex-wrap:wrap; }
+.lang-badge {
+    display:flex;align-items:center;gap:4px;padding:2px 8px;border-radius:99px;
+    font-size:10.5px;font-weight:500;border:1px solid transparent;
+}
+.lang-badge.ok   { background:rgba(34,197,94,0.12);  color:var(--success); border-color:rgba(34,197,94,0.25); }
+.lang-badge.warn { background:rgba(234,179,8,0.12);   color:var(--warning); border-color:rgba(234,179,8,0.3); }
+.lang-badge.current { font-weight:700; }
 .result-actions { display:flex;gap:8px;margin-top:10px; }
 .result-actions .btn { padding:5px 12px;font-size:12px; }
 
@@ -193,6 +202,14 @@ Focus on strong search visibility and high click-through rates.';
     <span>Mit Keywords: <strong>{{ count(array_filter($rows, fn($r)=>!empty($r['keywords']))) }}</strong></span>
     <span>Mit SEO-Text: <strong>{{ count(array_filter($rows, fn($r)=>!empty($r['description']))) }}</strong></span>
     <span>Sprache: <strong>{{ $languages[$selectedLang] ?? $selectedLang }}</strong></span>
+    @if($rows && count($rows[0]['langStatus'] ?? []) > 1)
+        @foreach($rows[0]['langStatus'] as $ls)
+            @if(!$ls['isCurrent'])
+                @php $missing = count(array_filter($rows, fn($r) => !($r['langStatus'][$ls['langId']]['hasTitle'] && $r['langStatus'][$ls['langId']]['hasDesc']))); @endphp
+                <span>{{ $ls['name'] }} fehlt noch: <strong style="{{ $missing ? 'color:var(--warning)' : '' }}">{{ $missing }}</strong></span>
+            @endif
+        @endforeach
+    @endif
 </div>
 @endif
 
@@ -240,6 +257,18 @@ Focus on strong search visibility and high click-through rates.';
         @if($cat['description']) <span>✅ SEO-Text</span> @endif
         @if(!$cat['title']) <span style="color:var(--warning)">⚠️ Kein Title</span> @endif
     </div>
+
+    @if(count($cat['langStatus'] ?? []) > 1)
+    <div class="lang-badges">
+        @foreach($cat['langStatus'] as $ls)
+            @php $ok = $ls['hasTitle'] && $ls['hasDesc']; @endphp
+            <span class="lang-badge {{ $ok ? 'ok' : 'warn' }} {{ $ls['isCurrent'] ? 'current' : '' }}"
+                  title="{{ $ls['hasTitle'] ? 'Meta-Title ✓' : 'Meta-Title fehlt' }} · {{ $ls['hasDesc'] ? 'Meta-Description ✓' : 'Meta-Description fehlt' }}">
+                {{ $ok ? '✅' : '⚠️' }} {{ $ls['name'] }}
+            </span>
+        @endforeach
+    </div>
+    @endif
 
     <div id="analysis-{{ $idx }}" style="display:none;"></div>
 
