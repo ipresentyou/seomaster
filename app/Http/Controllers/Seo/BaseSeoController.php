@@ -74,6 +74,22 @@ abstract class BaseSeoController extends Controller
     }
 
     /**
+     * Custom AI prompt to show/use for the selected language. The legacy,
+     * pre-multilingual seo_prompt field only applies as a fallback for German —
+     * it was almost always written in that context (often with German-domain-
+     * specific text baked in), so silently reusing it for every other language
+     * would leak German instructions into non-German generations.
+     */
+    protected function customPromptFor(SeoProject $project, string $langId, bool $isGerman): ?string
+    {
+        if (array_key_exists($langId, $project->seo_prompts ?? [])) {
+            return $project->seo_prompts[$langId] ?: null;
+        }
+
+        return $isGerman ? $project->seo_prompt : null;
+    }
+
+    /**
      * Sorts an assembled row array (products/categories) by name, product
      * number, or "missing field first" — done in PHP since the underlying
      * Shopware search API only sorts by name.

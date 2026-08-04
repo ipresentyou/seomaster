@@ -57,7 +57,7 @@ class ProductSeoController extends BaseSeoController
         }
 
         $isGerman     = $this->isGermanLanguage($meta['languages'][$selectedLang] ?? '');
-        $customPrompt = $project->promptFor($selectedLang);
+        $customPrompt = $this->customPromptFor($project, $selectedLang, $isGerman);
 
         return view('seo.products.index', array_merge($meta, compact(
             'project', 'rows', 'selectedSc', 'selectedLang', 'limit', 'search', 'sort', 'isGerman', 'customPrompt'
@@ -73,7 +73,7 @@ class ProductSeoController extends BaseSeoController
                 'search' => $search ?? '',
                 'sort' => $sort ?? 'name_asc',
                 'isGerman' => true,
-                'customPrompt' => $project->promptFor($selectedLang ?? '') ?? null,
+                'customPrompt' => $this->customPromptFor($project, $selectedLang ?? '', true),
                 'connectionError' => 'Verbindung zum Shopware-Shop fehlgeschlagen. Bitte überprüfen Sie, ob der Shop erreichbar ist und die API-Zugangsdaten korrekt sind.',
                 'languages' => [],
                 'domainName' => $project->name ?? '',
@@ -101,7 +101,7 @@ class ProductSeoController extends BaseSeoController
                 'search' => $search ?? '',
                 'sort' => $sort ?? 'name_asc',
                 'isGerman' => true,
-                'customPrompt' => $project->promptFor($selectedLang ?? '') ?? null,
+                'customPrompt' => $this->customPromptFor($project, $selectedLang ?? '', true),
                 'connectionError' => $errorMessage,
                 'languages' => [],
                 'domainName' => $project->name ?? '',
@@ -120,7 +120,7 @@ class ProductSeoController extends BaseSeoController
                 'search' => $search ?? '',
                 'sort' => $sort ?? 'name_asc',
                 'isGerman' => true,
-                'customPrompt' => $project->promptFor($selectedLang ?? '') ?? null,
+                'customPrompt' => $this->customPromptFor($project, $selectedLang ?? '', true),
                 'connectionError' => 'Fehler beim Laden der Produkte: ' . $e->getMessage(),
                 'languages' => [],
                 'domainName' => $project->name ?? '',

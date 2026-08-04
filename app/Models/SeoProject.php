@@ -28,15 +28,6 @@ class SeoProject extends Model
         'seo_prompts' => 'array',
     ];
 
-    /**
-     * Custom AI prompt for a given language, falling back to the legacy
-     * project-wide prompt (pre-multilingual) for languages without their own.
-     */
-    public function promptFor(string $langId): ?string
-    {
-        return $this->seo_prompts[$langId] ?? $this->seo_prompt ?? null;
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
