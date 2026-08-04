@@ -127,7 +127,9 @@ Route::post('/webhooks/paypal', [SubscriptionController::class, 'webhook'])
 
 // Kontaktformular (öffentlich zugänglich)
 Route::get('/kontakt', [ContactController::class, 'index'])->name('contact.index');
-Route::post('/kontakt', [ContactController::class, 'submit'])->name('contact.submit');
+Route::post('/kontakt', [ContactController::class, 'submit'])
+    ->middleware('throttle:5,1')
+    ->name('contact.submit');
 
 Route::name('legal.')->group(function () {
     Route::view('/impressum', 'impressum')->name('impressum');

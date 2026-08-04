@@ -190,7 +190,12 @@
     <div class="contact-form">
         <form method="POST" action="{{ route('contact.submit') }}">
             @csrf
-            
+            <input type="hidden" name="form_token" value="{{ $formToken }}">
+            <div style="position:absolute; left:-9999px; top:-9999px;" aria-hidden="true">
+                <label for="website">Website</label>
+                <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+            </div>
+
             <div class="form-row">
                 <div class="form-group">
                     <label class="form-label">

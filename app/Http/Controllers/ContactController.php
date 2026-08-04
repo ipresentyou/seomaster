@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Mail\ContactFormSubmitted;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\View\View;
 
@@ -11,11 +12,26 @@ class ContactController extends Controller
 {
     public function index(): View
     {
-        return view('contact.index');
+        return view('contact.index', [
+            'formToken' => Crypt::encryptString((string) now()->timestamp),
+        ]);
     }
 
     public function submit(Request $request)
     {
+        // Honeypot: real users never fill this hidden field, bots usually do.
+        if (filled($request->input('website'))) {
+            return redirect()->route('contact.index')
+                ->with('success', '✅ Deine Nachricht wurde erfolgreich gesendet. Wir melden uns bald bei dir!');
+        }
+
+        // Minimum fill time: bots submit near-instantly after loading the page.
+        $renderedAt = rescue(fn () => (int) Crypt::decryptString((string) $request->input('form_token')), 0, false);
+        if (now()->timestamp - $renderedAt < 3) {
+            return redirect()->route('contact.index')
+                ->with('success', '✅ Deine Nachricht wurde erfolgreich gesendet. Wir melden uns bald bei dir!');
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
