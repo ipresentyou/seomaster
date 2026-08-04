@@ -156,18 +156,18 @@ class AltTextController extends BaseSeoController
 
     public function generate(Request $request, SeoProject $project): JsonResponse
     {
-        $this->bootProject($project);
+        return $this->guardJson(function () use ($request, $project) {
+            $this->bootProject($project);
 
-        $v = $request->validate([
-            'imageUrl'           => 'required|url',
-            'fileName'           => 'required|string',
-            'productContext'     => 'nullable|string',
-            'customInstructions' => 'nullable|string|max:3000',
-            'targetLang'         => 'nullable|string',
-            'domain'             => 'nullable|string',
-        ]);
+            $v = $request->validate([
+                'imageUrl'           => 'required|url',
+                'fileName'           => 'required|string',
+                'productContext'     => 'nullable|string',
+                'customInstructions' => 'nullable|string|max:3000',
+                'targetLang'         => 'nullable|string',
+                'domain'             => 'nullable|string',
+            ]);
 
-        try {
             $result = $this->getAi()->generateAltText(
                 imageUrl:           $v['imageUrl'],
                 fileName:           $v['fileName'],
@@ -176,61 +176,63 @@ class AltTextController extends BaseSeoController
                 domainName:         $v['domain']             ?? '',
                 customInstructions: $v['customInstructions'] ?? '',
             );
-        } catch (\RuntimeException $e) {
-            return $this->err($e->getMessage());
-        }
 
-        if (isset($result['error'])) return $this->err($result['error']);
+            if (isset($result['error'])) return $this->err($result['error']);
 
-        $this->log('alt_text.generated', 'media', '', [], 500);
+            $this->log('alt_text.generated', 'media', '', [], 500);
 
-        return $this->ok($result);
+            return $this->ok($result);
+        });
     }
 
     // ── Save Alt-Text ─────────────────────────────────────────────────────────
 
     public function save(Request $request, SeoProject $project): JsonResponse
     {
-        $this->bootProject($project);
+        return $this->guardJson(function () use ($request, $project) {
+            $this->bootProject($project);
 
-        $v = $request->validate([
-            'mediaId' => 'required|string',
-            'langId'  => 'required|string',
-            'alt'     => 'required|string|max:200',
-        ]);
+            $v = $request->validate([
+                'mediaId' => 'required|string',
+                'langId'  => 'required|string',
+                'alt'     => 'required|string|max:200',
+            ]);
 
-        $ok = $this->shopware->saveMediaAlt($v['mediaId'], $v['langId'], $v['alt']);
+            $ok = $this->shopware->saveMediaAlt($v['mediaId'], $v['langId'], $v['alt']);
 
-        if ($ok) {
-            $this->log('alt_text.saved', 'media', $v['mediaId'], ['alt' => $v['alt']]);
-        }
+            if ($ok) {
+                $this->log('alt_text.saved', 'media', $v['mediaId'], ['alt' => $v['alt']]);
+            }
 
-        return $ok ? $this->ok() : $this->err('Shopware PATCH fehlgeschlagen', 500);
+            return $ok ? $this->ok() : $this->err('Shopware PATCH fehlgeschlagen', 500);
+        });
     }
 
     // ── Batch Save ────────────────────────────────────────────────────────────
 
     public function batchSave(Request $request, SeoProject $project): JsonResponse
     {
-        $this->bootProject($project);
+        return $this->guardJson(function () use ($request, $project) {
+            $this->bootProject($project);
 
-        $v = $request->validate([
-            'items'           => 'required|array|max:100',
-            'items.*.mediaId' => 'required|string',
-            'items.*.langId'  => 'required|string',
-            'items.*.alt'     => 'required|string|max:200',
-        ]);
+            $v = $request->validate([
+                'items'           => 'required|array|max:100',
+                'items.*.mediaId' => 'required|string',
+                'items.*.langId'  => 'required|string',
+                'items.*.alt'     => 'required|string|max:200',
+            ]);
 
-        $saved = $failed = 0;
+            $saved = $failed = 0;
 
-        foreach ($v['items'] as $item) {
-            $ok = $this->shopware->saveMediaAlt($item['mediaId'], $item['langId'], $item['alt']);
-            $ok ? $saved++ : $failed++;
-            if ($ok) {
-                $this->log('alt_text.saved', 'media', $item['mediaId'], ['alt' => $item['alt']]);
+            foreach ($v['items'] as $item) {
+                $ok = $this->shopware->saveMediaAlt($item['mediaId'], $item['langId'], $item['alt']);
+                $ok ? $saved++ : $failed++;
+                if ($ok) {
+                    $this->log('alt_text.saved', 'media', $item['mediaId'], ['alt' => $item['alt']]);
+                }
             }
-        }
 
-        return $this->ok(['saved' => $saved, 'failed' => $failed]);
+            return $this->ok(['saved' => $saved, 'failed' => $failed]);
+        });
     }
 }

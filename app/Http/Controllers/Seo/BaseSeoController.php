@@ -64,6 +64,46 @@ abstract class BaseSeoController extends Controller
         return response()->json(['success' => false, 'error' => $message], $status);
     }
 
+    /**
+     * Sorts an assembled row array (products/categories) by name, product
+     * number, or "missing field first" — done in PHP since the underlying
+     * Shopware search API only sorts by name.
+     */
+    protected function sortRows(array $rows, string $sort): array
+    {
+        usort($rows, fn ($a, $b) => match ($sort) {
+            'name_desc'     => strcasecmp($b['name'] ?? '', $a['name'] ?? ''),
+            'number_asc'    => strcasecmp($a['productNumber'] ?? '', $b['productNumber'] ?? ''),
+            'missing_title' => (int) (! empty($a['title']))    <=> (int) (! empty($b['title'])),
+            'missing_desc'  => (int) (! empty($a['metaDesc'])) <=> (int) (! empty($b['metaDesc'])),
+            default         => strcasecmp($a['name'] ?? '', $b['name'] ?? ''),
+        });
+
+        return $rows;
+    }
+
+    /**
+     * Runs an AJAX action and guarantees a JSON response even on failure —
+     * without this, an uncaught exception (e.g. an expired Shopware token)
+     * renders Laravel's HTML error page, which breaks the frontend's
+     * `res.json()` call ("unexpected character at line 1 column 1").
+     */
+    protected function guardJson(\Closure $fn): JsonResponse
+    {
+        try {
+            return $fn();
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return $this->err(collect($e->errors())->flatten()->first() ?? 'Ungültige Eingabe.', 422);
+        } catch (\Illuminate\Http\Client\ConnectionException) {
+            return $this->err('Verbindung zum Shop fehlgeschlagen. Bitte später erneut versuchen.', 502);
+        } catch (\RuntimeException $e) {
+            return $this->err($e->getMessage());
+        } catch (\Throwable $e) {
+            report($e);
+            return $this->err('Unerwarteter Fehler: ' . $e->getMessage(), 500);
+        }
+    }
+
     // ── Shared page-data builder ──────────────────────────────────────────────
 
     /**

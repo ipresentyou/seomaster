@@ -22,6 +22,7 @@ class ProductSeoController extends BaseSeoController
             $selectedLang = $request->input('lang', '');
             $limit        = (int) $request->input('max', 50);
             $search       = (string) $request->input('search', '');
+            $sort         = (string) $request->input('sort', 'name_asc');
 
             $meta = $this->buildPageMeta($selectedSc, $selectedLang);
             if (! $selectedSc)   $selectedSc   = array_key_first($meta['salesChannels']) ?? '';
@@ -47,10 +48,12 @@ class ProductSeoController extends BaseSeoController
                     'url'           => isset($seoUrls[$prod['id']]) ? $base . '/' . ltrim($seoUrls[$prod['id']], '/') : '',
                 ];
             }
+
+            $rows = $this->sortRows($rows, $sort);
         }
 
         return view('seo.products.index', array_merge($meta, compact(
-            'project', 'rows', 'selectedSc', 'selectedLang', 'limit', 'search'
+            'project', 'rows', 'selectedSc', 'selectedLang', 'limit', 'search', 'sort'
         )));
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
             // Connection timeout or network error
@@ -61,6 +64,7 @@ class ProductSeoController extends BaseSeoController
                 'selectedLang' => $selectedLang ?? '',
                 'limit' => $limit ?? 50,
                 'search' => $search ?? '',
+                'sort' => $sort ?? 'name_asc',
                 'connectionError' => 'Verbindung zum Shopware-Shop fehlgeschlagen. Bitte überprüfen Sie, ob der Shop erreichbar ist und die API-Zugangsdaten korrekt sind.',
                 'languages' => [],
                 'domainName' => $project->name ?? '',
@@ -86,6 +90,7 @@ class ProductSeoController extends BaseSeoController
                 'selectedLang' => $selectedLang ?? '',
                 'limit' => $limit ?? 50,
                 'search' => $search ?? '',
+                'sort' => $sort ?? 'name_asc',
                 'connectionError' => $errorMessage,
                 'languages' => [],
                 'domainName' => $project->name ?? '',
@@ -102,6 +107,7 @@ class ProductSeoController extends BaseSeoController
                 'selectedLang' => $selectedLang ?? '',
                 'limit' => $limit ?? 50,
                 'search' => $search ?? '',
+                'sort' => $sort ?? 'name_asc',
                 'connectionError' => 'Fehler beim Laden der Produkte: ' . $e->getMessage(),
                 'languages' => [],
                 'domainName' => $project->name ?? '',
@@ -116,40 +122,42 @@ class ProductSeoController extends BaseSeoController
 
     public function analyze(Request $request, SeoProject $project): JsonResponse
     {
-        $this->bootProject($project);
-        $url = $request->input('url', '');
+        return $this->guardJson(function () use ($request, $project) {
+            $this->bootProject($project);
+            $url = $request->input('url', '');
 
-        if (! filter_var($url, FILTER_VALIDATE_URL)) {
-            return $this->err('Ungültige URL');
-        }
+            if (! filter_var($url, FILTER_VALIDATE_URL)) {
+                return $this->err('Ungültige URL');
+            }
 
-        return $this->ok($this->scraper->scrapeProduct($url));
+            return $this->ok($this->scraper->scrapeProduct($url));
+        });
     }
 
     // ── AI Generate ───────────────────────────────────────────────────────────
 
     public function generate(Request $request, SeoProject $project): JsonResponse
     {
-        $this->bootProject($project);
+        return $this->guardJson(function () use ($request, $project) {
+            $this->bootProject($project);
 
-        $v = $request->validate([
-            'name'               => 'required|string|max:255',
-            'productNumber'      => 'nullable|string',
-            'content'            => 'nullable|string',
-            'h1'                 => 'nullable|string',
-            'price'              => 'nullable|string',
-            'features'           => 'nullable|string',
-            'customInstructions' => 'nullable|string|max:3000',
-            'targetLang'         => 'nullable|string',
-            'domain'             => 'nullable|string',
-            'generate'           => 'required|array',
-            'generate.*'         => 'in:title,desc,text',
-        ]);
+            $v = $request->validate([
+                'name'               => 'required|string|max:255',
+                'productNumber'      => 'nullable|string',
+                'content'            => 'nullable|string',
+                'h1'                 => 'nullable|string',
+                'price'              => 'nullable|string',
+                'features'           => 'nullable|string',
+                'customInstructions' => 'nullable|string|max:3000',
+                'targetLang'         => 'nullable|string',
+                'domain'             => 'nullable|string',
+                'generate'           => 'required|array',
+                'generate.*'         => 'in:title,desc,text',
+            ]);
 
-        $result = [];
-        $tokens = 0;
+            $result = [];
+            $tokens = 0;
 
-        try {
             if (in_array('title', $v['generate']) || in_array('desc', $v['generate'])) {
                 $meta = $this->getAi()->generateMeta(
                     entityName:         $v['name'],
@@ -190,42 +198,42 @@ class ProductSeoController extends BaseSeoController
                 $result = array_merge($result, $seo);
                 $tokens += 1000;
             }
-        } catch (\RuntimeException $e) {
-            return $this->err($e->getMessage());
-        }
 
-        $this->log('meta.generated', 'product', '', [], $tokens);
+            $this->log('meta.generated', 'product', '', [], $tokens);
 
-        return $this->ok($result);
+            return $this->ok($result);
+        });
     }
 
     // ── Save to Shopware ──────────────────────────────────────────────────────
 
     public function save(Request $request, SeoProject $project): JsonResponse
     {
-        $this->bootProject($project);
+        return $this->guardJson(function () use ($request, $project) {
+            $this->bootProject($project);
 
-        $v = $request->validate([
-            'productId' => 'required|string',
-            'langId'    => 'required|string',
-            'title'     => 'nullable|string|max:255',
-            'metaDesc'  => 'nullable|string|max:500',
-            'seoText'   => 'nullable|string',
-        ]);
+            $v = $request->validate([
+                'productId' => 'required|string',
+                'langId'    => 'required|string',
+                'title'     => 'nullable|string|max:255',
+                'metaDesc'  => 'nullable|string|max:500',
+                'seoText'   => 'nullable|string',
+            ]);
 
-        $payload = array_filter([
-            'metaTitle'       => strip_tags($v['title']    ?? ''),
-            'metaDescription' => strip_tags($v['metaDesc'] ?? ''),
-            'keywords'        => strip_tags($v['keywords'] ?? ''),
-            'description'     => $v['seoText'] ?? '',
-        ], fn($val) => $val !== '');
+            $payload = array_filter([
+                'metaTitle'       => strip_tags($v['title']    ?? ''),
+                'metaDescription' => strip_tags($v['metaDesc'] ?? ''),
+                'keywords'        => strip_tags($v['keywords'] ?? ''),
+                'description'     => $v['seoText'] ?? '',
+            ], fn($val) => $val !== '');
 
-        $ok = $this->shopware->saveProduct($v['productId'], $v['langId'], $payload);
+            $ok = $this->shopware->saveProduct($v['productId'], $v['langId'], $payload);
 
-        if ($ok) {
-            $this->log('meta.saved', 'product', $v['productId'], $payload);
-        }
+            if ($ok) {
+                $this->log('meta.saved', 'product', $v['productId'], $payload);
+            }
 
-        return $ok ? $this->ok() : $this->err('Shopware PATCH fehlgeschlagen', 500);
+            return $ok ? $this->ok() : $this->err('Shopware PATCH fehlgeschlagen', 500);
+        });
     }
 }

@@ -21,6 +21,8 @@ class CategorySeoController extends BaseSeoController
             $selectedSc   = $request->input('sc', '');
             $selectedLang = $request->input('lang', '');
             $limit        = (int) $request->input('max', 50);
+            $search       = trim((string) $request->input('search', ''));
+            $sort         = (string) $request->input('sort', 'name_asc');
 
             $meta = $this->buildPageMeta($selectedSc, $selectedLang);
             $salesChannels = $meta['salesChannels'];
@@ -40,9 +42,13 @@ class CategorySeoController extends BaseSeoController
 
             foreach ($rawCategories as $cat) {
                 $a = $cat;
+                $name = $a['translated']['name'] ?? $a['name'] ?? '';
+
+                if ($search && stripos($name, $search) === false) continue;
+
                 $rows[] = [
                     'id'       => $cat['id'],
-                    'name'     => $a['translated']['name']              ?? $a['name']              ?? '',
+                    'name'     => $name,
                     'title'    => $a['translated']['metaTitle']         ?? $a['metaTitle']         ?? '',
                     'metaDesc' => $a['translated']['metaDescription']   ?? $a['metaDescription']   ?? '',
                     'keywords' => $a['translated']['keywords']          ?? $a['keywords']          ?? '',
@@ -51,10 +57,12 @@ class CategorySeoController extends BaseSeoController
                     'url'      => isset($seoUrls[$cat['id']]) ? $base . '/' . ltrim($seoUrls[$cat['id']], '/') : '',
                 ];
             }
+
+            $rows = $this->sortRows($rows, $sort);
         }
 
         return view('seo.categories.index', array_merge($meta, compact(
-            'project', 'rows', 'selectedSc', 'selectedLang', 'limit', 'salesChannels', 'storefrontDomain'
+            'project', 'rows', 'selectedSc', 'selectedLang', 'limit', 'salesChannels', 'storefrontDomain', 'search', 'sort'
         )));
         } catch (\Illuminate\Http\Client\ConnectionException $e) {
             // Connection timeout or network error
@@ -66,6 +74,8 @@ class CategorySeoController extends BaseSeoController
                 'limit' => $limit ?? 50,
                 'salesChannels' => [],
                 'storefrontDomain' => '',
+                'search' => $search ?? '',
+                'sort' => $sort ?? 'name_asc',
                 'connectionError' => 'Verbindung zum Shopware-Shop fehlgeschlagen. Bitte überprüfen Sie, ob der Shop erreichbar ist und die API-Zugangsdaten korrekt sind.',
                 'languages' => [],
                 'domainName' => $project->name ?? '',
@@ -82,6 +92,8 @@ class CategorySeoController extends BaseSeoController
                 'limit' => $limit ?? 50,
                 'salesChannels' => [],
                 'storefrontDomain' => '',
+                'search' => $search ?? '',
+                'sort' => $sort ?? 'name_asc',
                 'connectionError' => 'Fehler beim Laden der Kategorien: ' . $e->getMessage(),
                 'languages' => [],
                 'domainName' => $project->name ?? '',
@@ -95,38 +107,40 @@ class CategorySeoController extends BaseSeoController
 
     public function analyze(Request $request, SeoProject $project): JsonResponse
     {
-        $this->bootProject($project);
-        $url = $request->input('url', '');
+        return $this->guardJson(function () use ($request, $project) {
+            $this->bootProject($project);
+            $url = $request->input('url', '');
 
-        if (! filter_var($url, FILTER_VALIDATE_URL)) {
-            return $this->err('Ungültige URL');
-        }
+            if (! filter_var($url, FILTER_VALIDATE_URL)) {
+                return $this->err('Ungültige URL');
+            }
 
-        return $this->ok($this->scraper->scrapeCategory($url));
+            return $this->ok($this->scraper->scrapeCategory($url));
+        });
     }
 
     // ── AI Generate ───────────────────────────────────────────────────────────
 
     public function generate(Request $request, SeoProject $project): JsonResponse
     {
-        $this->bootProject($project);
+        return $this->guardJson(function () use ($request, $project) {
+            $this->bootProject($project);
 
-        $v = $request->validate([
-            'name'               => 'required|string|max:255',
-            'content'            => 'nullable|string',
-            'h1'                 => 'nullable|string',
-            'existingKeywords'   => 'nullable|string',
-            'customInstructions' => 'nullable|string|max:3000',
-            'targetLang'         => 'nullable|string',
-            'domain'             => 'nullable|string',
-            'generate'           => 'required|array',
-            'generate.*'         => 'in:title,desc,keywords,text',
-        ]);
+            $v = $request->validate([
+                'name'               => 'required|string|max:255',
+                'content'            => 'nullable|string',
+                'h1'                 => 'nullable|string',
+                'existingKeywords'   => 'nullable|string',
+                'customInstructions' => 'nullable|string|max:3000',
+                'targetLang'         => 'nullable|string',
+                'domain'             => 'nullable|string',
+                'generate'           => 'required|array',
+                'generate.*'         => 'in:title,desc,keywords,text',
+            ]);
 
-        $result = [];
-        $tokens = 0;
+            $result = [];
+            $tokens = 0;
 
-        try {
             if (in_array('title', $v['generate']) || in_array('desc', $v['generate']) || in_array('keywords', $v['generate'])) {
                 $meta = $this->getAi()->generateMeta(
                     entityName:         $v['name'],
@@ -159,45 +173,44 @@ class CategorySeoController extends BaseSeoController
                 $result = array_merge($result, $seo);
                 $tokens += 1200;
             }
-        } catch (\RuntimeException $e) {
-            return $this->err($e->getMessage());
-        }
 
-        $this->log('meta.generated', 'category', '', [], $tokens);
+            $this->log('meta.generated', 'category', '', [], $tokens);
 
-        return $this->ok($result);
+            return $this->ok($result);
+        });
     }
 
     // ── Save ──────────────────────────────────────────────────────────────────
 
     public function save(Request $request, SeoProject $project): JsonResponse
     {
-        $this->bootProject($project);
+        return $this->guardJson(function () use ($request, $project) {
+            $this->bootProject($project);
 
-        $v = $request->validate([
-            'categoryId' => 'required|string',
-            'langId'     => 'required|string',
-            'title'      => 'nullable|string|max:255',
-            'metaDesc'   => 'nullable|string|max:500',
-            'keywords'   => 'nullable|string|max:500',
-            'seoText'    => 'nullable|string',
-        ]);
+            $v = $request->validate([
+                'categoryId' => 'required|string',
+                'langId'     => 'required|string',
+                'title'      => 'nullable|string|max:255',
+                'metaDesc'   => 'nullable|string|max:500',
+                'keywords'   => 'nullable|string|max:500',
+                'seoText'    => 'nullable|string',
+            ]);
 
-        $payload = array_filter([
-            'metaTitle'       => strip_tags($v['title']    ?? ''),
-            'metaDescription' => strip_tags($v['metaDesc'] ?? ''),
-            'keywords'        => strip_tags($v['keywords'] ?? ''),
-            'description'     => $v['seoText'] ?? '',
-        ], fn($val) => $val !== '');
+            $payload = array_filter([
+                'metaTitle'       => strip_tags($v['title']    ?? ''),
+                'metaDescription' => strip_tags($v['metaDesc'] ?? ''),
+                'keywords'        => strip_tags($v['keywords'] ?? ''),
+                'description'     => $v['seoText'] ?? '',
+            ], fn($val) => $val !== '');
 
-        error_log("PATCH payload: " . json_encode($v) . " payload: " . json_encode($payload));
-        $ok = $this->shopware->saveCategory($v['categoryId'], $v['langId'], $payload);
+            $ok = $this->shopware->saveCategory($v['categoryId'], $v['langId'], $payload);
 
-        if ($ok) {
-            $this->log('meta.saved', 'category', $v['categoryId'], $payload);
-        }
+            if ($ok) {
+                $this->log('meta.saved', 'category', $v['categoryId'], $payload);
+            }
 
-        return $ok ? $this->ok() : $this->err('Shopware PATCH fehlgeschlagen', 500);
+            return $ok ? $this->ok() : $this->err('Shopware PATCH fehlgeschlagen', 500);
+        });
     }
 
     public function savePrompt(Request $request, SeoProject $project): JsonResponse

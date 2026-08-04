@@ -103,6 +103,15 @@
                 </option>
             @endforeach
         </select>
+        <input type="text" class="seo-input" name="search" style="width:200px"
+               value="{{ $search ?? '' }}" placeholder="🔍 Kategorie suchen…"
+               onkeydown="if(event.key==='Enter')this.form.submit()">
+        <select class="seo-select" name="sort" onchange="this.form.submit()">
+            <option value="name_asc"      {{ ($sort ?? 'name_asc') === 'name_asc'      ? 'selected' : '' }}>Name A–Z</option>
+            <option value="name_desc"     {{ ($sort ?? '') === 'name_desc'     ? 'selected' : '' }}>Name Z–A</option>
+            <option value="missing_title" {{ ($sort ?? '') === 'missing_title' ? 'selected' : '' }}>Ohne Meta-Title zuerst</option>
+            <option value="missing_desc"  {{ ($sort ?? '') === 'missing_desc'  ? 'selected' : '' }}>Ohne Beschreibung zuerst</option>
+        </select>
         <input type="number" class="seo-input" name="max" value="{{ $limit }}">
         <button type="submit" class="btn btn-primary" style="padding:7px 14px;font-size:13px;">Laden</button>
         <div class="toolbar-right">
