@@ -6,8 +6,9 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Auth\Events\Verified;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class EmailVerificationController extends Controller
@@ -27,14 +28,27 @@ class EmailVerificationController extends Controller
     /**
      * Mark email as verified from the signed URL in the email.
      */
-    public function verify(EmailVerificationRequest $request)
+    public function verify(Request $request, int $id, string $hash)
     {
-        if ($request->user()->hasVerifiedEmail()) {
+        $user = User::findOrFail($id);
+
+        if (! hash_equals(sha1($user->getEmailForVerification()), $hash)) {
+            abort(403);
+        }
+
+        // Signierter Link aus dem eigenen Postfach → direkt einloggen,
+        // statt den User auf die Login-Seite zu schicken
+        if (! Auth::check() || Auth::id() !== $user->id) {
+            Auth::login($user);
+            $request->session()->regenerate();
+        }
+
+        if ($user->hasVerifiedEmail()) {
             return redirect()->intended(route('dashboard') . '?verified=1');
         }
 
-        if ($request->user()->markEmailAsVerified()) {
-            event(new Verified($request->user()));
+        if ($user->markEmailAsVerified()) {
+            event(new Verified($user));
         }
 
         return redirect()->intended(route('dashboard') . '?verified=1')
