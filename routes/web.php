@@ -9,7 +9,6 @@ use App\Http\Controllers\SeoProjectController;
 use App\Http\Controllers\Seo\AltTextController;
 use App\Http\Controllers\Seo\CategorySeoController;
 use App\Http\Controllers\Seo\ProductSeoController;
-use App\Http\Controllers\Seo\Typo3PageSeoController;
 use App\Http\Controllers\SubscriptionController;
 use Illuminate\Support\Facades\Route;
 
@@ -100,11 +99,6 @@ Route::middleware(['auth', 'verified', 'user.active'])->group(function () {
             Route::post('/alt-text/batch',      [AltTextController::class, 'batchSave'])->name('alttext.batch');
             Route::post('/alt-text/prompt',     [AltTextController::class, 'savePrompt'])->name('alttext.prompt');
 
-            // ── TYPO3 Seiten ───────────────────────────────────────────────────
-            Route::get('/typo3-pages',           [Typo3PageSeoController::class, 'index'])->name('typo3pages');
-            Route::get('/typo3-pages/analyze',   [Typo3PageSeoController::class, 'analyze'])->name('typo3pages.analyze');
-            Route::post('/typo3-pages/generate', [Typo3PageSeoController::class, 'generate'])->name('typo3pages.generate');
-            Route::post('/typo3-pages/save',     [Typo3PageSeoController::class, 'save'])->name('typo3pages.save');
         });
 
     // Abonnements
