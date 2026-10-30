@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SEOmaster – KI-SEO für Shopware</title>
-    <meta name="description" content="SEOmaster optimiert automatisch Meta-Titel, Beschreibungen, Keywords und Alt-Texte in Ihrem Shopware-Shop – mit echter KI, in Sekunden.">
+    <title>Shopware SEO mit KI automatisieren | SEOmaster</title>
+    <meta name="description" content="Optimieren Sie Meta-Titel, Beschreibungen und Bild-Alt-Texte für Shopware 6 mit KI. Direkt per API, ohne Plugin. SEOmaster 3 Tage kostenlos testen.">
+    <link rel="canonical" href="{{ url('/') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=DM+Serif+Display&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
@@ -479,11 +480,11 @@
 <!-- HERO -->
 <section class="hero">
     <div class="hero-badge">Exklusiv für Shopware 6</div>
-    <h1>SEO-Optimierung,<br>die <em>wirklich</em> funktioniert</h1>
+    <h1>Shopware SEO<br>mit <em>KI</em> automatisieren</h1>
     <p class="hero-sub">
-        SEOmaster analysiert Ihren Shop und generiert per KI
-        perfekte Meta-Titel, Beschreibungen, Keywords und Alt-Texte —
-        in wenigen Minuten statt wochenlanger Handarbeit.
+        SEOmaster erkennt fehlende SEO-Daten in Ihrem Shopware-6-Shop und erstellt
+        Meta-Titel, Beschreibungen und Bild-Alt-Texte per KI.
+        Prüfen Sie die Vorschläge und speichern Sie sie direkt in Ihrem Shop.
     </p>
     <div class="hero-cta">
         <a href="{{ route('register') }}" class="btn btn-primary btn-xl">Jetzt kostenlos testen →</a>
@@ -632,7 +633,7 @@
 <section id="features">
     <div class="section-inner">
         <div class="section-tag">Features</div>
-        <h2 class="section-title">Alles was Ihr Shop braucht,<br>um auf Seite 1 zu landen</h2>
+        <h2 class="section-title">Drei Editoren für Ihre<br>Shopware-SEO-Inhalte</h2>
         <p class="section-sub">Drei mächtige Editoren, direkt verbunden mit Ihrer Shopware API — ohne Plugin, ohne Agentur.</p>
 
         <div class="features-grid">
@@ -726,6 +727,37 @@
                 </ul>
                 <a href="{{ route('register') }}" class="btn btn-outline" style="text-align:center; justify-content:center">Jetzt starten →</a>
             </div>
+        </div>
+    </div>
+</section>
+
+<!-- SEO THEMEN -->
+<section id="seo-themen" style="background:var(--bg-soft);">
+    <div class="section-inner">
+        <div class="section-tag">Shopware SEO in der Praxis</div>
+        <h2 class="section-title">Welche SEO-Aufgabe möchten Sie lösen?</h2>
+        <p class="section-sub">Vom fehlenden Meta-Titel bis zum mehrsprachigen Sortiment: Erfahren Sie, wie Sie die einzelnen Aufgaben mit SEOmaster bearbeiten.</p>
+        @php
+            $seoTopics = [
+                ['shopware-seo', 'Shopware SEO', 'So verbinden Sie Ihren Shop und bearbeiten die SEO-Daten Ihrer Produkte, Kategorien und Bilder.'],
+                ['meta-tags-optimieren', 'Meta-Tags optimieren', 'Ein Produkt hat noch keinen Meta-Titel? Erstellen Sie einen Vorschlag und prüfen Sie ihn vor dem Speichern.'],
+                ['produktbeschreibungen-seo', 'Produktbeschreibungen für SEO', 'Nutzen Sie vorhandene Produktinformationen als Grundlage für individuelle Beschreibungstexte.'],
+                ['alt-text-generator', 'Alt-Texte für Produktbilder', 'Finden Sie Bilder ohne Alt-Text und lassen Sie passende Bildbeschreibungen vorschlagen.'],
+                ['kategorie-seo', 'Kategorie-SEO', 'Bearbeiten Sie Meta-Daten und Beschreibungstexte für die Kategorien Ihres Shops.'],
+                ['seo-audit', 'SEO-Daten prüfen', 'Verschaffen Sie sich einen Überblick über fehlende Meta-Daten und Alt-Texte in Ihrem Sortiment.'],
+                ['shopware-seo-ohne-plugin', 'Shopware SEO ohne Plugin', 'Erfahren Sie, wie die Verbindung über die Shopware-API funktioniert.'],
+                ['ki-brand-voice', 'KI-Texte im Ton Ihrer Marke', 'Geben Sie Zielgruppe, Ton und Stil vor, damit die Vorschläge zu Ihrem Shop passen.'],
+                ['mehrsprachiges-seo', 'Mehrsprachiges SEO', 'Bearbeiten Sie deutsche und englische SEO-Texte getrennt für die Sprachversionen Ihres Shops.'],
+                ['seo-fuer-agenturen', 'SEO für Agenturen', 'Organisieren Sie die SEO-Arbeit für mehrere Kundenshops in separaten Projekten.'],
+            ];
+        @endphp
+        <div class="features-grid">
+            @foreach ($seoTopics as [$slug, $label, $description])
+                <div class="feature-card">
+                    <h3 class="feature-title"><a href="{{ route('landing.' . $slug) }}" style="color:var(--blue);">{{ $label }}</a></h3>
+                    <p class="feature-desc">{{ $description }}</p>
+                </div>
+            @endforeach
         </div>
     </div>
 </section>

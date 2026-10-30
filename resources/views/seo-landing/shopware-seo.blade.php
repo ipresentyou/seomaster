@@ -46,6 +46,20 @@
         <li><strong>Analyse fehlender SEO-Daten</strong> über den kompletten Shop hinweg</li>
     </ul>
 
+    <h2>Beispiel: einen fehlenden Meta-Titel ergänzen</h2>
+    <p>
+        Angenommen, Ihr Shop enthält das Produkt „Leder-Handtasche Classic“, aber noch keinen
+        Meta-Titel. Öffnen Sie den Produkt-SEO-Editor, wählen Sie die gewünschte Sprache und
+        lassen Sie einen Textvorschlag erstellen. Prüfen Sie, ob Material, Produktname und
+        Formulierung zu Ihrem Angebot passen. Erst mit „Speichern“ übernehmen Sie den Text in Shopware.
+        Das Beispiel zeigt den Arbeitsablauf; eine bestimmte Google-Platzierung ist damit nicht garantiert.
+    </p>
+    <p>
+        Für den nächsten Schritt finden Sie hier mehr zum
+        <a href="{{ route('landing.meta-tags-optimieren') }}">Optimieren von Meta-Tags</a>
+        und zu <a href="{{ route('landing.mehrsprachiges-seo') }}">SEO für mehrere Shop-Sprachen</a>.
+    </p>
+
     <h2>In wenigen Minuten startklar</h2>
     <p>
         Shopware-Zugangsdaten hinterlegen, Shop verbinden, loslegen. Keine Entwicklerkenntnisse
