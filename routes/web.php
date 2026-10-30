@@ -10,6 +10,7 @@ use App\Http\Controllers\Seo\AltTextController;
 use App\Http\Controllers\Seo\CategorySeoController;
 use App\Http\Controllers\Seo\ProductSeoController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\TrialFeedbackController;
 use Illuminate\Support\Facades\Route;
 
 // ─── Public ───────────────────────────────────────────────────────────────────
@@ -18,6 +19,14 @@ Route::get('/', function() { return auth()->check() ? redirect()->route('dashboa
 
 // Auth Routes
 require __DIR__ . '/auth.php';
+
+// Personal feedback links remain accessible after the trial, without a login.
+Route::middleware(['signed', 'throttle:30,1'])
+    ->withoutMiddleware(\App\Http\Middleware\RedirectIfOnboardingIncomplete::class)
+    ->group(function () {
+        Route::get('/trial-feedback/{subscription}', [TrialFeedbackController::class, 'show'])->name('trial-feedback.show');
+        Route::post('/trial-feedback/{subscription}', [TrialFeedbackController::class, 'store'])->name('trial-feedback.store');
+    });
 
 // ─── Onboarding (auth + verified, but NOT onboarding middleware) ───────────────
 

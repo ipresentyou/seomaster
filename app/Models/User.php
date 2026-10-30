@@ -118,7 +118,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
 
     public function hasActiveSubscription(): bool
     {
-        return $this->activeSubscription !== null;
+        return $this->activeSubscription?->isActive() ?? false;
     }
 
     public function canUseFeature(string $feature): bool
@@ -128,7 +128,7 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
         }
 
         $sub = $this->activeSubscription;
-        if (! $sub) {
+        if (! $sub || ! $sub->isActive()) {
             return false;
         }
 
@@ -156,7 +156,13 @@ class User extends Authenticatable implements FilamentUser, MustVerifyEmail
     public function activeSubscription(): HasOne
     {
         return $this->hasOne(Subscription::class)
-                    ->whereIn('status', ['active', 'trial'])
+                    ->where(function ($query) {
+                        $query->where('status', 'active')
+                            ->orWhere(function ($trial) {
+                                $trial->where('status', 'trial')
+                                    ->where('trial_ends_at', '>', now());
+                            });
+                    })
                     ->latest();
     }
 

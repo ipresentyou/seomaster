@@ -28,6 +28,7 @@ class SubscriptionController extends Controller
         $user         = auth()->user();
         $plans        = SubscriptionPlan::where('is_active', true)->orderBy('sort_order')->get();
         $subscription = $user->activeSubscription;
+        $canStartTrial = ! $user->subscriptions()->exists();
         $invoices     = Subscription::where('user_id', $user->id)
                             ->with('invoices')
                             ->get()
@@ -35,7 +36,7 @@ class SubscriptionController extends Controller
                             ->flatten()
                             ->sortByDesc('created_at');
 
-        return view('subscription.index', compact('plans', 'subscription', 'invoices'));
+        return view('subscription.index', compact('plans', 'subscription', 'invoices', 'canStartTrial'));
     }
 
     // ── Start Trial (Starter Plan) ─────────────────────────────────────────────────
@@ -48,6 +49,11 @@ class SubscriptionController extends Controller
         if ($user->activeSubscription) {
             return redirect()->route('subscription.index')
                 ->with('info', 'Du hast bereits ein aktives Abonnement oder Trial.');
+        }
+
+        if ($user->subscriptions()->exists()) {
+            return redirect()->route('subscription.index')
+                ->with('warning', 'Deine kostenlose Testphase wurde bereits genutzt. Bitte wähle ein Abonnement.');
         }
 
         // Find Starter plan

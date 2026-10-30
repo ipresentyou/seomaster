@@ -83,10 +83,15 @@
 
     <p>Hey {{ $subscription->user->name ?? 'da' }},</p>
     <p>
-        dein 14-tägiger SEOmaster-Trial ist gestern abgelaufen.
+        deine kostenlose SEOmaster-Testphase ist beendet.
         Dein Account ist noch vorhanden — du kannst jederzeit ein Abonnement starten und
         direkt dort weitermachen, wo du aufgehört hast.
     </p>
+
+    <h2 style="font-size:18px; color:#111;">Wie war dein Eindruck?</h2>
+    <p>Hat dir SEOmaster Arbeit abgenommen? Was hat gefehlt oder nicht funktioniert? Mit deinem freiwilligen Feedback hilfst du uns, das Tool zu verbessern.</p>
+    <a href="{{ $feedbackUrl }}" class="btn">In einer Minute Feedback geben →</a>
+    <p style="font-size:13px; margin-top:12px;">Ohne Login. Dein persönlicher Feedbacklink ist 30 Tage gültig.</p>
 
     <div class="reactivate-box">
         <div class="reactivate-title">🚀 Jetzt einsteigen</div>
@@ -116,8 +121,7 @@
     <hr class="divider">
 
     <p style="font-size:13px; color:#6b7280; text-align:center;">
-        Kein Interesse? Dein Account bleibt 30 Tage erhalten und wird dann automatisch gelöscht.<br>
-        Daten exportieren? Schreib uns an <a href="mailto:support@seomaster.de" style="color:#7c3aed;">support@seomaster.de</a>
+        Fragen zu deinem Konto? <a href="{{ route('contact.index') }}" style="color:#7c3aed;">Kontaktiere uns</a>.
     </p>
 
     <div class="footer">

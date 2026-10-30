@@ -54,7 +54,7 @@ class RegisteredUserController extends Controller
                 ]);
 
                 // Subscription prüfen/wiederherstellen
-                if (!$existingUser->subscription) {
+                if (! $existingUser->subscriptions()->exists()) {
                     $plan = SubscriptionPlan::where('slug', 'starter')->first();
                     if ($plan) {
                         Subscription::create([

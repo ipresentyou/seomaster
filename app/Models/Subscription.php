@@ -15,6 +15,7 @@ class Subscription extends Model
         'trial_ends_at', 'current_period_start', 'current_period_end',
         'cancelled_at', 'paypal_subscription_id', 'paypal_order_id',
         'amount', 'currency',
+        'trial_feedback_sent_at',
     ];
 
     protected $casts = [
@@ -23,6 +24,7 @@ class Subscription extends Model
         'current_period_end'    => 'datetime',
         'cancelled_at'          => 'datetime',
         'amount'                => 'float',
+        'trial_feedback_sent_at' => 'datetime',
     ];
 
     public function user(): BelongsTo
@@ -41,7 +43,7 @@ class Subscription extends Model
 
     public function isActive(): bool
     {
-        return in_array($this->status, ['active', 'trial']);
+        return $this->status === 'active' || $this->isOnTrial();
     }
 
     public function isOnTrial(): bool

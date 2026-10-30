@@ -28,6 +28,11 @@ return Application::configure(basePath: dirname(__DIR__))
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (\Illuminate\Routing\Exceptions\InvalidSignatureException $e, $request) {
+            if ($request->routeIs('trial-feedback.*')) {
+                return response('Dieser Feedbacklink ist ungültig oder abgelaufen. Bitte kontaktiere uns über shopware-seomaster.com/kontakt.', 403)
+                    ->header('Content-Type', 'text/plain; charset=UTF-8')
+                    ->header('X-Robots-Tag', 'noindex, nofollow');
+            }
             if ($request->routeIs('verification.verify')) {
                 return redirect()->route('verification.notice')
                     ->with('status', 'verification-link-invalid');

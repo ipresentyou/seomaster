@@ -13,9 +13,10 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\DB;
 
 /**
- * Runs daily.
+ * Runs hourly via deployment/seomaster-trials.cron (also safe to run manually).
  * Finds all trial subscriptions whose trial_ends_at has passed,
  * marks them as cancelled, and notifies the user.
  */
@@ -28,37 +29,41 @@ class ExpireTrialsJob implements ShouldQueue
 
     public function handle(): void
     {
-        $expired = Subscription::query()
+        // Access checks enforce the deadline independently of this status reconciliation.
+        Subscription::query()
             ->where('status', 'trial')
             ->where('trial_ends_at', '<=', now())
-            ->with('user', 'plan')
-            ->get();
+            ->update(['status' => 'cancelled', 'cancelled_at' => now()]);
 
-        if ($expired->isEmpty()) {
-            Log::info('[ExpireTrials] No expired trials found.');
-            return;
-        }
+        // Retry pending deliveries, without mailing months-old trials at rollout.
+        $candidates = Subscription::where('status', 'cancelled')
+            ->whereBetween('trial_ends_at', [now()->subDays(7), now()])
+            ->whereNull('trial_feedback_sent_at')
+            ->whereHas('user', fn ($user) => $user->whereNotNull('email_verified_at'))
+            ->pluck('id');
 
-        Log::info("[ExpireTrials] Processing {$expired->count()} expired trial(s).");
-
-        foreach ($expired as $subscription) {
+        $failed = false;
+        foreach ($candidates as $id) {
             try {
-                $subscription->update([
-                    'status'       => 'cancelled',
-                    'cancelled_at' => now(),
-                ]);
-
-                if ($subscription->user && $subscription->user->email) {
-                    Mail::to($subscription->user->email)
-                        ->send(new TrialExpiredMail($subscription));
-                }
-
-                Log::info("[ExpireTrials] Expired trial for user #{$subscription->user_id} ({$subscription->user?->email}).");
+                DB::transaction(function () use ($id) {
+                    $subscription = Subscription::with('user', 'plan')->lockForUpdate()->find($id);
+                    if (! $subscription || $subscription->trial_feedback_sent_at || $subscription->status !== 'cancelled') {
+                        return;
+                    }
+                    if (! $subscription->user || $subscription->user->hasActiveSubscription()) {
+                        return;
+                    }
+                    Mail::to($subscription->user->email)->send(new TrialExpiredMail($subscription));
+                    $subscription->update(['trial_feedback_sent_at' => now()]);
+                });
             } catch (\Throwable $e) {
-                Log::error("[ExpireTrials] Failed for subscription #{$subscription->id}: {$e->getMessage()}");
+                $failed = true;
+                Log::error('[ExpireTrials] Feedback delivery failed', ['subscription_id' => $id, 'error' => $e->getMessage()]);
             }
         }
 
-        Log::info("[ExpireTrials] Done. {$expired->count()} trial(s) expired.");
+        if ($failed) {
+            throw new \RuntimeException('Trial feedback delivery failed; pending deliveries will be retried.');
+        }
     }
 }

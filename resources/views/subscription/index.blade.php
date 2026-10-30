@@ -271,9 +271,12 @@
 @endif
 
 {{-- ── Pricing Toggle ─────────────────────────────────────── --}}
+@if (! $subscription && ! $canStartTrial)
+    <p style="text-align:center; margin-bottom:24px; color:var(--text-2);">Dein Zugang ist derzeit nicht aktiv. Wähle ein Abonnement, um die SEO-Tools weiter zu nutzen. Deine Projekte und Einstellungen bleiben erhalten.</p>
+@endif
 <div class="pricing-header">
     <h2>Plan wählen oder wechseln</h2>
-    <div style="color:var(--text-3);font-size:13px;">Starter Plan: 3 Tage gratis testen (inkl. 10 KI-Calls/Tag ohne eigenen API-Key) | Pro & Agency: PayPal Abrechnung</div>
+    <div style="color:var(--text-3);font-size:13px;">Einmalig 3 Tage gratis testen (inkl. 10 KI-Calls/Tag ohne eigenen API-Key). Danach mit einem PayPal-Abonnement weiterarbeiten.</div>
     <div style="display:flex;align-items:center;justify-content:center;margin-top:10px;">
         <div class="billing-toggle">
             <button class="toggle-btn active" id="btn-monthly" onclick="setBilling('monthly')">Monatlich</button>
@@ -367,7 +370,7 @@
 
             @if($isCurrent)
                 <button class="pricing-cta cta-current">✓ Aktueller Plan</button>
-            @elseif($plan->slug === 'starter')
+            @elseif($plan->slug === 'starter' && $canStartTrial)
                 {{-- Starter Plan: Local Trial --}}
                 <a href="{{ route('subscription.start-trial') }}" 
                    class="pricing-cta {{ $isPopular ? 'cta-primary' : 'cta-secondary' }}">

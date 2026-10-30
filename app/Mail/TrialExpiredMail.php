@@ -10,6 +10,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\URL;
 
 class TrialExpiredMail extends Mailable
 {
@@ -22,13 +23,17 @@ class TrialExpiredMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: '🔴 Dein SEOmaster-Trial ist abgelaufen'
+            subject: 'Deine SEOmaster-Testphase ist vorbei – wie war dein Eindruck?'
         );
     }
 
     public function content(): Content
     {
-        return new Content(view: 'emails.trial.expired');
+        return new Content(view: 'emails.trial.expired', with: [
+            'feedbackUrl' => URL::temporarySignedRoute('trial-feedback.show', now()->addDays(30), [
+                'subscription' => $this->subscription->id,
+            ]),
+        ]);
     }
 
     public function attachments(): array

@@ -1,0 +1,3 @@
+# Install as /etc/cron.d/seomaster-trials (root:root, mode 0644).
+# Only trigger the trial lifecycle; unrelated billing schedules are not activated.
+5 * * * * www-data cd /var/www/seomaster && /usr/bin/php artisan lavarell:expire-trials >> /var/www/seomaster/storage/logs/trial-scheduler.log 2>&1
