@@ -167,21 +167,22 @@
     <div class="welcome-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
     <div style="flex:1;">
         <div style="font-size:18px; font-weight:600; letter-spacing:-0.02em;">
-            Willkommen zurück, {{ explode(' ', auth()->user()->name)[0] }}! 👋
+            {{ auth()->user()->created_at->gt(now()->subDay()) ? 'Willkommen' : 'Willkommen zurück' }}, {{ explode(' ', auth()->user()->name)[0] }}! 👋
         </div>
         <div style="font-size:12px; color:var(--text-2); margin-top:3px;">
             @if(auth()->user()->hasActiveSubscription())
                 @php $sub = auth()->user()->activeSubscription; @endphp
                 Du bist auf dem <strong style="color:#4285f4">{{ $sub->plan->name }}</strong>-Plan.
                 @if($sub->isOnTrial())
-                    Testphase endet {{ $sub->trial_ends_at->locale("de")->diffForHumans() }}.
+                    @php $trialDaysLeft = (int) ceil(max(0, now()->diffInDays($sub->trial_ends_at, false))); @endphp
+                    Testphase endet am {{ $sub->trial_ends_at->format('d.m.Y') }} (noch {{ $trialDaysLeft }} {{ $trialDaysLeft === 1 ? 'Tag' : 'Tage' }}).
                     @php
                         $todayUsage = \App\Models\ApiUsage::getTodayUsage(auth()->id(), 'openai') + \App\Models\ApiUsage::getTodayUsage(auth()->id(), 'gemini');
                         $remaining = max(0, 10 - $todayUsage);
                     @endphp
                     @if($remaining > 0)
                         <div style="margin-top:4px; font-size:11px; color:var(--success);">
-                            🤖 {{ $remaining }} von 10 KI-Calls heute verfügbar
+                            🤖 {{ $remaining }} von 10 kostenlosen KI-Calls heute verfügbar (Testphase, ohne eigenen API-Key)
                         </div>
                     @else
                         <div style="margin-top:4px; font-size:11px; color:var(--warning);">

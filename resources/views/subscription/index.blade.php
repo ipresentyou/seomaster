@@ -245,7 +245,7 @@
         @if($subscription->isOnTrial())
             @php
                 $trialDays = 3;
-                $daysLeft = max(0, now()->diffInDays($subscription->trial_ends_at, false));
+                $daysLeft = (int) ceil(max(0, now()->diffInDays($subscription->trial_ends_at, false)));
                 $progress = round((1 - $daysLeft / $trialDays) * 100);
             @endphp
             <div class="trial-bar" style="margin-top:10px; max-width:300px;">
@@ -273,7 +273,7 @@
 {{-- ── Pricing Toggle ─────────────────────────────────────── --}}
 <div class="pricing-header">
     <h2>Plan wählen oder wechseln</h2>
-    <div style="color:var(--text-3);font-size:13px;">Starter Plan: 3 Tage gratis testen | Pro & Agency: PayPal Abrechnung</div>
+    <div style="color:var(--text-3);font-size:13px;">Starter Plan: 3 Tage gratis testen (inkl. 10 KI-Calls/Tag ohne eigenen API-Key) | Pro & Agency: PayPal Abrechnung</div>
     <div style="display:flex;align-items:center;justify-content:center;margin-top:10px;">
         <div class="billing-toggle">
             <button class="toggle-btn active" id="btn-monthly" onclick="setBilling('monthly')">Monatlich</button>
