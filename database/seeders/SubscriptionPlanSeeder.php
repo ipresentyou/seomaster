@@ -96,6 +96,12 @@ class SubscriptionPlanSeeder extends Seeder
         ];
 
         foreach ($plans as $plan) {
+            // Preserve IDs configured through the admin/API when no environment override exists.
+            foreach (['paypal_plan_id_monthly', 'paypal_plan_id_yearly'] as $field) {
+                if (blank($plan[$field])) {
+                    unset($plan[$field]);
+                }
+            }
             SubscriptionPlan::updateOrCreate(
                 ['slug' => $plan['slug']],
                 $plan

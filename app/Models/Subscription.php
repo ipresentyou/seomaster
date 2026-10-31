@@ -13,7 +13,7 @@ class Subscription extends Model
         'user_id', 'subscription_plan_id',
         'status', 'billing_cycle',
         'trial_ends_at', 'current_period_start', 'current_period_end',
-        'cancelled_at', 'paypal_subscription_id', 'paypal_order_id',
+        'cancelled_at', 'paypal_subscription_id', 'paypal_order_id', 'paypal_status',
         'amount', 'currency',
         'trial_feedback_sent_at',
     ];

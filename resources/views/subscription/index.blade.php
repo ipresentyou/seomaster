@@ -215,6 +215,9 @@
 </div>
 
 {{-- ── Current Plan ───────────────────────────────────────── --}}
+@if (config('paypal.mode') === 'sandbox')
+    <p style="padding:16px; margin-bottom:24px; border:1px solid #f59e0b; border-radius:8px; color:var(--text-2);">PayPal läuft derzeit im Testbetrieb. Buchungen verwenden PayPal-Testkonten; es erfolgt keine echte Abbuchung.</p>
+@endif
 @if($subscription)
 <div class="current-plan-banner">
     <div class="plan-badge-big">

@@ -37,6 +37,7 @@ class TrialLifecycleTest extends TestCase
             '2024_01_01_000005_add_onboarding_to_users_table.php',
             '2026_02_25_210346_create_permission_tables.php',
             '2026_10_30_000001_add_trial_feedback.php',
+            '2026_10_31_000001_allow_pending_subscriptions.php',
         ] as $migration) {
             (require database_path('migrations/' . $migration))->up();
         }
@@ -229,5 +230,45 @@ class TrialLifecycleTest extends TestCase
         $this->assertStringContainsString('Mir fehlen Funktionen', $text);
         $this->assertStringContainsString('Mehr Filter bitte', $text);
         $this->assertStringContainsString('/admin/trial-feedbacks', $text);
+    }
+
+    public function test_monthly_and_yearly_checkout_store_pending_and_redirect_to_paypal(): void
+    {
+        $sub = $this->trial();
+        $plan = $sub->plan;
+        $plan->update(['paypal_plan_id_monthly' => 'P-MONTH', 'paypal_plan_id_yearly' => 'P-YEAR']);
+        foreach (['monthly' => 'P-MONTH', 'yearly' => 'P-YEAR'] as $cycle => $id) {
+            $approval = 'https://www.sandbox.paypal.com/webapps/billing/subscriptions?ba_token=TEST-' . $cycle;
+            $this->app->make(PayPalService::class)->shouldReceive('createSubscription')->once()
+                ->with($id, route('subscription.success'), route('subscription.cancel'), Mockery::type('array'))
+                ->andReturn(['id' => 'I-TEST-' . $cycle, 'approve_url' => $approval]);
+            $this->actingAs($sub->user)->post(route('subscription.checkout'), [
+                'plan_id' => $plan->id, 'billing_cycle' => $cycle,
+            ])->assertRedirect($approval);
+            $pending = Subscription::where('paypal_subscription_id', 'I-TEST-' . $cycle)->firstOrFail();
+            $this->assertSame('pending', $pending->status);
+            $this->assertSame('APPROVAL_PENDING', $pending->paypal_status);
+            $this->assertFalse($pending->isActive());
+            $this->assertSame($cycle, $pending->billing_cycle);
+        }
+    }
+
+    public function test_missing_plan_id_does_not_call_paypal_or_create_subscription(): void
+    {
+        $sub = $this->trial();
+        $this->app->make(PayPalService::class)->shouldNotReceive('createSubscription');
+        $this->actingAs($sub->user)->from(route('subscription.index'))->post(route('subscription.checkout'), [
+            'plan_id' => $sub->subscription_plan_id, 'billing_cycle' => 'monthly',
+        ])->assertRedirect(route('subscription.index'))->assertSessionHasErrors('plan');
+        $this->assertSame(1, Subscription::count());
+    }
+
+    public function test_reseeding_does_not_clear_existing_paypal_plan_ids(): void
+    {
+        $sub = $this->trial();
+        $sub->plan->update(['paypal_plan_id_monthly' => 'P-KEEP-MONTH', 'paypal_plan_id_yearly' => 'P-KEEP-YEAR']);
+        $this->seed(\Database\Seeders\SubscriptionPlanSeeder::class);
+        $this->assertSame('P-KEEP-MONTH', $sub->plan->fresh()->paypal_plan_id_monthly);
+        $this->assertSame('P-KEEP-YEAR', $sub->plan->fresh()->paypal_plan_id_yearly);
     }
 }

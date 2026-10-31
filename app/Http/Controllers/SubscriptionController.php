@@ -114,7 +114,8 @@ class SubscriptionController extends Controller
                 'monthly_id' => $plan->paypal_plan_id_monthly,
                 'yearly_id' => $plan->paypal_plan_id_yearly,
             ]);
-            return back()->withErrors(['plan' => 'Dieser Plan ist noch nicht für ' . $cycle . ' Abrechnung konfiguriert.']);
+            $billingLabel = $cycle === 'yearly' ? 'jährliche' : 'monatliche';
+            return back()->withErrors(['plan' => "Der Tarif {$plan->name} ist für die {$billingLabel} Abrechnung derzeit nicht verfügbar. Bitte kontaktiere uns über das Kontaktformular."]);
         }
 
         // Offene pending-Subs wegräumen

@@ -36,7 +36,7 @@ return new class extends Migration
             $table->string('paypal_status')->nullable();   // ACTIVE, SUSPENDED, CANCELLED
 
             $table->enum('billing_cycle', ['monthly', 'yearly'])->default('monthly');
-            $table->enum('status', ['active', 'cancelled', 'suspended', 'trial'])->default('trial');
+            $table->enum('status', ['active', 'cancelled', 'suspended', 'trial', 'pending'])->default('trial');
 
             $table->timestamp('trial_ends_at')->nullable();
             $table->timestamp('current_period_start')->nullable();
