@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\TrialFeedbackReceived;
 use App\Models\Subscription;
 use App\Models\TrialFeedback;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\Rule;
 
 class TrialFeedbackController extends Controller
@@ -30,12 +32,17 @@ class TrialFeedbackController extends Controller
         ]);
 
         // The unique subscription key also prevents duplicate submissions from parallel requests.
-        TrialFeedback::query()->insertOrIgnore([
+        $inserted = TrialFeedback::query()->insertOrIgnore([
             ...$data,
             'subscription_id' => $subscription->id,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
+
+        if ($inserted) {
+            $feedback = TrialFeedback::where('subscription_id', $subscription->id)->firstOrFail();
+            Mail::to(config('mail.feedback_recipient'))->queue(new TrialFeedbackReceived($feedback));
+        }
 
         return redirect()->to($request->fullUrl());
     }

@@ -3,6 +3,7 @@
 use App\Http\Middleware\EnsureSubscriptionIsActive;
 use App\Jobs\ExpireTrialsJob;
 use App\Mail\TrialExpiredMail;
+use App\Mail\TrialFeedbackReceived;
 use App\Models\Subscription;
 use App\Models\SubscriptionPlan;
 use App\Models\TrialFeedback;
@@ -150,6 +151,10 @@ class TrialLifecycleTest extends TestCase
         $this->assertSame(1, TrialFeedback::count());
         $this->assertSame(4, (int) TrialFeedback::first()->rating);
         $this->get($url)->assertOk()->assertSee('Danke für dein Feedback!');
+        Mail::assertQueued(TrialFeedbackReceived::class, 1);
+        Mail::assertQueued(TrialFeedbackReceived::class, fn ($mail) =>
+            $mail->hasTo('mail@kreativ.team') && (int) $mail->feedback->rating === 4
+        );
     }
 
     public function test_feedback_rejects_missing_tampered_expired_links_and_invalid_answers(): void
@@ -160,6 +165,7 @@ class TrialLifecycleTest extends TestCase
         $this->get($url . 'tampered')->assertForbidden();
         $this->postJson($url, ['rating' => 9, 'reason' => 'made_up'])->assertUnprocessable();
         $this->assertSame(0, TrialFeedback::count());
+        Mail::assertNothingQueued();
         $this->travel(2)->days();
         $this->get($url)->assertForbidden();
         $this->post($url, ['rating' => 4, 'reason' => 'price'])->assertForbidden();
@@ -208,5 +214,20 @@ class TrialLifecycleTest extends TestCase
         $this->actingAs($sub->user)->get(route('subscription.index'))
             ->assertOk()->assertSee('Mit PayPal starten')
             ->assertDontSee('href="' . route('subscription.start-trial') . '"', false);
+    }
+
+    public function test_feedback_notification_contains_customer_rating_reason_comment_and_admin_link(): void
+    {
+        $sub = $this->trial();
+        $feedback = TrialFeedback::create([
+            'subscription_id' => $sub->id, 'rating' => 5, 'reason' => 'features',
+            'comment' => 'Mehr Filter bitte',
+        ]);
+        $text = (new TrialFeedbackReceived($feedback))->render();
+        $this->assertStringContainsString($sub->user->email, $text);
+        $this->assertStringContainsString('5 von 5', $text);
+        $this->assertStringContainsString('Mir fehlen Funktionen', $text);
+        $this->assertStringContainsString('Mehr Filter bitte', $text);
+        $this->assertStringContainsString('/admin/trial-feedbacks', $text);
     }
 }

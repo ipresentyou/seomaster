@@ -16,6 +16,8 @@ return [
 
     'default' => env('MAIL_MAILER', 'log'),
 
+    'feedback_recipient' => env('FEEDBACK_NOTIFICATION_EMAIL', 'mail@kreativ.team'),
+
     /*
     |--------------------------------------------------------------------------
     | Mailer Configurations
