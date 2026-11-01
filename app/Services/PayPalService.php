@@ -169,7 +169,7 @@ class PayPalService
      */
     public function listBillingPlans(int $pageSize = 20): array
     {
-        return Cache::remember('paypal_billing_plans', 3600, function () use ($pageSize) {
+        return Cache::remember('paypal_billing_plans_' . $this->mode . '_' . config('paypal.product_id'), 3600, function () use ($pageSize) {
             try {
                 $response = $this->client->listPlans([
                     'product_id' => config('paypal.product_id'),
@@ -250,7 +250,7 @@ class PayPalService
      */
     private function getAccessToken(): string
     {
-        return Cache::remember('paypal_access_token', 3300, function () {
+        return Cache::remember('paypal_access_token_' . $this->mode, 3300, function () {
             $baseUrl  = $this->mode === 'live'
                 ? 'https://api-m.paypal.com'
                 : 'https://api-m.sandbox.paypal.com';

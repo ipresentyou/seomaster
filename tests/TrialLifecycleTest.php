@@ -271,4 +271,55 @@ class TrialLifecycleTest extends TestCase
         $this->assertSame('P-KEEP-MONTH', $sub->plan->fresh()->paypal_plan_id_monthly);
         $this->assertSame('P-KEEP-YEAR', $sub->plan->fresh()->paypal_plan_id_yearly);
     }
+
+    public function test_paid_webhook_records_payment_once_and_displays_it_in_history(): void
+    {
+        $sub = $this->trial(null, 'pending');
+        $sub->update(['paypal_subscription_id' => 'I-PAID-TEST']);
+        $this->app->make(PayPalService::class)->shouldReceive('verifyWebhookSignature')->twice()->andReturnTrue();
+        $invoices = Mockery::mock(\App\Services\InvoiceService::class);
+        $invoices->shouldReceive('createForSubscription')->once()->andReturn(new \App\Models\Invoice());
+        $this->app->instance(\App\Services\InvoiceService::class, $invoices);
+        $event = ['event_type' => 'PAYMENT.SALE.COMPLETED', 'resource' => [
+            'id' => 'SALE-TEST', 'billing_agreement_id' => 'I-PAID-TEST',
+            'amount' => ['total' => '19.00', 'currency' => 'EUR'],
+        ]];
+        $this->postJson(route('webhooks.paypal'), $event)->assertOk();
+        $this->postJson(route('webhooks.paypal'), $event)->assertOk();
+        $this->assertSame('active', $sub->fresh()->status);
+        $this->assertSame(1, $sub->invoices()->count());
+        $this->assertSame(19.0, $sub->invoices()->first()->amount);
+        $this->withoutVite();
+        $this->actingAs($sub->user)->get(route('subscription.index'))->assertOk()->assertSee('SALE-TEST');
+    }
+
+    public function test_invalid_webhooks_are_rejected_and_failures_return_retryable_error(): void
+    {
+        $paypal = $this->app->make(PayPalService::class);
+        $paypal->shouldReceive('verifyWebhookSignature')->once()->andReturnFalse();
+        $this->postJson(route('webhooks.paypal'), ['event_type' => 'PAYMENT.SALE.COMPLETED'])->assertUnauthorized();
+        $paypal->shouldReceive('verifyWebhookSignature')->once()->andReturnTrue();
+        $sub = $this->trial(null, 'pending');
+        $sub->update(['paypal_subscription_id' => 'I-FAIL-TEST']);
+        $paypal->shouldReceive('getSubscription')->once()->andThrow(new RuntimeException('PayPal unavailable'));
+        $this->postJson(route('webhooks.paypal'), [
+            'event_type' => 'BILLING.SUBSCRIPTION.ACTIVATED', 'resource' => ['id' => 'I-FAIL-TEST'],
+        ])->assertStatus(500);
+    }
+
+    public function test_activation_does_not_generate_an_invoice_before_payment(): void
+    {
+        $sub = $this->trial(null, 'pending');
+        $sub->update(['paypal_subscription_id' => 'I-ACTIVE-TEST']);
+        $this->app->make(PayPalService::class)->shouldReceive('verifyWebhookSignature')->once()->andReturnTrue();
+        $invoices = Mockery::mock(\App\Services\InvoiceService::class);
+        $invoices->shouldNotReceive('createForSubscription');
+        $this->app->instance(\App\Services\InvoiceService::class, $invoices);
+        $this->postJson(route('webhooks.paypal'), [
+            'event_type' => 'BILLING.SUBSCRIPTION.ACTIVATED',
+            'resource' => ['id' => 'I-ACTIVE-TEST', 'subscriber' => ['name' => []]],
+        ])->assertOk();
+        $this->assertSame('active', $sub->fresh()->status);
+        $this->assertSame(0, $sub->invoices()->count());
+    }
 }

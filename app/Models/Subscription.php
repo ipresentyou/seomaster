@@ -38,7 +38,7 @@ class Subscription extends Model
     }
     public function invoices()
     {
-        return $this->hasMany(self::class, "id", "id")->whereRaw("1=0");
+        return $this->hasMany(SubscriptionInvoice::class);
     }
 
     public function isActive(): bool

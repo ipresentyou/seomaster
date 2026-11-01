@@ -87,6 +87,7 @@ class SubscriptionController extends Controller
         ]);
 
         $plan  = SubscriptionPlan::findOrFail($v['plan_id']);
+        abort_unless($plan->is_active, 422, 'Dieser Tarif ist nicht verfügbar.');
         $cycle = $v['billing_cycle'];
 
         // USt-ID kann PayPal nicht liefern — hier separat sichern, falls angegeben
@@ -118,9 +119,7 @@ class SubscriptionController extends Controller
             return back()->withErrors(['plan' => "Der Tarif {$plan->name} ist für die {$billingLabel} Abrechnung derzeit nicht verfügbar. Bitte kontaktiere uns über das Kontaktformular."]);
         }
 
-        // Offene pending-Subs wegräumen
-        $deleted = Subscription::where('user_id', auth()->id())->where('status', 'pending')->delete();
-        Log::info('Pending subscriptions cleaned up', ['count' => $deleted]);
+        // Keep previous approval attempts so a later PayPal webhook can still find them.
 
         $result = $this->paypal->createSubscription(
             paypalPlanId:   $paypalPlanId,
@@ -209,9 +208,7 @@ class SubscriptionController extends Controller
     {
         Log::info('Cancel method called');
         
-        $deleted = Subscription::where('user_id', auth()->id())->where('status', 'pending')->delete();
-        
-        Log::info('Pending subscriptions deleted in cancel', ['count' => $deleted]);
+        // Preserve the PayPal reference: approval in another tab may still complete.
 
         return redirect()->route('subscription.index')
             ->with('info', 'Checkout abgebrochen. Dein aktueller Plan bleibt unverändert.');
@@ -284,6 +281,7 @@ class SubscriptionController extends Controller
             };
         } catch (\Throwable $e) {
             Log::error('PayPal webhook handler error', ['event' => $eventType, 'message' => $e->getMessage()]);
+            return response()->json(['error' => 'Webhook processing failed'], 500);
         }
 
         return response()->json(['status' => 'ok']);
@@ -308,7 +306,7 @@ class SubscriptionController extends Controller
             $this->syncBillingFromPayPal($sub->user, $details);
         }
 
-        $this->generateInvoice($sub);
+        // Invoices are generated from confirmed payments, not activation events.
     }
 
     /**

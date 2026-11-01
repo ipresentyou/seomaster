@@ -19,7 +19,14 @@ class InvoiceService
         $seller  = config('invoice.seller');
         $taxRate = config('invoice.tax_rate', 19);
 
-        $gross  = round((float) $subscription->amount, 2);
+        // Do not create empty drafts or issue invoices with placeholder seller details.
+        if (! class_exists(Pdf::class) || blank($seller['company'] ?? null)
+            || blank($seller['address'] ?? null) || blank($seller['zip'] ?? null)
+            || blank($seller['city'] ?? null)) {
+            throw new \RuntimeException('Automatische Rechnungen benötigen den PDF-Renderer und vollständige Rechnungsstellerdaten. Die Zahlung bleibt im Zahlungsprotokoll gespeichert.');
+        }
+        $payment = $subscription->invoices()->where('status', 'paid')->latest('paid_at')->latest('id')->firstOrFail();
+        $gross  = round((float) $payment->amount, 2);
         $net    = round($gross / (1 + $taxRate / 100), 2);
         $tax    = round($gross - $net, 2);
 
@@ -32,7 +39,7 @@ class InvoiceService
             'tax_rate'        => $taxRate,
             'tax_amount'      => $tax,
             'gross_amount'    => $gross,
-            'currency'        => $subscription->currency ?? 'EUR',
+            'currency'        => $payment->currency,
             'description'     => 'SEOmaster ' . ($plan->name ?? 'Abonnement'),
             'due_date'        => now()->addDays(config('invoice.payment_days', 14)),
             'issued_at'       => now(),
