@@ -10,7 +10,7 @@ use App\Models\Subscription;
 use App\Models\SubscriptionInvoice;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
-use App\Services\InvoiceService;
+use App\Jobs\SendPaidInvoice;
 use App\Services\PayPalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -369,7 +369,7 @@ class SubscriptionController extends Controller
 
         SubscriptionInvoice::create([
             'subscription_id'       => $sub->id,
-            'paypal_transaction_id' => $r['id'] ?? null,
+            'paypal_transaction_id' => null,
             'amount'                => (float) ($r['amount']['value'] ?? $r['amount']['total'] ?? 0),
             'currency'              => strtoupper($r['amount']['currency_code'] ?? $r['amount']['currency'] ?? 'EUR'),
             'status'                => 'failed',
@@ -386,15 +386,18 @@ class SubscriptionController extends Controller
         if (! $sub) return;
 
         // Duplicate guard
-        if (SubscriptionInvoice::where('paypal_transaction_id', $r['id'])->exists()) return;
+        if ($existing = SubscriptionInvoice::where('paypal_transaction_id', $r['id'])->first()) {
+            SendPaidInvoice::dispatch($existing->id);
+            return;
+        }
 
-        SubscriptionInvoice::create([
+        $payment = SubscriptionInvoice::create([
             'subscription_id'       => $sub->id,
             'paypal_transaction_id' => $r['id'],
             'amount'                => (float) ($r['amount']['total'] ?? $r['amount']['value'] ?? 0),
             'currency'              => strtoupper($r['amount']['currency'] ?? $r['amount']['currency_code'] ?? 'EUR'),
             'status'                => 'paid',
-            'paid_at'               => now(),
+            'paid_at'               => $r['create_time'] ?? now(),
         ]);
 
         $sub->update([
@@ -403,16 +406,7 @@ class SubscriptionController extends Controller
             'current_period_start' => now(),
             'current_period_end'   => $sub->billing_cycle === 'yearly' ? now()->addYear() : now()->addMonth(),
         ]);
-        $this->generateInvoice($sub);
-    }
-
-    private function generateInvoice(Subscription $sub): void
-    {
-        try {
-            app(InvoiceService::class)->createForSubscription($sub->load(['user', 'plan']));
-        } catch (\Throwable $e) {
-            Log::error('Invoice generation failed', ['subscription_id' => $sub->id, 'error' => $e->getMessage()]);
-        }
+        SendPaidInvoice::dispatch($payment->id);
     }
 
     private function handlePaymentRefunded(array $r): void

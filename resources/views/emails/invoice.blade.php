@@ -17,23 +17,21 @@
 <body>
 <div class="card">
     <h1>📄 Ihre Rechnung ist bereit</h1>
-    <p>vielen Dank für Ihr Vertrauen in SEOmaster. Im Anhang finden Sie Ihre Rechnung als PDF und als XRechnung (XML) für Ihre Buchhaltung.</p>
+    <p>Vielen Dank für Ihr Vertrauen in SEOmaster. Im Anhang finden Sie Ihre Rechnung als PDF für Ihre Buchhaltung.</p>
 
     <div class="invoice-box">
         <div class="inv-number">{{ $invoice->invoice_number }}</div>
         <div class="inv-meta">{{ $invoice->description }}</div>
-        <div class="inv-meta">Ausgestellt: {{ $invoice->issued_at->format('d.m.Y') }} · Fällig: {{ $invoice->due_date->format('d.m.Y') }}</div>
+        <div class="inv-meta">Ausgestellt: {{ $invoice->issued_at->format('d.m.Y') }} · Bezahlt: {{ $invoice->paid_at->format('d.m.Y') }}</div>
         <div class="amount">{{ number_format($invoice->gross_amount, 2, ',', '.') }} {{ $invoice->currency }}</div>
         <div class="inv-meta" style="margin-top:4px;">inkl. {{ number_format($invoice->tax_rate, 0) }} % MwSt. ({{ number_format($invoice->tax_amount, 2, ',', '.') }} {{ $invoice->currency }})</div>
     </div>
 
-    <p>Bitte überweisen Sie den Betrag bis zum <strong>{{ $invoice->due_date->format('d.m.Y') }}</strong> unter Angabe der Rechnungsnummer <strong>{{ $invoice->invoice_number }}</strong>.</p>
+    <p>Der Rechnungsbetrag wurde bereits per PayPal bezahlt. Bitte überweisen Sie ihn nicht erneut.</p>
 
     @if($seller['iban'])
     <p><strong>IBAN:</strong> {{ $seller['iban'] }}@if($seller['bic']) &nbsp;·&nbsp; <strong>BIC:</strong> {{ $seller['bic'] }}@endif</p>
     @endif
-
-    <p style="font-size:13px;color:#888;">Die XRechnung-Datei (XML) entspricht dem deutschen Standard EN 16931 / XRechnung 3.0 und kann direkt in Ihre Buchhaltungssoftware importiert werden.</p>
 
     <div class="footer">
         {{ $seller['company'] }} · {{ $seller['address'] }}, {{ $seller['zip'] }} {{ $seller['city'] }}<br>

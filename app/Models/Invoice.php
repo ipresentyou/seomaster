@@ -14,6 +14,7 @@ class Invoice extends Model
         'net_amount', 'tax_rate', 'tax_amount', 'gross_amount',
         'currency', 'description', 'pdf_path', 'xml_path',
         'due_date', 'issued_at',
+        'subscription_invoice_id', 'service_period_start', 'service_period_end', 'paid_at',
     ];
 
     protected $casts = [
@@ -23,6 +24,9 @@ class Invoice extends Model
         'gross_amount' => 'float',
         'due_date'     => 'date',
         'issued_at'    => 'datetime',
+        'service_period_start' => 'datetime',
+        'service_period_end' => 'datetime',
+        'paid_at' => 'datetime',
     ];
 
     public function user(): BelongsTo
@@ -38,7 +42,8 @@ class Invoice extends Model
     public static function nextNumber(): string
     {
         $year  = now()->year;
-        $count = static::whereYear('created_at', $year)->count() + 1;
+        $last = static::where('invoice_number', 'like', 'RE-' . $year . '-%')->latest('id')->value('invoice_number');
+        $count = $last ? (int) substr($last, strrpos($last, '-') + 1) + 1 : 1;
         return sprintf('RE-%d-%04d', $year, $count);
     }
 }

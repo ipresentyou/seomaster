@@ -54,7 +54,8 @@ body { font-family: DejaVu Sans, sans-serif; font-size:11px; color:#1a1a1a; }
         <div class="logo-sub">{{ $seller['company'] }}</div>
     </div>
     <div class="doc-col">
-        <div class="doc-title">RECHNUNG</div>
+        <div class="doc-title">{{ ($preview ?? false) ? 'MUSTERRECHNUNG' : 'RECHNUNG' }}</div>
+        @if($preview ?? false)<div>Nur zur Vorschau · keine Zahlungsforderung</div>@endif
         <div class="doc-number">{{ $invoice->invoice_number }}</div>
     </div>
 </div>
@@ -100,9 +101,9 @@ body { font-family: DejaVu Sans, sans-serif; font-size:11px; color:#1a1a1a; }
     </tr>
     <tr>
         <td class="label">Leistungszeitraum</td>
-        <td class="value">{{ $invoice->issued_at->format('M Y') }}</td>
-        <td class="label">Fällig am</td>
-        <td class="value">{{ $invoice->due_date->format('d.m.Y') }}</td>
+        <td class="value">{{ $invoice->service_period_start->format('d.m.Y') }} – {{ $invoice->service_period_end->copy()->subDay()->format('d.m.Y') }}</td>
+        <td class="label">Bezahlt am</td>
+        <td class="value">{{ $invoice->paid_at->format('d.m.Y') }}</td>
     </tr>
 </table>
 
@@ -119,7 +120,7 @@ body { font-family: DejaVu Sans, sans-serif; font-size:11px; color:#1a1a1a; }
     <tbody>
         <tr>
             <td>{{ $invoice->description }}<br>
-                <span style="color:#888;font-size:10px;">Nutzungszeitraum: {{ $invoice->issued_at->format('d.m.Y') }} – {{ $invoice->due_date->subDay()->format('d.m.Y') }}</span>
+                <span style="color:#888;font-size:10px;">Nutzungszeitraum: {{ $invoice->service_period_start->format('d.m.Y') }} – {{ $invoice->service_period_end->copy()->subDay()->format('d.m.Y') }}</span>
             </td>
             <td class="right">{{ number_format($invoice->net_amount, 2, ',', '.') }} €</td>
             <td class="right">{{ number_format($invoice->tax_rate, 0) }} %</td>
@@ -146,11 +147,9 @@ body { font-family: DejaVu Sans, sans-serif; font-size:11px; color:#1a1a1a; }
 
 {{-- Payment --}}
 <div class="payment" style="margin-top:32px;">
-    <strong>Zahlungshinweis:</strong> Bitte überweisen Sie den Betrag von
-    <strong>{{ number_format($invoice->gross_amount, 2, ',', '.') }} €</strong>
-    bis zum <strong>{{ $invoice->due_date->format('d.m.Y') }}</strong> unter Angabe der Rechnungsnummer
-    <strong>{{ $invoice->invoice_number }}</strong> auf folgendes Konto:<br>
-    IBAN: {{ $seller['iban'] }}@if($seller['bic'])  · BIC: {{ $seller['bic'] }}@endif
+    <strong>Zahlungshinweis:</strong> Der Betrag von
+    <strong>{{ number_format($invoice->gross_amount, 2, ',', '.') }} {{ $invoice->currency }}</strong>
+    wurde bereits per PayPal bezahlt. Bitte nicht erneut überweisen.
 </div>
 
 {{-- Footer --}}
@@ -158,6 +157,10 @@ body { font-family: DejaVu Sans, sans-serif; font-size:11px; color:#1a1a1a; }
     {{ $seller['company'] }} · {{ $seller['address'] }}, {{ $seller['zip'] }} {{ $seller['city'] }}
     @if($seller['vat_id']) · USt-IdNr.: {{ $seller['vat_id'] }} @endif
     @if($seller['tax_number']) · Steuernr.: {{ $seller['tax_number'] }} @endif
+    @if($seller['director'] ?? '')<br>Geschäftsführer: {{ $seller['director'] }}@endif
+    @if(($seller['register_court'] ?? '') && ($seller['register_number'] ?? ''))<br>Registergericht: {{ $seller['register_court'] }} · {{ $seller['register_number'] }}@endif
+    <br>{{ $seller['email'] }}@if($seller['website'] ?? '') · {{ $seller['website'] }}@endif
+    @if($seller['iban'])<br>{{ $seller['bank'] ?? '' }} · IBAN: {{ $seller['iban'] }}@if($seller['bic']) · BIC: {{ $seller['bic'] }}@endif @endif
 </div>
 
 </div>

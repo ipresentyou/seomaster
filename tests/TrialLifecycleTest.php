@@ -36,8 +36,11 @@ class TrialLifecycleTest extends TestCase
             '2024_01_01_000004_create_seo_tables.php',
             '2024_01_01_000005_add_onboarding_to_users_table.php',
             '2026_02_25_210346_create_permission_tables.php',
+            '2026_05_29_000001_create_invoices_table.php',
+            '2026_05_29_000002_add_billing_fields_to_users_table.php',
             '2026_10_30_000001_add_trial_feedback.php',
             '2026_10_31_000001_allow_pending_subscriptions.php',
+            '2026_11_02_000001_link_invoices_to_payments.php',
         ] as $migration) {
             (require database_path('migrations/' . $migration))->up();
         }
@@ -277,9 +280,7 @@ class TrialLifecycleTest extends TestCase
         $sub = $this->trial(null, 'pending');
         $sub->update(['paypal_subscription_id' => 'I-PAID-TEST']);
         $this->app->make(PayPalService::class)->shouldReceive('verifyWebhookSignature')->twice()->andReturnTrue();
-        $invoices = Mockery::mock(\App\Services\InvoiceService::class);
-        $invoices->shouldReceive('createForSubscription')->once()->andReturn(new \App\Models\Invoice());
-        $this->app->instance(\App\Services\InvoiceService::class, $invoices);
+        \Illuminate\Support\Facades\Queue::fake([\App\Jobs\SendPaidInvoice::class]);
         $event = ['event_type' => 'PAYMENT.SALE.COMPLETED', 'resource' => [
             'id' => 'SALE-TEST', 'billing_agreement_id' => 'I-PAID-TEST',
             'amount' => ['total' => '19.00', 'currency' => 'EUR'],
@@ -289,6 +290,7 @@ class TrialLifecycleTest extends TestCase
         $this->assertSame('active', $sub->fresh()->status);
         $this->assertSame(1, $sub->invoices()->count());
         $this->assertSame(19.0, $sub->invoices()->first()->amount);
+        \Illuminate\Support\Facades\Queue::assertPushed(\App\Jobs\SendPaidInvoice::class, 2);
         $this->withoutVite();
         $this->actingAs($sub->user)->get(route('subscription.index'))->assertOk()->assertSee('SALE-TEST');
     }
@@ -321,5 +323,78 @@ class TrialLifecycleTest extends TestCase
         ])->assertOk();
         $this->assertSame('active', $sub->fresh()->status);
         $this->assertSame(0, $sub->invoices()->count());
+    }
+
+    private function invoicePayment(string $cycle = 'monthly'): \App\Models\SubscriptionInvoice
+    {
+        \Illuminate\Support\Facades\Storage::fake('local');
+        config(['invoice.enabled' => true, 'invoice.seller' => [
+            'company' => 'Testfirma GmbH', 'name' => '', 'address' => 'Teststraße 1',
+            'zip' => '12345', 'city' => 'Teststadt', 'country' => 'DE', 'vat_id' => 'DE123456789',
+            'tax_number' => '', 'email' => 'billing@example.test', 'iban' => '', 'bic' => '',
+        ]]);
+        $sub = $this->trial(null, 'active');
+        $sub->update(['billing_cycle' => $cycle]);
+        $sub->user->update(['billing_address' => 'Kundenstraße 2', 'billing_zip' => '54321', 'billing_city' => 'Kundenstadt']);
+        return $sub->invoices()->create([
+            'paypal_transaction_id' => 'SALE-' . uniqid(), 'amount' => $cycle === 'yearly' ? 190 : 19,
+            'currency' => 'EUR', 'status' => 'paid', 'paid_at' => now(),
+        ]);
+    }
+
+    public function test_invoice_pdf_uses_actual_payment_period_and_is_sent_once(): void
+    {
+        $payment = $this->invoicePayment();
+        $service = app(\App\Services\InvoiceService::class);
+        $invoice = $service->createForSubscription($payment->subscription, $payment);
+        $again = $service->createForSubscription($payment->subscription, $payment);
+        $this->assertSame($invoice->id, $again->id);
+        $this->assertSame(1, \App\Models\Invoice::count());
+        $this->assertSame('sent', $invoice->status);
+        $this->assertSame(19.0, $invoice->gross_amount);
+        $this->assertSame(15.97, $invoice->net_amount);
+        $this->assertSame(3.03, $invoice->tax_amount);
+        $this->assertSame('2026-11-30', $invoice->service_period_end->toDateString());
+        $pdf = $service->getPdfContent($invoice);
+        $this->assertStringStartsWith('%PDF-', $pdf);
+        $this->assertGreaterThan(5000, strlen($pdf));
+        $this->assertNull($invoice->xml_path);
+        $html = view('invoices.pdf', ['invoice' => $invoice, 'user' => $payment->subscription->user, 'seller' => config('invoice.seller')])->render();
+        $this->assertStringContainsString('bereits per PayPal bezahlt', $html);
+        $this->assertStringNotContainsString('Bitte überweisen', $html);
+        Mail::assertSent(\App\Mail\InvoiceMail::class, 1);
+        $this->assertCount(1, (new \App\Mail\InvoiceMail($invoice))->attachments());
+    }
+
+    public function test_yearly_invoice_period_and_retry_keep_same_number(): void
+    {
+        $payment = $this->invoicePayment('yearly');
+        Mail::shouldReceive('to')->once()->andThrow(new RuntimeException('SMTP unavailable'));
+        $service = app(\App\Services\InvoiceService::class);
+        try {
+            $service->createForSubscription($payment->subscription, $payment);
+            $this->fail('Expected failed delivery');
+        } catch (RuntimeException $e) {
+            $this->assertSame('SMTP unavailable', $e->getMessage());
+        }
+        $draft = \App\Models\Invoice::firstOrFail();
+        $this->assertSame('error', $draft->status);
+        Mail::swap(new \Illuminate\Mail\MailManager($this->app));
+        Mail::fake();
+        $invoice = $service->createForSubscription($payment->subscription, $payment);
+        $this->assertSame($draft->invoice_number, $invoice->invoice_number);
+        $this->assertSame('2027-10-30', $invoice->service_period_end->toDateString());
+        $this->assertSame(190.0, $invoice->gross_amount);
+        $this->assertSame(1, \App\Models\Invoice::count());
+        Mail::assertSent(\App\Mail\InvoiceMail::class, 1);
+    }
+
+    public function test_invoice_job_respects_disabled_switch(): void
+    {
+        config(['invoice.enabled' => false]);
+        $service = Mockery::mock(\App\Services\InvoiceService::class);
+        $service->shouldNotReceive('createForSubscription');
+        (new \App\Jobs\SendPaidInvoice(999))->handle($service);
+        Mail::assertNothingSent();
     }
 }
