@@ -699,7 +699,7 @@
                 <div class="pricing-popular">Empfohlen</div>
                 <div class="pricing-plan">Professional</div>
                 <div class="pricing-price"><sup>€</sup>49</div>
-                <div class="pricing-period">/ Monat, jährlich abgerechnet</div>
+                <div class="pricing-period">/ Monat · alternativ €490 pro Jahr</div>
                 <div class="pricing-desc">Für wachsende Shops mit mehreren Projekten.</div>
                 <ul class="pricing-features">
                     <li><span class="check">✓</span> 3 Projekte / Shops</li>
@@ -715,7 +715,7 @@
             <div class="pricing-card">
                 <div class="pricing-plan">Agency</div>
                 <div class="pricing-price"><sup>€</sup>149</div>
-                <div class="pricing-period">/ Monat, jährlich abgerechnet</div>
+                <div class="pricing-period">/ Monat · alternativ €1.490 pro Jahr</div>
                 <div class="pricing-desc">Für Agenturen, die mehrere Kundenshops verwalten.</div>
                 <ul class="pricing-features">
                     <li><span class="check">✓</span> Bis zu 20 Projekte / Shops</li>
