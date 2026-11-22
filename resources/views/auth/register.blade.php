@@ -20,6 +20,12 @@
     <form method="POST" action="{{ route('register') }}" id="registerForm">
         @csrf
 
+        {{-- Honeypot: für Menschen unsichtbar, Bots füllen es aus --}}
+        <div style="position:absolute;left:-10000px;top:auto;width:1px;height:1px;overflow:hidden;" aria-hidden="true">
+            <label for="website">Website (bitte leer lassen)</label>
+            <input type="text" id="website" name="website" value="" tabindex="-1" autocomplete="off">
+        </div>
+
         {{-- Name --}}
         <div class="form-group">
             <label class="form-label" for="name">Vollständiger Name</label>
